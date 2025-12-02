@@ -38,8 +38,126 @@ class Sweetaddons_Maintenance_Mode
             $hd     = isset($opt['header']) && !empty($opt['header']) ? $opt['header'] : 'Maintenance Mode';
             $bd     = isset($opt['body']) && !empty($opt['body']) ? $opt['body'] : '';
 
-            wp_die('<h1>' . $hd . '</h1><p>' . $bd . '</p>', 'Maintenance Mode');
+            $this->show_maintenance_page($hd, $bd);
         }
+    }
+
+    private function show_maintenance_page($title, $message)
+    {
+        // Get site information
+        $site_name = get_bloginfo('name');
+        $site_icon_url = get_site_icon_url() ? get_site_icon_url() : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiM5Q0EzQUYiLz4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMTYiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+';
+
+        // Set proper HTTP headers
+        status_header(503);
+        header('Content-Type: text/html; charset=utf-8');
+        header('Retry-After: 3600'); // Suggest retry after 1 hour
+
+?>
+        <!DOCTYPE html>
+        <html <?php language_attributes(); ?>>
+
+        <head>
+            <meta charset="<?php bloginfo('charset'); ?>">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="robots" content="noindex, nofollow">
+            <title><?php echo esc_html($title); ?> - <?php echo esc_html($site_name); ?></title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    background: #f8f9fa;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #333;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 20px;
+                }
+
+                h1 {
+                    font-size: 2rem;
+                    font-weight: 300;
+                    margin-bottom: 1rem;
+                    text-align: center;
+                    color: #000;
+                }
+
+                p {
+                    font-size: 1rem;
+                    text-align: center;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    color: #6c757d;
+                    line-height: 1.5;
+                }
+
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                /* Mobile Responsive */
+                @media (max-width: 640px) {
+                    h1 {
+                        font-size: 2rem;
+                    }
+
+                    p {
+                        font-size: 1.1rem;
+                        padding: 0 1rem;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <div style="text-align: center;">
+                <h1><?php echo esc_html($title); ?></h1>
+                <p><?php echo wp_kses_post($message); ?></p>
+            </div>
+
+            <script>
+                // Add some interactivity
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Auto-refresh every 5 minutes
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 300000);
+
+                    // Add click sound effect (optional)
+                    const clickSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBi6Gy/LaizsJHWi98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+
+                    document.querySelector('.back-to-home').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Smooth fade out
+                        document.body.style.opacity = '0';
+                        document.body.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 500);
+                    });
+                });
+            </script>
+        </body>
+
+        </html>
+<?php
+        exit;
     }
 
     public function qc_maintenance()
@@ -117,12 +235,12 @@ class Sweetaddons_Maintenance_Mode
         ob_start();
         $linksetting    = admin_url('options-general.php?page=custom_admin_options');
         $check_recaptcha = get_option('captcha_Sweetaddons', []);
-        
+
         // Ensure $check_recaptcha is an array
         if (!is_array($check_recaptcha)) {
             $check_recaptcha = [];
         }
-        
+
         $aktif  = isset($check_recaptcha['aktif']) ? $check_recaptcha['aktif'] : false;
         $sitekey    = isset($check_recaptcha['sitekey']) ? $check_recaptcha['sitekey'] : '';
         $secretkey  = isset($check_recaptcha['secretkey']) ? $check_recaptcha['secretkey'] : '';
