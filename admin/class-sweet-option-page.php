@@ -266,32 +266,42 @@ class Custom_Admin_Option_Page
         ];
 
 ?>
-        <div class="wrap vd-ons">
-            <h1>Proteksi Spam</h1>
-
-            <form method="post" action="options.php">
-                <?php settings_fields('custom_admin_options_group'); ?>
-                <?php do_settings_sections('custom_admin_options_group'); ?>
-
-                <table class="form-table">
-                    <?php
-                    foreach ($spam_fields as $data) :
-                        echo '<tr>';
-                        echo '<th scope="row">';
-                        echo $data['title'];
-                        echo '</th>';
-                        echo '<td>';
-                        $this->field($data);
-                        echo '</td>';
-                        echo '</tr>';
-                    endforeach;
-                    ?>
-                </table>
-
-                <div style="float:right;">
-                    <?php submit_button(); ?>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">Proteksi Spam</h1>
+            <div class="sad-grid">
+                <div class="sad-card">
+                    <div class="sad-card-title">Pengaturan Utama</div>
+                    <form method="post" action="options.php" class="sad-form">
+                        <?php settings_fields('custom_admin_options_group'); ?>
+                        <?php do_settings_sections('custom_admin_options_group'); ?>
+                        <table class="form-table">
+                            <?php
+                            foreach ($spam_fields as $data) :
+                                echo '<tr>';
+                                echo '<th scope="row">';
+                                echo $data['title'];
+                                echo '</th>';
+                                echo '<td>';
+                                $this->field($data);
+                                echo '</td>';
+                                echo '</tr>';
+                            endforeach;
+                            ?>
+                        </table>
+                        <div class="sad-actions-row" style="justify-content: flex-end;">
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                        </div>
+                    </form>
                 </div>
-            </form>
+                <div class="sad-card">
+                    <div class="sad-card-title">Ringkasan</div>
+                    <div class="sad-status">
+                        <div><span>Batasi Percobaan Login</span><span><?php echo get_option('limit_login_attempts') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Nonaktifkan XML-RPC</span><span><?php echo get_option('disable_xmlrpc') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Nonaktifkan REST API</span><span><?php echo get_option('disable_rest_api') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                    </div>
+                </div>
+            </div>
         </div>
     <?php
     }
@@ -707,8 +717,8 @@ class Custom_Admin_Option_Page
             </div>
             <div class="sad-card sad-stat">
                 <div class="sad-card-title">Bulan Ini</div>
-                <div class="sad-card-value"><?php echo number_format($this_month ? (int)$this_month->pv : 0); ?></div>
-                <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
+                <div class="sad-card-value"><?php echo number_format($summary_stats['this_month']->total_visits ?: 0); ?></div>
+                <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($summary_stats['this_month']->unique_visitors ?: 0); ?></div>
             </div>
             <!-- Summary Cards -->
             <div class="stats-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
@@ -743,7 +753,7 @@ class Custom_Admin_Option_Page
             </div>
 
             <!-- Charts Section -->
-            <div class="charts-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; width: 70%;">
+            <div class="charts-section" style="display: grid; grid-template-columns: 7fr 3fr; gap: 20px; margin: 20px 0;">
 
                 <!-- Daily Visits Chart -->
                 <div class="chart-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -1166,16 +1176,14 @@ class Custom_Admin_Option_Page
         $google_search_console = get_option('sweetaddons_seo_google_search_console', '');
 
     ?>
-        <div class="wrap vd-ons">
-            <h1>🔍 Pengaturan SEO</h1>
-            <p>Optimalkan website Anda untuk mesin pencari dengan pengaturan SEO dasar ini.</p>
-
-            <form method="post" action="">
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">🔍 Pengaturan SEO</h1>
+            <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_seo_settings'); ?>
 
                 <!-- General SEO Settings -->
-                <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">🏠 SEO Halaman Utama</h2>
+                <div class="sad-card">
+                    <div class="sad-card-title">🏠 SEO Halaman Utama</div>
 
                     <table class="form-table">
                         <tr>
@@ -1202,8 +1210,8 @@ class Custom_Admin_Option_Page
                 </div>
 
                 <!-- Social Media Settings -->
-                <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📱 Social Media</h2>
+                <div class="sad-card">
+                    <div class="sad-card-title">📱 Social Media</div>
 
                     <table class="form-table">
                         <tr>
@@ -1252,8 +1260,8 @@ class Custom_Admin_Option_Page
                 </div>
 
                 <!-- Technical SEO -->
-                <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">⚙️ Technical SEO</h2>
+                <div class="sad-card">
+                    <div class="sad-card-title">⚙️ Technical SEO</div>
 
                     <table class="form-table">
                         <tr>
@@ -1276,8 +1284,8 @@ class Custom_Admin_Option_Page
                 </div>
 
                 <!-- Analytics -->
-                <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📊 Analytics & Alat Webmaster</h2>
+                <div class="sad-card">
+                    <div class="sad-card-title">📊 Analytics & Alat Webmaster</div>
 
                     <table class="form-table">
                         <tr>
@@ -1302,8 +1310,8 @@ class Custom_Admin_Option_Page
                 </div>
 
                 <!-- SEO Features Info -->
-                <div class="seo-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">✨ Fitur SEO yang Disertakan</h2>
+                <div class="sad-card" style="background: #f0f8ff;">
+                    <div class="sad-card-title">✨ Fitur SEO yang Disertakan</div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         <div>
@@ -1348,7 +1356,9 @@ class Custom_Admin_Option_Page
                     </div>
                 </div>
 
-                <?php submit_button('Save SEO Settings', 'primary', 'submit', false); ?>
+                <div class="sad-actions-row" style="justify-content: flex-end;">
+                    <?php submit_button('Save SEO Settings', 'primary', 'submit', false); ?>
+                </div>
             </form>
         </div>
 

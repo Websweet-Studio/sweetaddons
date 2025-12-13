@@ -127,3 +127,11 @@ body.toplevel_page_custom_admin_options .update-nag {
       grid-template-columns: 1fr;
    }
 }
+
+.sad-form .form-table th {
+   width: 40%;
+   vertical-align: top;
+}
+.sad-form .form-table td {
+   width: 60%;
+}
