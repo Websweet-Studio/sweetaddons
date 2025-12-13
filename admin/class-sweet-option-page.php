@@ -32,10 +32,10 @@ class Custom_Admin_Option_Page
 
     public function enqueue_admin_scripts($hook)
     {
-        // Only load on our plugin settings pages
-        if (strpos($hook, 'sweetaddons') !== false) {
+        if (strpos($hook, 'sweetaddons') !== false || strpos($hook, 'custom_admin_options') !== false) {
             wp_enqueue_media();
             wp_enqueue_script('jquery');
+            wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
         }
     }
 
@@ -47,7 +47,7 @@ class Custom_Admin_Option_Page
             'manage_options',           // Hak akses yang dibutuhkan
             'custom_admin_options',     // Slug menu
             array($this, 'options_page_callback'), // Callback untuk halaman pengaturan
-            '',                         // URL icon (biarkan kosong atau tambahkan URL icon)
+            'dashicons-chart-pie',                         // URL icon (biarkan kosong atau tambahkan URL icon)
             70                         // Posisi menu (semakin kecil angkanya semakin tinggi posisinya)
         );
 
@@ -136,7 +136,7 @@ class Custom_Admin_Option_Page
         register_setting('custom_admin_options_group', 'auto_resize_image_Sweetaddons');
         register_setting('custom_admin_options_group', 'captcha_Sweetaddons');
         register_setting('custom_admin_options_group', 'news_generate');
-        
+
         // SEO settings
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_title');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_description');
@@ -145,10 +145,10 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_enable_sitemap');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_google_analytics');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_google_search_console');
-        
+
         // reCaptcha settings
         register_setting('sweetaddons_recaptcha_group', 'captcha_Sweetaddons');
-        
+
         // White Label settings
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_plugin_name');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_plugin_uri');
@@ -158,7 +158,7 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_version');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_menu_title');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_hide_original');
-        
+
         // WhatsApp settings
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_enable');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_phone');
@@ -299,21 +299,165 @@ class Custom_Admin_Option_Page
     public function options_page_callback()
     {
     ?>
-        <div class="wrap vd-ons">
-            <h1>Dashboard Sweet Addons</h1>
-            <p>Selamat datang di pengaturan Sweet Addons. Gunakan menu di sebelah kiri untuk mengakses pengaturan yang berbeda.</p>
-
-            <div class="websweet-dashboard">
-                <?php echo $this->generate_website_report(); ?>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">Dashboard Sweet Addons</h1>
+            <div class="sad-top">
+                <?php
+                global $wpdb;
+                $prefix = $wpdb->prefix;
+                $today = $wpdb->get_row("SELECT unique_visitors as uv, total_pageviews as pv FROM {$prefix}sweetaddons_daily_stats WHERE stat_date = CURDATE()");
+                $this_week = $wpdb->get_row("SELECT SUM(unique_visitors) as uv, SUM(total_pageviews) as pv FROM {$prefix}sweetaddons_daily_stats WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
+                $this_month = $wpdb->get_row("SELECT SUM(unique_visitors) as uv, SUM(total_pageviews) as pv FROM {$prefix}sweetaddons_daily_stats WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)");
+                $daily_stats = $wpdb->get_results($wpdb->prepare("SELECT stat_date as visit_date, unique_visitors as unique_visits, total_pageviews as total_visits FROM {$prefix}sweetaddons_daily_stats WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ORDER BY stat_date ASC", 30));
+                $site_url = get_site_url();
+                $site_name = get_bloginfo('name');
+                $admin_email = get_option('admin_email');
+                $wp_version = get_bloginfo('version');
+                $php_version = phpversion();
+                $memory_limit = ini_get('memory_limit');
+                $max_execution_time = ini_get('max_execution_time');
+                ?>
+                <div class="sad-top-left">
+                    <div class="sad-row">
+                        <div class="sad-card sad-stat">
+                            <div class="sad-card-title">Hari Ini</div>
+                            <div class="sad-card-value"><?php echo number_format($today ? (int)$today->pv : 0); ?></div>
+                            <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
+                        </div>
+                        <div class="sad-card sad-stat">
+                            <div class="sad-card-title">Minggu Ini</div>
+                            <div class="sad-card-value"><?php echo number_format($this_week ? (int)$this_week->pv : 0); ?></div>
+                            <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
+                        </div>
+                        <div class="sad-card sad-stat">
+                            <div class="sad-card-title">Bulan Ini</div>
+                            <div class="sad-card-value"><?php echo number_format($this_month ? (int)$this_month->pv : 0); ?></div>
+                            <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
+                        </div>
+                    </div>
+                    <div class="sad-card">
+                        <div class="sad-card-title">Grafik 30 Hari Terakhir</div>
+                        <canvas id="sadThirtyChart"></canvas>
+                    </div>
+                </div>
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-card-title">System Health</div>
+                        <div class="sad-chips">
+                            <span class="sad-chip">PHP <?php echo esc_html($php_version); ?></span>
+                            <span class="sad-chip">Memory <?php echo esc_html($memory_limit); ?></span>
+                            <span class="sad-chip">Max Exec <?php echo esc_html($max_execution_time); ?>s</span>
+                        </div>
+                    </div>
+                    <div class="sad-card">
+                        <div class="sad-card-title">Informasi Situs</div>
+                        <div class="sad-table">
+                            <div><span>Nama</span><span><?php echo esc_html($site_name); ?></span></div>
+                            <div><span>URL</span><span><a href="<?php echo esc_url($site_url); ?>" target="_blank"><?php echo esc_url($site_url); ?></a></span></div>
+                            <div><span>Email Admin</span><span><?php echo esc_html($admin_email); ?></span></div>
+                            <div><span>WordPress</span><span><?php echo esc_html($wp_version); ?></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sad-grid">
+                <div class="sad-card">
+                    <div class="sad-card-title">Status Fitur</div>
+                    <div class="sad-status">
+                        <div><span>Disable Comments</span><span><?php echo get_option('fully_disable_comment') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Hide Admin Notice</span><span><?php echo get_option('hide_admin_notice') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Maintenance Mode</span><span><?php echo get_option('maintenance_mode') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Limit Login</span><span><?php echo get_option('limit_login_attempts') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Block wp-login</span><span><?php echo get_option('block_wp_login') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Disable XML-RPC</span><span><?php echo get_option('disable_xmlrpc') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Disable REST API</span><span><?php echo get_option('disable_rest_api') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>Disable Gutenberg</span><span><?php echo get_option('disable_gutenberg') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                        <div><span>reCaptcha</span><span><?php echo get_option('captcha_Sweetaddons') ? 'Aktif' : 'Nonaktif'; ?></span></div>
+                    </div>
+                </div>
+                <div class="sad-card sad-actions">
+                    <div class="sad-card-title">Aksi Cepat</div>
+                    <div class="sad-actions-row">
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Statistik</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">SEO</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">reCaptcha</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">White Label</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">WhatsApp</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Umum</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Blokir Login</a>
+                        <a href="<?php echo admin_url('admin.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Proteksi Spam</a>
+                    </div>
+                </div>
             </div>
         </div>
-<?php
+        <script>
+            (function() {
+                var data = <?php echo json_encode(array_map(function ($stat) {
+                                return array(
+                                    'date' => $stat->visit_date,
+                                    'unique' => (int)$stat->unique_visits,
+                                    'total' => (int)$stat->total_visits
+                                );
+                            }, $daily_stats ?: array())); ?>;
+                var labels = data.map(function(i) {
+                    return i.date;
+                });
+                var uniqueData = data.map(function(i) {
+                    return i.unique;
+                });
+                var totalData = data.map(function(i) {
+                    return i.total;
+                });
+                var ctx = document.getElementById('sadThirtyChart');
+                if (ctx && window.Chart) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                    label: 'Pengunjung Unik',
+                                    data: uniqueData,
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16,185,129,0.15)',
+                                    tension: 0.35,
+                                    fill: true
+                                },
+                                {
+                                    label: 'Total Kunjungan',
+                                    data: totalData,
+                                    borderColor: '#0ea5e9',
+                                    backgroundColor: 'rgba(14,165,233,0.1)',
+                                    tension: 0.35,
+                                    fill: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+                }
+            })();
+        </script>
+    <?php
     }
 
     public function generate_website_report()
     {
         ob_start();
-        
+
         // Get site information
         $site_url = get_site_url();
         $site_name = get_bloginfo('name');
@@ -321,51 +465,66 @@ class Custom_Admin_Option_Page
         $wp_version = get_bloginfo('version');
         $theme = wp_get_theme();
         $admin_email = get_option('admin_email');
-        
+
         // Get user counts
         $user_count = count_users();
         $total_users = $user_count['total_users'];
-        
+
         // Get post counts
         $post_counts = wp_count_posts();
         $published_posts = $post_counts->publish;
         $draft_posts = $post_counts->draft;
-        
+
         // Get page counts
         $page_counts = wp_count_posts('page');
         $published_pages = $page_counts->publish;
-        
+
         // Get plugin information
         $active_plugins = get_option('active_plugins');
         $all_plugins = get_plugins();
         $active_plugin_count = count($active_plugins);
         $total_plugin_count = count($all_plugins);
-        
+
         // Get theme information
         $theme_name = $theme->get('Name');
         $theme_version = $theme->get('Version');
-        
+
         // Get database information
         global $wpdb;
         $db_size = $wpdb->get_var("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) AS 'DB Size in MB' FROM information_schema.tables WHERE table_schema='{$wpdb->dbname}'");
-        
+
         // Get server information
         $php_version = phpversion();
         $max_execution_time = ini_get('max_execution_time');
         $memory_limit = ini_get('memory_limit');
-        
-        ?>
+
+    ?>
         <div class="websweet-report-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
-            
+
             <!-- Site Information -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h3 style="margin-top: 0; color: #23282d;">🌐 Informasi Website</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
-                    <tr><td><strong>Nama Website:</strong></td><td><?php echo esc_html($site_name); ?></td></tr>
-                    <tr><td><strong>URL:</strong></td><td><a href="<?php echo esc_url($site_url); ?>" target="_blank"><?php echo esc_url($site_url); ?></a></td></tr>
-                    <tr><td><strong>Deskripsi:</strong></td><td><?php echo esc_html($site_description); ?></td></tr>
-                    <tr><td><strong>Email Admin:</strong></td><td><?php echo esc_html($admin_email); ?></td></tr>
-                    <tr><td><strong>WordPress Version:</strong></td><td><?php echo esc_html($wp_version); ?></td></tr>
+                    <tr>
+                        <td><strong>Nama Website:</strong></td>
+                        <td><?php echo esc_html($site_name); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>URL:</strong></td>
+                        <td><a href="<?php echo esc_url($site_url); ?>" target="_blank"><?php echo esc_url($site_url); ?></a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deskripsi:</strong></td>
+                        <td><?php echo esc_html($site_description); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email Admin:</strong></td>
+                        <td><?php echo esc_html($admin_email); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>WordPress Version:</strong></td>
+                        <td><?php echo esc_html($wp_version); ?></td>
+                    </tr>
                 </table>
             </div>
 
@@ -373,10 +532,22 @@ class Custom_Admin_Option_Page
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h3 style="margin-top: 0; color: #23282d;">📝 Statistik Konten</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
-                    <tr><td><strong>Posts Terpublikasi:</strong></td><td><?php echo esc_html($published_posts); ?></td></tr>
-                    <tr><td><strong>Draft Posts:</strong></td><td><?php echo esc_html($draft_posts); ?></td></tr>
-                    <tr><td><strong>Pages Terpublikasi:</strong></td><td><?php echo esc_html($published_pages); ?></td></tr>
-                    <tr><td><strong>Total Pengguna:</strong></td><td><?php echo esc_html($total_users); ?></td></tr>
+                    <tr>
+                        <td><strong>Posts Terpublikasi:</strong></td>
+                        <td><?php echo esc_html($published_posts); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Draft Posts:</strong></td>
+                        <td><?php echo esc_html($draft_posts); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pages Terpublikasi:</strong></td>
+                        <td><?php echo esc_html($published_pages); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Pengguna:</strong></td>
+                        <td><?php echo esc_html($total_users); ?></td>
+                    </tr>
                 </table>
             </div>
 
@@ -384,10 +555,22 @@ class Custom_Admin_Option_Page
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h3 style="margin-top: 0; color: #23282d;">🎨 Theme & Plugin</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
-                    <tr><td><strong>Active Theme:</strong></td><td><?php echo esc_html($theme_name); ?></td></tr>
-                    <tr><td><strong>Theme Version:</strong></td><td><?php echo esc_html($theme_version); ?></td></tr>
-                    <tr><td><strong>Active Plugins:</strong></td><td><?php echo esc_html($active_plugin_count); ?></td></tr>
-                    <tr><td><strong>Total Plugin:</strong></td><td><?php echo esc_html($total_plugin_count); ?></td></tr>
+                    <tr>
+                        <td><strong>Active Theme:</strong></td>
+                        <td><?php echo esc_html($theme_name); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Theme Version:</strong></td>
+                        <td><?php echo esc_html($theme_version); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Active Plugins:</strong></td>
+                        <td><?php echo esc_html($active_plugin_count); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Plugin:</strong></td>
+                        <td><?php echo esc_html($total_plugin_count); ?></td>
+                    </tr>
                 </table>
             </div>
 
@@ -395,10 +578,22 @@ class Custom_Admin_Option_Page
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h3 style="margin-top: 0; color: #23282d;">🖥️ Server Information</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
-                    <tr><td><strong>PHP Version:</strong></td><td><?php echo esc_html($php_version); ?></td></tr>
-                    <tr><td><strong>Memory Limit:</strong></td><td><?php echo esc_html($memory_limit); ?></td></tr>
-                    <tr><td><strong>Max Execution Time:</strong></td><td><?php echo esc_html($max_execution_time); ?>s</td></tr>
-                    <tr><td><strong>Ukuran Database:</strong></td><td><?php echo esc_html($db_size); ?> MB</td></tr>
+                    <tr>
+                        <td><strong>PHP Version:</strong></td>
+                        <td><?php echo esc_html($php_version); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Memory Limit:</strong></td>
+                        <td><?php echo esc_html($memory_limit); ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Max Execution Time:</strong></td>
+                        <td><?php echo esc_html($max_execution_time); ?>s</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ukuran Database:</strong></td>
+                        <td><?php echo esc_html($db_size); ?> MB</td>
+                    </tr>
                 </table>
             </div>
 
@@ -406,11 +601,26 @@ class Custom_Admin_Option_Page
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h3 style="margin-top: 0; color: #23282d;">⚙️ Sweet Addons Status</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
-                    <tr><td><strong>Disable Comments:</strong></td><td><?php echo get_option('fully_disable_comment') ? '✅ Aktif' : '❌ Nonaktif'; ?></td></tr>
-                    <tr><td><strong>Hide Admin Notice:</strong></td><td><?php echo get_option('hide_admin_notice') ? '✅ Aktif' : '❌ Nonaktif'; ?></td></tr>
-                    <tr><td><strong>Maintenance Mode:</strong></td><td><?php echo get_option('maintenance_mode') ? '✅ Aktif' : '❌ Nonaktif'; ?></td></tr>
-                    <tr><td><strong>Limit Login Attempts:</strong></td><td><?php echo get_option('limit_login_attempts') ? '✅ Aktif' : '❌ Nonaktif'; ?></td></tr>
-                    <tr><td><strong>Block wp-login:</strong></td><td><?php echo get_option('block_wp_login') ? '✅ Aktif' : '❌ Nonaktif'; ?></td></tr>
+                    <tr>
+                        <td><strong>Disable Comments:</strong></td>
+                        <td><?php echo get_option('fully_disable_comment') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hide Admin Notice:</strong></td>
+                        <td><?php echo get_option('hide_admin_notice') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maintenance Mode:</strong></td>
+                        <td><?php echo get_option('maintenance_mode') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Limit Login Attempts:</strong></td>
+                        <td><?php echo get_option('limit_login_attempts') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Block wp-login:</strong></td>
+                        <td><?php echo get_option('block_wp_login') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                    </tr>
                 </table>
             </div>
 
@@ -423,42 +633,46 @@ class Custom_Admin_Option_Page
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">🛡️ reCaptcha</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">🏷️ White Label</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">💬 WhatsApp Chat</a>
-                    <a href="<?php echo admin_url('options-general.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Pengaturan Umum</a>
-                    <a href="<?php echo admin_url('options-general.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance Mode</a>
-                    <a href="<?php echo admin_url('options-general.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Block Login</a>
-                    <a href="<?php echo admin_url('options-general.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Spam Protection</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Pengaturan Umum</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance Mode</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Block Login</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Spam Protection</a>
                 </div>
             </div>
         </div>
-        
+
         <style>
-        .report-table td {
-            padding: 8px 0;
-            border-bottom: 1px solid #f1f1f1;
-        }
-        .report-table td:first-child {
-            width: 50%;
-            padding-right: 10px;
-        }
-        .report-card h3 {
-            border-bottom: 2px solid #0073aa;
-            padding-bottom: 10px;
-        }
-        @media (max-width: 768px) {
-            .websweet-report-grid {
-                grid-template-columns: 1fr !important;
+            .report-table td {
+                padding: 8px 0;
+                border-bottom: 1px solid #f1f1f1;
             }
-        }
+
+            .report-table td:first-child {
+                width: 50%;
+                padding-right: 10px;
+            }
+
+            .report-card h3 {
+                border-bottom: 2px solid #0073aa;
+                padding-bottom: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .websweet-report-grid {
+                    grid-template-columns: 1fr !important;
+                }
+            }
         </style>
-        <?php
-        
+    <?php
+
         return ob_get_clean();
     }
 
     public function visitor_stats_page_callback()
     {
         $stats_handler = new Sweetaddons_Visitor_Stats();
-        
+        wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
+
         // Handle rebuild request
         $rebuild_message = '';
         if (isset($_POST['rebuild_stats']) && wp_verify_nonce($_POST['_wpnonce'], 'rebuild_stats')) {
@@ -466,18 +680,18 @@ class Custom_Admin_Option_Page
             $page_count = $stats_handler->rebuild_page_stats();
             $rebuild_message = "<div class='notice notice-success'><p>✅ Statistik berhasil dibangun ulang! Memproses {$daily_count} data harian dan {$page_count} data halaman.</p></div>";
         }
-        
+
         $summary_stats = $stats_handler->get_summary_stats();
         $daily_stats = $stats_handler->get_daily_stats(30);
         $page_stats = $stats_handler->get_page_stats(30);
         $referer_stats = $stats_handler->get_referer_stats(30);
-        
-        ?>
+
+    ?>
         <div class="wrap vd-ons">
             <h1>📊 Statistik Pengunjung</h1>
-            
+
             <?php echo $rebuild_message; ?>
-            
+
             <!-- Rebuild Stats Button -->
             <div style="margin: 20px 0;">
                 <form method="post" style="display: inline;">
@@ -491,10 +705,14 @@ class Custom_Admin_Option_Page
                     </span>
                 </form>
             </div>
-            
+            <div class="sad-card sad-stat">
+                <div class="sad-card-title">Bulan Ini</div>
+                <div class="sad-card-value"><?php echo number_format($this_month ? (int)$this_month->pv : 0); ?></div>
+                <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
+            </div>
             <!-- Summary Cards -->
             <div class="stats-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
-                
+
                 <div class="stat-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <h3 style="margin: 0 0 10px 0; color: #0073aa;">Hari Ini</h3>
                     <div style="font-size: 24px; font-weight: bold; color: #23282d;"><?php echo $summary_stats['today']->unique_visitors ?: 0; ?></div>
@@ -525,8 +743,8 @@ class Custom_Admin_Option_Page
             </div>
 
             <!-- Charts Section -->
-            <div class="charts-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                
+            <div class="charts-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; width: 70%;">
+
                 <!-- Daily Visits Chart -->
                 <div class="chart-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <h3 style="margin-top: 0; color: #23282d;">📈 Daily Visits (Last 30 Days)</h3>
@@ -544,13 +762,13 @@ class Custom_Admin_Option_Page
             <div class="shortcode-section" style="background: #fff; padding: 30px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #23282d;">📋 Shortcode Usage - [statistic]</h3>
                 <p style="color: #666; margin-bottom: 25px;">Tampilkan statistik visitor di halaman, post, atau widget dengan shortcode yang fleksibel.</p>
-                
+
                 <div class="shortcode-examples" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-                    
+
                     <!-- Basic Examples -->
                     <div class="shortcode-group">
                         <h4 style="color: #23282d; margin-bottom: 15px;">🎯 Basic Usage</h4>
-                        
+
                         <div class="shortcode-item" style="margin-bottom: 20px;">
                             <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
                                 <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic]')">[statistic]</span>
@@ -579,7 +797,7 @@ class Custom_Admin_Option_Page
                     <!-- Advanced Examples -->
                     <div class="shortcode-group">
                         <h4 style="color: #23282d; margin-bottom: 15px;">⚙️ Advanced Usage</h4>
-                        
+
                         <div class="shortcode-item" style="margin-bottom: 20px;">
                             <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
                                 <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic style=&quot;cards&quot; columns=&quot;2&quot;]')">[statistic style="cards" columns="2"]</span>
@@ -610,7 +828,7 @@ class Custom_Admin_Option_Page
                 <div class="parameters-reference" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
                     <h4 style="color: #23282d; margin-bottom: 15px;">📚 Parameter Reference</h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                        
+
                         <div class="param-group">
                             <strong style="color: #0073aa;">show</strong>
                             <div style="font-size: 13px; color: #666; margin-top: 5px;">
@@ -645,7 +863,7 @@ class Custom_Admin_Option_Page
                 <div class="live-preview" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
                     <h4 style="color: #23282d; margin-bottom: 15px;">👁️ Live Preview</h4>
                     <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-                        <?php 
+                        <?php
                         $stats_handler_preview = new Sweetaddons_Visitor_Stats();
                         echo $stats_handler_preview->statistics_shortcode(array('style' => 'cards', 'columns' => '4'));
                         ?>
@@ -658,7 +876,7 @@ class Custom_Admin_Option_Page
 
             <!-- Data Tables Section -->
             <div class="tables-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                
+
                 <!-- Top Pages Table -->
                 <div class="table-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <h3 style="margin-top: 0; color: #23282d;">🏆 Halaman Teratas (30 Hari Terakhir)</h3>
@@ -672,7 +890,9 @@ class Custom_Admin_Option_Page
                         </thead>
                         <tbody>
                             <?php if (empty($page_stats)): ?>
-                                <tr><td colspan="3" style="text-align: center; color: #666;">No data available</td></tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: #666;">No data available</td>
+                                </tr>
                             <?php else: ?>
                                 <?php foreach ($page_stats as $page): ?>
                                     <tr>
@@ -698,7 +918,9 @@ class Custom_Admin_Option_Page
                         </thead>
                         <tbody>
                             <?php if (empty($referer_stats)): ?>
-                                <tr><td colspan="2" style="text-align: center; color: #666;">No data available</td></tr>
+                                <tr>
+                                    <td colspan="2" style="text-align: center; color: #666;">No data available</td>
+                                </tr>
                             <?php else: ?>
                                 <?php foreach ($referer_stats as $referer): ?>
                                     <tr>
@@ -715,146 +937,145 @@ class Custom_Admin_Option_Page
 
         <!-- Chart.js CDN -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        
+
         <script>
-        // Daily Visits Chart
-        const dailyData = <?php echo json_encode(array_map(function($stat) {
-            return [
-                'date' => $stat->visit_date,
-                'unique_visits' => (int)$stat->unique_visits,
-                'total_visits' => (int)$stat->total_visits
-            ];
-        }, $daily_stats)); ?>;
+            // Daily Visits Chart
+            const dailyData = <?php echo json_encode(array_map(function ($stat) {
+                                    return [
+                                        'date' => $stat->visit_date,
+                                        'unique_visits' => (int)$stat->unique_visits,
+                                        'total_visits' => (int)$stat->total_visits
+                                    ];
+                                }, $daily_stats)); ?>;
 
-        const dailyLabels = dailyData.map(item => item.date);
-        const uniqueVisitsData = dailyData.map(item => item.unique_visits);
-        const totalVisitsData = dailyData.map(item => item.total_visits);
+            const dailyLabels = dailyData.map(item => item.date);
+            const uniqueVisitsData = dailyData.map(item => item.unique_visits);
+            const totalVisitsData = dailyData.map(item => item.total_visits);
 
-        const dailyCtx = document.getElementById('dailyVisitsChart').getContext('2d');
-        new Chart(dailyCtx, {
-            type: 'line',
-            data: {
-                labels: dailyLabels,
-                datasets: [
-                    {
-                        label: 'Pengunjung Unik',
-                        data: uniqueVisitsData,
-                        borderColor: '#0073aa',
-                        backgroundColor: 'rgba(0, 115, 170, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Total Kunjungan',
-                        data: totalVisitsData,
-                        borderColor: '#00a32a',
-                        backgroundColor: 'rgba(0, 163, 42, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            const dailyCtx = document.getElementById('dailyVisitsChart').getContext('2d');
+            new Chart(dailyCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyLabels,
+                    datasets: [{
+                            label: 'Pengunjung Unik',
+                            data: uniqueVisitsData,
+                            borderColor: '#0073aa',
+                            backgroundColor: 'rgba(0, 115, 170, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Total Kunjungan',
+                            data: totalVisitsData,
+                            borderColor: '#00a32a',
+                            backgroundColor: 'rgba(0, 163, 42, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }
+                    ]
                 },
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    }
-                }
-            }
-        });
-
-        // Top Pages Chart
-        const pageData = <?php echo json_encode(array_map(function($page) {
-            return [
-                'url' => $page->page_url,
-                'views' => (int)$page->total_views
-            ];
-        }, array_slice($page_stats, 0, 8))); ?>;
-
-        const pageLabels = pageData.map(item => item.url);
-        const pageViews = pageData.map(item => item.views);
-
-        const pageCtx = document.getElementById('topPagesChart').getContext('2d');
-        new Chart(pageCtx, {
-            type: 'bar',
-            data: {
-                labels: pageLabels,
-                datasets: [{
-                    label: 'Page Views',
-                    data: pageViews,
-                    backgroundColor: [
-                        '#0073aa', '#00a32a', '#d63638', '#ff922b',
-                        '#7c3aed', '#db2777', '#059669', '#dc2626'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     },
-                    x: {
-                        ticks: {
-                            maxRotation: 45,
-                            minRotation: 0,
-                            callback: function(value, index, values) {
-                                const label = this.getLabelForValue(value);
-                                return label.length > 20 ? label.substring(0, 20) + '...' : label;
-                            }
+                    plugins: {
+                        legend: {
+                            position: 'top'
                         }
                     }
+                }
+            });
+
+            // Top Pages Chart
+            const pageData = <?php echo json_encode(array_map(function ($page) {
+                                    return [
+                                        'url' => $page->page_url,
+                                        'views' => (int)$page->total_views
+                                    ];
+                                }, array_slice($page_stats, 0, 8))); ?>;
+
+            const pageLabels = pageData.map(item => item.url);
+            const pageViews = pageData.map(item => item.views);
+
+            const pageCtx = document.getElementById('topPagesChart').getContext('2d');
+            new Chart(pageCtx, {
+                type: 'bar',
+                data: {
+                    labels: pageLabels,
+                    datasets: [{
+                        label: 'Page Views',
+                        data: pageViews,
+                        backgroundColor: [
+                            '#0073aa', '#00a32a', '#d63638', '#ff922b',
+                            '#7c3aed', '#db2777', '#059669', '#dc2626'
+                        ],
+                        borderWidth: 1
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        display: false
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0,
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 20 ? label.substring(0, 20) + '...' : label;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // Copy to clipboard function
-        function copyToClipboard(text) {
-            if (navigator.clipboard && window.isSecureContext) {
-                // Use modern clipboard API
-                navigator.clipboard.writeText(text).then(function() {
-                    showCopySuccess();
-                });
-            } else {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                textArea.style.top = '-999999px';
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                
-                try {
-                    document.execCommand('copy');
-                    showCopySuccess();
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
+            // Copy to clipboard function
+            function copyToClipboard(text) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    // Use modern clipboard API
+                    navigator.clipboard.writeText(text).then(function() {
+                        showCopySuccess();
+                    });
+                } else {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                        document.execCommand('copy');
+                        showCopySuccess();
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                    }
+
+                    document.body.removeChild(textArea);
                 }
-                
-                document.body.removeChild(textArea);
             }
-        }
 
-        function showCopySuccess() {
-            // Create temporary success message
-            const message = document.createElement('div');
-            message.style.cssText = `
+            function showCopySuccess() {
+                // Create temporary success message
+                const message = document.createElement('div');
+                message.style.cssText = `
                 position: fixed;
                 top: 50px;
                 right: 20px;
@@ -867,58 +1088,59 @@ class Custom_Admin_Option_Page
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
                 transition: all 0.3s ease;
             `;
-            message.textContent = '✅ Shortcode copied to clipboard!';
-            document.body.appendChild(message);
-            
-            // Animate and remove
-            setTimeout(() => {
-                message.style.opacity = '0';
-                message.style.transform = 'translateY(-20px)';
+                message.textContent = '✅ Shortcode copied to clipboard!';
+                document.body.appendChild(message);
+
+                // Animate and remove
                 setTimeout(() => {
-                    document.body.removeChild(message);
-                }, 300);
-            }, 2000);
-        }
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        document.body.removeChild(message);
+                    }, 300);
+                }, 2000);
+            }
         </script>
 
         <style>
-        @media (max-width: 768px) {
-            .stats-summary,
-            .charts-section,
-            .tables-section,
-            .shortcode-examples {
-                grid-template-columns: 1fr !important;
+            @media (max-width: 768px) {
+
+                .stats-summary,
+                .charts-section,
+                .tables-section,
+                .shortcode-examples {
+                    grid-template-columns: 1fr !important;
+                }
             }
-        }
-        
-        .chart-container canvas {
-            height: 200px !important;
-        }
-        
-        .table-container table {
-            font-size: 14px;
-        }
-        
-        .table-container code {
-            background: #f1f1f1;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
+
+            .chart-container canvas {
+                height: 200px !important;
+            }
+
+            .table-container table {
+                font-size: 14px;
+            }
+
+            .table-container code {
+                background: #f1f1f1;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 12px;
+            }
         </style>
-        <?php
+    <?php
     }
 
     public function seo_page_callback()
     {
         // Enqueue media uploader scripts
         wp_enqueue_media();
-        
+
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_seo_settings')) {
             $fields = array(
                 'sweetaddons_seo_home_title',
-                'sweetaddons_seo_home_description', 
+                'sweetaddons_seo_home_description',
                 'sweetaddons_seo_default_og_image',
                 'sweetaddons_seo_twitter_site',
                 'sweetaddons_seo_enable_sitemap',
@@ -943,7 +1165,7 @@ class Custom_Admin_Option_Page
         $google_analytics = get_option('sweetaddons_seo_google_analytics', '');
         $google_search_console = get_option('sweetaddons_seo_google_search_console', '');
 
-        ?>
+    ?>
         <div class="wrap vd-ons">
             <h1>🔍 Pengaturan SEO</h1>
             <p>Optimalkan website Anda untuk mesin pencari dengan pengaturan SEO dasar ini.</p>
@@ -954,7 +1176,7 @@ class Custom_Admin_Option_Page
                 <!-- General SEO Settings -->
                 <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">🏠 SEO Halaman Utama</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -982,7 +1204,7 @@ class Custom_Admin_Option_Page
                 <!-- Social Media Settings -->
                 <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📱 Social Media</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1032,7 +1254,7 @@ class Custom_Admin_Option_Page
                 <!-- Technical SEO -->
                 <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">⚙️ Technical SEO</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">XML Sitemap</th>
@@ -1056,7 +1278,7 @@ class Custom_Admin_Option_Page
                 <!-- Analytics -->
                 <div class="seo-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📊 Analytics & Alat Webmaster</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1082,7 +1304,7 @@ class Custom_Admin_Option_Page
                 <!-- SEO Features Info -->
                 <div class="seo-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">✨ Fitur SEO yang Disertakan</h2>
-                    
+
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">📝 Optimasi Konten</h4>
@@ -1093,7 +1315,7 @@ class Custom_Admin_Option_Page
                                 <li>Tag meta robots (noindex, nofollow)</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">📱 Media Sosial</h4>
                             <ul style="margin: 0; padding-left: 20px;">
@@ -1103,7 +1325,7 @@ class Custom_Admin_Option_Page
                                 <li>Fallback otomatis</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">🔧 SEO Teknis</h4>
                             <ul style="margin: 0; padding-left: 20px;">
@@ -1113,7 +1335,7 @@ class Custom_Admin_Option_Page
                                 <li>Verifikasi Search Console</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">📊 Kontrol Per Postingan</h4>
                             <ul style="margin: 0; padding-left: 20px;">
@@ -1131,96 +1353,96 @@ class Custom_Admin_Option_Page
         </div>
 
         <script>
-        jQuery(document).ready(function($) {
-            // Character counters
-            function updateCounter(input, counter, recommended) {
-                const length = input.val().length;
-                let color = '#666';
-                if (length > recommended + 10) color = '#d63638';
-                else if (length > recommended) color = '#ff922b';
-                else if (length > recommended - 10) color = '#00a32a';
-                
-                counter.html(length + ' characters').css('color', color);
-            }
+            jQuery(document).ready(function($) {
+                // Character counters
+                function updateCounter(input, counter, recommended) {
+                    const length = input.val().length;
+                    let color = '#666';
+                    if (length > recommended + 10) color = '#d63638';
+                    else if (length > recommended) color = '#ff922b';
+                    else if (length > recommended - 10) color = '#00a32a';
 
-            const homeTitleInput = $('#sweetaddons_seo_home_title');
-            const homeTitleCounter = $('#home-title-counter');
-            const homeDescInput = $('#sweetaddons_seo_home_description');
-            const homeDescCounter = $('#home-desc-counter');
+                    counter.html(length + ' characters').css('color', color);
+                }
 
-            homeTitleInput.on('input', function() {
+                const homeTitleInput = $('#sweetaddons_seo_home_title');
+                const homeTitleCounter = $('#home-title-counter');
+                const homeDescInput = $('#sweetaddons_seo_home_description');
+                const homeDescCounter = $('#home-desc-counter');
+
+                homeTitleInput.on('input', function() {
+                    updateCounter(homeTitleInput, homeTitleCounter, 60);
+                });
+
+                homeDescInput.on('input', function() {
+                    updateCounter(homeDescInput, homeDescCounter, 160);
+                });
+
+                // Initial count
                 updateCounter(homeTitleInput, homeTitleCounter, 60);
-            });
-
-            homeDescInput.on('input', function() {
                 updateCounter(homeDescInput, homeDescCounter, 160);
-            });
 
-            // Initial count
-            updateCounter(homeTitleInput, homeTitleCounter, 60);
-            updateCounter(homeDescInput, homeDescCounter, 160);
+                // OG Image preview update for default OG image
+                function updateDefaultOGImagePreview(imageUrl) {
+                    const previewContainer = $('#sweetaddons_seo_default_og_image').siblings('.og-image-preview');
+                    const removeButton = $('#remove-default-og-image');
+                    const buttonsContainer = $('.og-image-buttons');
 
-            // OG Image preview update for default OG image
-            function updateDefaultOGImagePreview(imageUrl) {
-                const previewContainer = $('#sweetaddons_seo_default_og_image').siblings('.og-image-preview');
-                const removeButton = $('#remove-default-og-image');
-                const buttonsContainer = $('.og-image-buttons');
-
-                if (imageUrl) {
-                    previewContainer.html('<div style="position: relative; display: inline-block;"><img src="' + imageUrl + '" alt="Default OG Image Preview" style="max-width: 300px; height: auto; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; border-radius: 4px;" /><div style="position: absolute; top: 5px; right: 5px; background: #23282d; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; opacity: 0.8;">Click to change</div></div>');
-                    previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
-                    buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button><button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>');
-                } else {
-                    previewContainer.html('<div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor=\'#005a87\'; this.style.background=\'#f0f8ff\';" onmouseout="this.style.borderColor=\'#0073aa\'; this.style.background=\'#f9f9f9\';"><div style="text-align: center;"><div style="font-size: 32px; margin-bottom: 8px;">📷</div><div>Click to choose image</div><div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div></div></div>');
-                    previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
-                    buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button>');
-                }
-            }
-
-            // Media uploader for default OG image
-            $('#upload-default-og-image').click(function(e) {
-                e.preventDefault();
-
-                // Check if wp.media exists
-                if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-                    alert('WordPress media uploader is not available. Please make sure you are on a settings page.');
-                    return;
-                }
-
-                const mediaUploader = wp.media({
-                    title: 'Choose Default Open Graph Image',
-                    button: {
-                        text: 'Use This Image'
-                    },
-                    multiple: false,
-                    library: {
-                        type: 'image'
+                    if (imageUrl) {
+                        previewContainer.html('<div style="position: relative; display: inline-block;"><img src="' + imageUrl + '" alt="Default OG Image Preview" style="max-width: 300px; height: auto; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; border-radius: 4px;" /><div style="position: absolute; top: 5px; right: 5px; background: #23282d; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; opacity: 0.8;">Click to change</div></div>');
+                        previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
+                        buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button><button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>');
+                    } else {
+                        previewContainer.html('<div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor=\'#005a87\'; this.style.background=\'#f0f8ff\';" onmouseout="this.style.borderColor=\'#0073aa\'; this.style.background=\'#f9f9f9\';"><div style="text-align: center;"><div style="font-size: 32px; margin-bottom: 8px;">📷</div><div>Click to choose image</div><div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div></div></div>');
+                        previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
+                        buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button>');
                     }
+                }
+
+                // Media uploader for default OG image
+                $('#upload-default-og-image').click(function(e) {
+                    e.preventDefault();
+
+                    // Check if wp.media exists
+                    if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+                        alert('WordPress media uploader is not available. Please make sure you are on a settings page.');
+                        return;
+                    }
+
+                    const mediaUploader = wp.media({
+                        title: 'Choose Default Open Graph Image',
+                        button: {
+                            text: 'Use This Image'
+                        },
+                        multiple: false,
+                        library: {
+                            type: 'image'
+                        }
+                    });
+
+                    mediaUploader.on('select', function() {
+                        const attachment = mediaUploader.state().get('selection').first().toJSON();
+                        $('#sweetaddons_seo_default_og_image').val(attachment.url);
+                        updateDefaultOGImagePreview(attachment.url);
+                    });
+
+                    mediaUploader.open();
                 });
 
-                mediaUploader.on('select', function() {
-                    const attachment = mediaUploader.state().get('selection').first().toJSON();
-                    $('#sweetaddons_seo_default_og_image').val(attachment.url);
-                    updateDefaultOGImagePreview(attachment.url);
+                // Remove default OG image
+                $('#remove-default-og-image').click(function(e) {
+                    e.preventDefault();
+                    $('#sweetaddons_seo_default_og_image').val('');
+                    updateDefaultOGImagePreview('');
                 });
 
-                mediaUploader.open();
+                // Manual URL input change for default OG image
+                $('#sweetaddons_seo_default_og_image').on('input change', function() {
+                    updateDefaultOGImagePreview($(this).val());
+                });
             });
-
-            // Remove default OG image
-            $('#remove-default-og-image').click(function(e) {
-                e.preventDefault();
-                $('#sweetaddons_seo_default_og_image').val('');
-                updateDefaultOGImagePreview('');
-            });
-
-            // Manual URL input change for default OG image
-            $('#sweetaddons_seo_default_og_image').on('input change', function() {
-                updateDefaultOGImagePreview($(this).val());
-            });
-        });
         </script>
-        <?php
+    <?php
     }
 
     public function recaptcha_page_callback()
@@ -1228,7 +1450,7 @@ class Custom_Admin_Option_Page
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) {
             $captcha_data = array();
-            
+
             if (isset($_POST['captcha_aktif'])) {
                 $captcha_data['aktif'] = sanitize_text_field($_POST['captcha_aktif']);
             }
@@ -1260,7 +1482,7 @@ class Custom_Admin_Option_Page
         $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
         $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
 
-        ?>
+    ?>
         <div class="wrap vd-ons">
             <h1>🛡️ Pengaturan Google reCaptcha</h1>
             <p>Lindungi website Anda dari spam dan bot dengan Google reCaptcha v2.</p>
@@ -1271,7 +1493,7 @@ class Custom_Admin_Option_Page
                 <!-- reCaptcha Configuration -->
                 <div class="recaptcha-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">⚙️ Konfigurasi reCaptcha</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">Aktifkan reCaptcha</th>
@@ -1308,7 +1530,7 @@ class Custom_Admin_Option_Page
                 <div class="recaptcha-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">🔒 Area Perlindungan</h2>
                     <p style="color: #666; margin-bottom: 20px;">Pilih di mana menampilkan perlindungan reCaptcha.</p>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">Form Login</th>
@@ -1346,7 +1568,7 @@ class Custom_Admin_Option_Page
                 <!-- Setup Instructions -->
                 <div class="recaptcha-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📋 Setup Instructions</h2>
-                    
+
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">1. Get reCaptcha Keys</h4>
@@ -1358,7 +1580,7 @@ class Custom_Admin_Option_Page
                                 <li>Salin Site Key dan Secret Key</li>
                             </ol>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">2. Konfigurasi Pengaturan</h4>
                             <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1369,7 +1591,7 @@ class Custom_Admin_Option_Page
                                 <li>Test reCaptcha on your forms</li>
                             </ol>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">3. Contact Form 7</h4>
                             <p style="margin: 0; line-height: 1.6;">
@@ -1382,7 +1604,7 @@ class Custom_Admin_Option_Page
                                 The reCaptcha will automatically appear when keys are configured.
                             </p>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">4. Testing</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1398,7 +1620,7 @@ class Custom_Admin_Option_Page
                 <!-- Current Status -->
                 <div class="recaptcha-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📊 Current Status</h2>
-                    
+
                     <table class="widefat striped">
                         <thead>
                             <tr>
@@ -1459,7 +1681,7 @@ class Custom_Admin_Option_Page
                 <?php submit_button('Save reCaptcha Settings', 'primary', 'submit', false); ?>
             </form>
         </div>
-        <?php
+    <?php
     }
 
     public function whitelabel_page_callback()
@@ -1504,7 +1726,7 @@ class Custom_Admin_Option_Page
         // Get current plugin data for reference
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
 
-        ?>
+    ?>
         <div class="wrap vd-ons">
             <h1>🏷️ Pengaturan White Label</h1>
             <p>Kustomisasi branding plugin dan informasi yang ditampilkan kepada pengguna.</p>
@@ -1516,7 +1738,7 @@ class Custom_Admin_Option_Page
                 <div class="whitelabel-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📋 Informasi Plugin</h2>
                     <p style="color: #666; margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1561,7 +1783,7 @@ class Custom_Admin_Option_Page
                 <div class="whitelabel-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">👤 Informasi Penulis</h2>
                     <p style="color: #666; margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1588,7 +1810,7 @@ class Custom_Admin_Option_Page
                 <div class="whitelabel-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">⚙️ Admin Customization</h2>
                     <p style="color: #666; margin-bottom: 20px;">Customize the admin interface appearance.</p>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1615,7 +1837,7 @@ class Custom_Admin_Option_Page
                 <!-- Current vs New Comparison -->
                 <div class="whitelabel-section" style="background: #f9f9f9; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📊 Before vs After Comparison</h2>
-                    
+
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div>
                             <h4 style="color: #d63638; margin-bottom: 15px;">🔴 Current (Original)</h4>
@@ -1627,7 +1849,7 @@ class Custom_Admin_Option_Page
                                 <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_data['PluginURI']); ?></p>
                             </div>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #00a32a; margin-bottom: 15px;">🟢 New (White Labeled)</h4>
                             <div style="background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
@@ -1644,7 +1866,7 @@ class Custom_Admin_Option_Page
                 <!-- White Label Benefits -->
                 <div class="whitelabel-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">✨ White Label Benefits</h2>
-                    
+
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">🏢 Professional Branding</h4>
@@ -1655,7 +1877,7 @@ class Custom_Admin_Option_Page
                                 <li>Professional appearance</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">👥 Client Relations</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1665,7 +1887,7 @@ class Custom_Admin_Option_Page
                                 <li>Custom support channels</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">⚙️ Easy Management</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1675,7 +1897,7 @@ class Custom_Admin_Option_Page
                                 <li>Reversible changes</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">🔄 Full Control</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1691,7 +1913,7 @@ class Custom_Admin_Option_Page
                 <?php submit_button('Save White Label Settings', 'primary', 'submit', false); ?>
             </form>
         </div>
-        <?php
+    <?php
     }
 
     public function whatsapp_page_callback()
@@ -1745,7 +1967,7 @@ class Custom_Admin_Option_Page
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
 
-        ?>
+    ?>
         <div class="wrap vd-ons">
             <h1>💬 Pengaturan Chat WhatsApp</h1>
             <p>Tambahkan tombol chat WhatsApp mengambang ke website Anda untuk komunikasi pelanggan yang lebih baik.</p>
@@ -1756,7 +1978,7 @@ class Custom_Admin_Option_Page
                 <!-- Basic Settings -->
                 <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">⚙️ Pengaturan Dasar</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">Aktifkan Chat WhatsApp</th>
@@ -1801,7 +2023,7 @@ class Custom_Admin_Option_Page
                 <!-- Appearance Settings -->
                 <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">🎨 Pengaturan Tampilan</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1854,7 +2076,7 @@ class Custom_Admin_Option_Page
                 <!-- Position Settings -->
                 <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📍 Pengaturan Posisi</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">
@@ -1890,7 +2112,7 @@ class Custom_Admin_Option_Page
                 <!-- Visibility Settings -->
                 <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">👁️ Visibility Settings</h2>
-                    
+
                     <table class="form-table">
                         <tr>
                             <th scope="row">Device Visibility</th>
@@ -1923,7 +2145,7 @@ class Custom_Admin_Option_Page
                 <div class="whatsapp-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">👁️ Live Preview</h2>
                     <p style="color: #666; margin-bottom: 20px;">This is how your WhatsApp chat button will look:</p>
-                    
+
                     <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
                         <div style="position: absolute; top: 10px; left: 10px; color: #666; font-size: 12px;">Preview Area</div>
 
@@ -1931,7 +2153,7 @@ class Custom_Admin_Option_Page
                             <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
                                 <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
                                     <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
-                                        <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                                        <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                                     </svg>
                                     <span id="whatsapp-preview-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
                                 </div>
@@ -1947,7 +2169,7 @@ class Custom_Admin_Option_Page
                 <!-- Setup Instructions -->
                 <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
                     <h2 style="margin-top: 0; color: #23282d;">📋 Setup Instructions</h2>
-                    
+
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">1. Get Your WhatsApp Number</h4>
@@ -1958,7 +2180,7 @@ class Custom_Admin_Option_Page
                                 <li>Example: +62812345678901</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">2. Konfigurasi Pengaturan</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1968,7 +2190,7 @@ class Custom_Admin_Option_Page
                                 <li>Atur pesan default</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">3. Test & Optimize</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1978,7 +2200,7 @@ class Custom_Admin_Option_Page
                                 <li>Adjust position if needed</li>
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h4 style="color: #0073aa; margin-bottom: 10px;">4. Best Practices</h4>
                             <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -1996,95 +2218,95 @@ class Custom_Admin_Option_Page
         </div>
 
         <script>
-        jQuery(document).ready(function($) {
-            // Color picker sync
-            $('#sweetaddons_whatsapp_color').on('change', function() {
-                $(this).next('input[type="text"]').val($(this).val());
+            jQuery(document).ready(function($) {
+                // Color picker sync
+                $('#sweetaddons_whatsapp_color').on('change', function() {
+                    $(this).next('input[type="text"]').val($(this).val());
+                    updateWhatsAppPreview();
+                });
+
+                // Real-time preview update function
+                function updateWhatsAppPreview() {
+                    const enable = $('#sweetaddons_whatsapp_enable').is(':checked');
+                    const phone = $('#sweetaddons_whatsapp_phone').val().trim();
+                    const button_text = $('#sweetaddons_whatsapp_button_text').val().trim() || 'Chat dengan kami';
+                    const position = $('#sweetaddons_whatsapp_position').val();
+                    const color = $('#sweetaddons_whatsapp_color').val();
+                    const size = $('#sweetaddons_whatsapp_size').val() || '60';
+                    const offset_x = $('#sweetaddons_whatsapp_offset_x').val() || '20';
+                    const offset_y = $('#sweetaddons_whatsapp_offset_y').val() || '20';
+                    const bubble_style = $('#sweetaddons_whatsapp_bubble_style').val();
+
+                    const $container = $('#whatsapp-preview-container');
+                    const $placeholder = $('#whatsapp-preview-placeholder');
+                    const $bubble = $('#whatsapp-preview-bubble');
+                    const $inner = $('#whatsapp-preview-inner');
+                    const $text = $('#whatsapp-preview-text');
+
+                    // Show/hide preview
+                    if (enable && phone) {
+                        $container.show();
+                        $placeholder.hide();
+
+                        // Update bubble position
+                        let positionStyle = '';
+                        switch (position) {
+                            case 'bottom-right':
+                                positionStyle = `bottom: ${offset_y}px; right: ${offset_x}px;`;
+                                break;
+                            case 'bottom-left':
+                                positionStyle = `bottom: ${offset_y}px; left: ${offset_x}px;`;
+                                break;
+                            case 'top-right':
+                                positionStyle = `top: ${offset_y}px; right: ${offset_x}px;`;
+                                break;
+                            case 'top-left':
+                                positionStyle = `top: ${offset_y}px; left: ${offset_x}px;`;
+                                break;
+                            case 'center-right':
+                                positionStyle = `top: 50%; transform: translateY(-50%); right: ${offset_x}px;`;
+                                break;
+                            case 'center-left':
+                                positionStyle = `top: 50%; transform: translateY(-50%); left: ${offset_x}px;`;
+                                break;
+                        }
+                        $bubble.attr('style', 'position: absolute; ' + positionStyle);
+
+                        // Update bubble style and content
+                        let innerStyle = '';
+                        if (bubble_style === 'extended') {
+                            innerStyle = `display: flex; align-items: center; padding: 12px 20px; background: ${color}; border-radius: 25px; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
+                            $text.show().text(button_text);
+                            $bubble.find('svg').css('margin-right', '8px');
+                        } else {
+                            innerStyle = `width: ${size}px; height: ${size}px; display: flex; align-items: center; justify-content: center; background: ${color}; border-radius: 50%; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
+                            $text.hide();
+                            $bubble.find('svg').css('margin-right', '0');
+                        }
+                        $inner.attr('style', innerStyle);
+
+                    } else {
+                        $container.hide();
+                        $placeholder.show();
+                    }
+                }
+
+                // Event listeners for all WhatsApp fields
+                $('#sweetaddons_whatsapp_enable').on('change', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_phone').on('input', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_button_text').on('input', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_size').on('input', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_offset_x').on('input', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_offset_y').on('input', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_bubble_style').on('change', updateWhatsAppPreview);
+
+                // Initialize preview on page load
                 updateWhatsAppPreview();
             });
-
-            // Real-time preview update function
-            function updateWhatsAppPreview() {
-                const enable = $('#sweetaddons_whatsapp_enable').is(':checked');
-                const phone = $('#sweetaddons_whatsapp_phone').val().trim();
-                const button_text = $('#sweetaddons_whatsapp_button_text').val().trim() || 'Chat dengan kami';
-                const position = $('#sweetaddons_whatsapp_position').val();
-                const color = $('#sweetaddons_whatsapp_color').val();
-                const size = $('#sweetaddons_whatsapp_size').val() || '60';
-                const offset_x = $('#sweetaddons_whatsapp_offset_x').val() || '20';
-                const offset_y = $('#sweetaddons_whatsapp_offset_y').val() || '20';
-                const bubble_style = $('#sweetaddons_whatsapp_bubble_style').val();
-
-                const $container = $('#whatsapp-preview-container');
-                const $placeholder = $('#whatsapp-preview-placeholder');
-                const $bubble = $('#whatsapp-preview-bubble');
-                const $inner = $('#whatsapp-preview-inner');
-                const $text = $('#whatsapp-preview-text');
-
-                // Show/hide preview
-                if (enable && phone) {
-                    $container.show();
-                    $placeholder.hide();
-
-                    // Update bubble position
-                    let positionStyle = '';
-                    switch(position) {
-                        case 'bottom-right':
-                            positionStyle = `bottom: ${offset_y}px; right: ${offset_x}px;`;
-                            break;
-                        case 'bottom-left':
-                            positionStyle = `bottom: ${offset_y}px; left: ${offset_x}px;`;
-                            break;
-                        case 'top-right':
-                            positionStyle = `top: ${offset_y}px; right: ${offset_x}px;`;
-                            break;
-                        case 'top-left':
-                            positionStyle = `top: ${offset_y}px; left: ${offset_x}px;`;
-                            break;
-                        case 'center-right':
-                            positionStyle = `top: 50%; transform: translateY(-50%); right: ${offset_x}px;`;
-                            break;
-                        case 'center-left':
-                            positionStyle = `top: 50%; transform: translateY(-50%); left: ${offset_x}px;`;
-                            break;
-                    }
-                    $bubble.attr('style', 'position: absolute; ' + positionStyle);
-
-                    // Update bubble style and content
-                    let innerStyle = '';
-                    if (bubble_style === 'extended') {
-                        innerStyle = `display: flex; align-items: center; padding: 12px 20px; background: ${color}; border-radius: 25px; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
-                        $text.show().text(button_text);
-                        $bubble.find('svg').css('margin-right', '8px');
-                    } else {
-                        innerStyle = `width: ${size}px; height: ${size}px; display: flex; align-items: center; justify-content: center; background: ${color}; border-radius: 50%; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
-                        $text.hide();
-                        $bubble.find('svg').css('margin-right', '0');
-                    }
-                    $inner.attr('style', innerStyle);
-
-                } else {
-                    $container.hide();
-                    $placeholder.show();
-                }
-            }
-
-            // Event listeners for all WhatsApp fields
-            $('#sweetaddons_whatsapp_enable').on('change', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_phone').on('input', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_button_text').on('input', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_size').on('input', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_offset_x').on('input', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_offset_y').on('input', updateWhatsAppPreview);
-            $('#sweetaddons_whatsapp_bubble_style').on('change', updateWhatsAppPreview);
-
-            // Initialize preview on page load
-            updateWhatsAppPreview();
-        });
         </script>
-        <?php
+<?php
     }
 }
 

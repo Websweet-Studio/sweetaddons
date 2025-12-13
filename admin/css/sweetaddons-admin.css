@@ -3,10 +3,127 @@
  * included in this file.
 */
 
- .vdaddons-notice {
-    background-color: #fff4bd;
-    display: block;
-    padding: .5rem 1rem;
-    border-left: .25rem solid #ffaf09;
-    margin: .25rem 0;
+.vdaddons-notice {
+   background-color: #fff4bd;
+   display: block;
+   padding: .5rem 1rem;
+   border-left: .25rem solid #ffaf09;
+   margin: .25rem 0;
+}
+
+.sweetaddons-dashboard {
+   margin-top: 10px;
+}
+.sad-title {
+   margin: 0 0 16px 0;
+}
+.sad-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+   gap: 16px;
+}
+.sad-top {
+   display: grid;
+   grid-template-columns: 7fr 3fr;
+   gap: 16px;
+   margin-bottom: 16px;
+}
+.sad-row {
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   gap: 16px;
+   margin-bottom: 16px;
+}
+.sad-top-right .sad-card + .sad-card {
+   margin-top: 16px;
+}
+.sad-card {
+   background: #fff;
+   border: 1px solid #e5e7eb;
+   border-radius: 14px;
+   padding: 18px;
+   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sad-card-title {
+   font-size: 14px;
+   color: #6b7280;
+   margin-bottom: 10px;
+}
+.sad-card-value {
+   font-size: 28px;
+   font-weight: 700;
+   color: #065f46;
+   margin-bottom: 6px;
+}
+.sad-subtext {
+   font-size: 12px;
+   color: #6b7280;
+}
+.sad-stat {
+   border-left: 6px solid #10b981;
+}
+.sad-table {
+   display: grid;
+   gap: 8px;
+}
+.sad-table div {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   align-items: center;
+   font-size: 13px;
+}
+.sad-table div span:first-child {
+   color: #6b7280;
+}
+.sad-chips {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 8px;
+}
+.sad-chip {
+   background: #ecfdf5;
+   color: #065f46;
+   border: 1px solid #a7f3d0;
+   padding: 6px 10px;
+   border-radius: 999px;
+   font-size: 12px;
+}
+.sad-status {
+   display: grid;
+   gap: 8px;
+}
+.sad-status div {
+   display: flex;
+   justify-content: space-between;
+   font-size: 13px;
+}
+.sad-actions-row {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 8px;
+}
+.sad-actions .button-primary {
+   background: #10b981;
+   border-color: #10b981;
+}
+.sad-actions .button-primary:hover {
+   background: #059669;
+   border-color: #059669;
+}
+
+body.toplevel_page_custom_admin_options .notice,
+body.toplevel_page_custom_admin_options .notice-warning,
+body.toplevel_page_custom_admin_options .notice-alt,
+body.toplevel_page_custom_admin_options .update-nag {
+   display: none !important;
+}
+
+.sad-card canvas {
+   height: 220px !important;
+}
+
+@media (max-width: 1024px) {
+   .sad-top {
+      grid-template-columns: 1fr;
+   }
 }
