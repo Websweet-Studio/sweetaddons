@@ -34,7 +34,7 @@ class Sweetaddons_SEO
         }
 
         global $post;
-        
+
         // Meta description
         $meta_description = $this->get_meta_description();
         if ($meta_description) {
@@ -85,7 +85,7 @@ class Sweetaddons_SEO
         $og_image = $this->get_og_image();
         if ($og_image) {
             echo '<meta property="og:image" content="' . esc_url($og_image) . '">' . "\n";
-            
+
             $image_data = wp_get_attachment_image_src(attachment_url_to_postid($og_image), 'full');
             if ($image_data) {
                 echo '<meta property="og:image:width" content="' . $image_data[1] . '">' . "\n";
@@ -96,11 +96,11 @@ class Sweetaddons_SEO
         // Twitter Card tags
         echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
         echo '<meta name="twitter:title" content="' . esc_attr($this->get_page_title()) . '">' . "\n";
-        
+
         if ($og_description) {
             echo '<meta name="twitter:description" content="' . esc_attr($og_description) . '">' . "\n";
         }
-        
+
         if ($og_image) {
             echo '<meta name="twitter:image" content="' . esc_url($og_image) . '">' . "\n";
         }
@@ -155,12 +155,12 @@ class Sweetaddons_SEO
             if ($custom_desc) {
                 return $custom_desc;
             }
-            
+
             // Auto-generate from excerpt or content
             if ($post->post_excerpt) {
                 return wp_trim_words($post->post_excerpt, 25);
             }
-            
+
             return wp_trim_words(strip_tags($post->post_content), 25);
         }
 
@@ -409,7 +409,7 @@ class Sweetaddons_SEO
         $noindex = get_post_meta($post->ID, '_sweetaddons_seo_noindex', true);
         $nofollow = get_post_meta($post->ID, '_sweetaddons_seo_nofollow', true);
 
-        ?>
+?>
         <table class="form-table">
             <tr>
                 <th><label for="sweetaddons_seo_title">SEO Title</label></th>
@@ -479,93 +479,93 @@ class Sweetaddons_SEO
         </table>
 
         <script>
-        jQuery(document).ready(function($) {
-            // Character counters
-            function updateCounter(input, counter, recommended) {
-                const length = input.val().length;
-                let color = '#666';
-                if (length > recommended + 10) color = '#d63638';
-                else if (length > recommended) color = '#ff922b';
-                else if (length > recommended - 10) color = '#00a32a';
+            jQuery(document).ready(function($) {
+                // Character counters
+                function updateCounter(input, counter, recommended) {
+                    const length = input.val().length;
+                    let color = '#666';
+                    if (length > recommended + 10) color = '#d63638';
+                    else if (length > recommended) color = '#ff922b';
+                    else if (length > recommended - 10) color = '#00a32a';
 
-                counter.html(length + ' characters').css('color', color);
-            }
+                    counter.html(length + ' characters').css('color', color);
+                }
 
-            const titleInput = $('#sweetaddons_seo_title');
-            const titleCounter = $('#title-length-counter');
-            const descInput = $('#sweetaddons_seo_description');
-            const descCounter = $('#desc-length-counter');
+                const titleInput = $('#sweetaddons_seo_title');
+                const titleCounter = $('#title-length-counter');
+                const descInput = $('#sweetaddons_seo_description');
+                const descCounter = $('#desc-length-counter');
 
-            titleInput.on('input', function() {
+                titleInput.on('input', function() {
+                    updateCounter(titleInput, titleCounter, 60);
+                });
+
+                descInput.on('input', function() {
+                    updateCounter(descInput, descCounter, 160);
+                });
+
+                // Initial count
                 updateCounter(titleInput, titleCounter, 60);
-            });
-
-            descInput.on('input', function() {
                 updateCounter(descInput, descCounter, 160);
-            });
 
-            // Initial count
-            updateCounter(titleInput, titleCounter, 60);
-            updateCounter(descInput, descCounter, 160);
+                // OG Image preview update
+                function updateOGImagePreview(imageUrl) {
+                    const previewContainer = $('.og-image-preview');
+                    const removeButton = $('#remove-og-image');
 
-            // OG Image preview update
-            function updateOGImagePreview(imageUrl) {
-                const previewContainer = $('.og-image-preview');
-                const removeButton = $('#remove-og-image');
-
-                if (imageUrl) {
-                    previewContainer.html('<img src="' + imageUrl + '" alt="OG Image Preview" style="max-width: 200px; height: auto; border: 1px solid #ddd; padding: 5px; background: #f9f9f9;" />');
-                    removeButton.show();
-                } else {
-                    previewContainer.html('<div style="width: 200px; height: 105px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; background: #f9f9f9;">No image selected</div>');
-                    removeButton.hide();
-                }
-            }
-
-            // Media uploader for OG image
-            $('#upload-og-image').click(function(e) {
-                e.preventDefault();
-
-                // Check if wp.media exists
-                if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-                    alert('WordPress media uploader is not available. Please make sure you are on a post edit screen.');
-                    return;
-                }
-
-                const mediaUploader = wp.media({
-                    title: 'Choose Open Graph Image',
-                    button: {
-                        text: 'Use This Image'
-                    },
-                    multiple: false,
-                    library: {
-                        type: 'image'
+                    if (imageUrl) {
+                        previewContainer.html('<img src="' + imageUrl + '" alt="OG Image Preview" style="max-width: 200px; height: auto; border: 1px solid #ddd; padding: 5px; background: #f9f9f9;" />');
+                        removeButton.show();
+                    } else {
+                        previewContainer.html('<div style="width: 200px; height: 105px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; background: #f9f9f9;">No image selected</div>');
+                        removeButton.hide();
                     }
+                }
+
+                // Media uploader for OG image
+                $('#upload-og-image').click(function(e) {
+                    e.preventDefault();
+
+                    // Check if wp.media exists
+                    if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+                        alert('WordPress media uploader is not available. Please make sure you are on a post edit screen.');
+                        return;
+                    }
+
+                    const mediaUploader = wp.media({
+                        title: 'Choose Open Graph Image',
+                        button: {
+                            text: 'Use This Image'
+                        },
+                        multiple: false,
+                        library: {
+                            type: 'image'
+                        }
+                    });
+
+                    mediaUploader.on('select', function() {
+                        const attachment = mediaUploader.state().get('selection').first().toJSON();
+                        $('#sweetaddons_seo_og_image').val(attachment.url);
+                        updateOGImagePreview(attachment.url);
+                    });
+
+                    mediaUploader.open();
                 });
 
-                mediaUploader.on('select', function() {
-                    const attachment = mediaUploader.state().get('selection').first().toJSON();
-                    $('#sweetaddons_seo_og_image').val(attachment.url);
-                    updateOGImagePreview(attachment.url);
+                // Remove OG image
+                $('#remove-og-image').click(function(e) {
+                    e.preventDefault();
+                    $('#sweetaddons_seo_og_image').val('');
+                    updateOGImagePreview('');
                 });
 
-                mediaUploader.open();
+                // Manual URL input change
+                $('#sweetaddons_seo_og_image').on('input change', function() {
+                    updateOGImagePreview($(this).val());
+                });
             });
-
-            // Remove OG image
-            $('#remove-og-image').click(function(e) {
-                e.preventDefault();
-                $('#sweetaddons_seo_og_image').val('');
-                updateOGImagePreview('');
-            });
-
-            // Manual URL input change
-            $('#sweetaddons_seo_og_image').on('input change', function() {
-                updateOGImagePreview($(this).val());
-            });
-        });
         </script>
-        <?php
+<?php
     }
 
     public function save_seo_meta_data($post_id)
@@ -599,6 +599,7 @@ class Sweetaddons_SEO
                 delete_post_meta($post_id, $meta_key);
             }
         }
+        delete_transient($this->get_sitemap_cache_key());
     }
 
     public function custom_title($title, $sep)
@@ -630,46 +631,100 @@ class Sweetaddons_SEO
 
     private function generate_xml_sitemap()
     {
-        header('Content-Type: application/xml; charset=utf-8');
-        
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-        // Homepage
-        echo '<url>' . "\n";
-        echo '<loc>' . esc_url(home_url('/')) . '</loc>' . "\n";
-        echo '<lastmod>' . date('c') . '</lastmod>' . "\n";
-        echo '<changefreq>daily</changefreq>' . "\n";
-        echo '<priority>1.0</priority>' . "\n";
-        echo '</url>' . "\n";
-
-        // Posts and pages
-        $posts = get_posts(array(
-            'post_type' => array('post', 'page'),
-            'post_status' => 'publish',
-            'numberposts' => -1
-        ));
-
-        foreach ($posts as $post) {
-            $noindex = get_post_meta($post->ID, '_sweetaddons_seo_noindex', true);
-            if ($noindex) continue;
-
-            echo '<url>' . "\n";
-            echo '<loc>' . esc_url(get_permalink($post->ID)) . '</loc>' . "\n";
-            echo '<lastmod>' . date('c', strtotime($post->post_modified)) . '</lastmod>' . "\n";
-            
-            if ($post->post_type === 'post') {
-                echo '<changefreq>monthly</changefreq>' . "\n";
-                echo '<priority>0.8</priority>' . "\n";
-            } else {
-                echo '<changefreq>monthly</changefreq>' . "\n";
-                echo '<priority>0.6</priority>' . "\n";
-            }
-            
-            echo '</url>' . "\n";
+        $cache = get_transient($this->get_sitemap_cache_key());
+        if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {
+            header('Content-Type: application/xml; charset=utf-8');
+            header('Cache-Control: public, max-age=43200');
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $cache['last_modified']) . ' GMT');
+            $this->maybe_output_304($cache['last_modified']);
+            echo $cache['xml'];
+            return;
         }
 
-        echo '</urlset>';
+        $last_modified = $this->get_latest_modified_timestamp();
+        $xml = '';
+        $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+        // Homepage
+        $xml .= '<url>' . "\n";
+        $xml .= '<loc>' . esc_url(home_url('/')) . '</loc>' . "\n";
+        $xml .= '<lastmod>' . date('c', $last_modified ?: time()) . '</lastmod>' . "\n";
+        $xml .= '<changefreq>daily</changefreq>' . "\n";
+        $xml .= '<priority>1.0</priority>' . "\n";
+        $xml .= '</url>' . "\n";
+
+        // Posts and pages (lightweight IDs only)
+        $ids = get_posts(array(
+            'post_type' => array('post', 'page'),
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true
+        ));
+
+        foreach ($ids as $id) {
+            $noindex = get_post_meta($id, '_sweetaddons_seo_noindex', true);
+            if ($noindex) {
+                continue;
+            }
+            $permalink = get_permalink($id);
+            $modified = get_post_field('post_modified', $id);
+            $type = get_post_type($id);
+
+            $xml .= '<url>' . "\n";
+            $xml .= '<loc>' . esc_url($permalink) . '</loc>' . "\n";
+            $xml .= '<lastmod>' . date('c', strtotime($modified)) . '</lastmod>' . "\n";
+            $xml .= '<changefreq>monthly</changefreq>' . "\n";
+            $xml .= ($type === 'post' ? '<priority>0.8</priority>' : '<priority>0.6</priority>') . "\n";
+            $xml .= '</url>' . "\n";
+        }
+
+        $xml .= '</urlset>';
+
+        set_transient($this->get_sitemap_cache_key(), array(
+            'xml' => $xml,
+            'last_modified' => $last_modified ?: time()
+        ), 12 * HOUR_IN_SECONDS);
+
+        header('Content-Type: application/xml; charset=utf-8');
+        header('Cache-Control: public, max-age=43200');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', ($last_modified ?: time())) . ' GMT');
+        $this->maybe_output_304($last_modified ?: time());
+        echo $xml;
+    }
+
+    private function get_latest_modified_timestamp()
+    {
+        $q = new WP_Query(array(
+            'post_type' => array('post', 'page'),
+            'post_status' => 'publish',
+            'orderby' => 'modified',
+            'order' => 'DESC',
+            'posts_per_page' => 1,
+            'fields' => 'ids',
+            'no_found_rows' => true
+        ));
+        if ($q->have_posts()) {
+            $id = $q->posts[0];
+            $modified = get_post_field('post_modified', $id);
+            return strtotime($modified);
+        }
+        return time();
+    }
+
+    private function get_sitemap_cache_key()
+    {
+        return 'sweetaddons_sitemap_xml_cache';
+    }
+
+    private function maybe_output_304($last_modified_ts)
+    {
+        $if_modified_since = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : false;
+        if ($if_modified_since && $last_modified_ts && $if_modified_since >= $last_modified_ts) {
+            status_header(304);
+            exit;
+        }
     }
 
     public function register_sitemap_rewrite()
