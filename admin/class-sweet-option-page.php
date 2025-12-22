@@ -1315,7 +1315,7 @@ class Custom_Admin_Option_Page
                             </p>
                             <?php if ($enable_sitemap): ?>
                                 <p class="description">
-                                    <a href="<?php echo home_url('/?sweetaddons_sitemap=xml'); ?>" target="_blank" class="button button-small">View Sitemap</a>
+                                    <a href="<?php echo home_url('/sitemap.xml'); ?>" target="_blank" class="button button-small">View Sitemap</a>
                                 </p>
                             <?php endif; ?>
                         </div>

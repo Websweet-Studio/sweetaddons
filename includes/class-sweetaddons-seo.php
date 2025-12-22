@@ -19,6 +19,9 @@ class Sweetaddons_SEO
         add_action('add_meta_boxes', array($this, 'add_seo_meta_boxes'));
         add_action('save_post', array($this, 'save_seo_meta_data'));
         add_action('init', array($this, 'handle_sitemap_request'));
+        add_action('init', array($this, 'register_sitemap_rewrite'));
+        add_filter('query_vars', array($this, 'add_query_vars'));
+        add_action('template_redirect', array($this, 'template_redirect_sitemap'));
         add_filter('wp_title', array($this, 'custom_title'), 10, 2);
         add_filter('document_title_parts', array($this, 'custom_document_title_parts'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
@@ -615,9 +618,13 @@ class Sweetaddons_SEO
 
     public function handle_sitemap_request()
     {
-        if (isset($_GET['sweetaddons_sitemap']) && $_GET['sweetaddons_sitemap'] === 'xml') {
-            $this->generate_xml_sitemap();
-            exit;
+        $qv = get_query_var('sweetaddons_sitemap');
+        if ((isset($_GET['sweetaddons_sitemap']) && $_GET['sweetaddons_sitemap'] === 'xml') || ($qv === 'xml')) {
+            $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
+            if ($enabled === '1') {
+                $this->generate_xml_sitemap();
+                exit;
+            }
         }
     }
 
@@ -663,5 +670,36 @@ class Sweetaddons_SEO
         }
 
         echo '</urlset>';
+    }
+
+    public function register_sitemap_rewrite()
+    {
+        add_rewrite_rule('^sitemap\.xml/?$', 'index.php?sweetaddons_sitemap=xml', 'top');
+        $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
+        $initialized = get_option('sweetaddons_sitemap_rules_initialized');
+        if ($enabled === '1' && $initialized !== '2') {
+            flush_rewrite_rules();
+            update_option('sweetaddons_sitemap_rules_initialized', 2);
+        }
+    }
+
+    public function add_query_vars($vars)
+    {
+        $vars[] = 'sweetaddons_sitemap';
+        return $vars;
+    }
+
+    public function template_redirect_sitemap()
+    {
+        $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
+        if ($enabled !== '1') {
+            return;
+        }
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+        $path = strtok($request_uri, '?');
+        if (rtrim($path, '/') === '/sitemap.xml') {
+            $this->generate_xml_sitemap();
+            exit;
+        }
     }
 }
