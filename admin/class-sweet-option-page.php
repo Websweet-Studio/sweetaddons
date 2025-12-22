@@ -143,7 +143,6 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_default_og_image');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_twitter_site');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_enable_sitemap');
-        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_google_analytics');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_google_search_console');
 
         // reCaptcha settings
@@ -1154,13 +1153,17 @@ class Custom_Admin_Option_Page
                 'sweetaddons_seo_default_og_image',
                 'sweetaddons_seo_twitter_site',
                 'sweetaddons_seo_enable_sitemap',
-                'sweetaddons_seo_google_analytics',
                 'sweetaddons_seo_google_search_console'
             );
 
             foreach ($fields as $field) {
                 if (isset($_POST[$field])) {
                     update_option($field, sanitize_text_field($_POST[$field]));
+                } else {
+                    // For checkboxes that might be unchecked
+                    if ($field === 'sweetaddons_seo_enable_sitemap') {
+                        update_option($field, '0');
+                    }
                 }
             }
 
@@ -1172,192 +1175,164 @@ class Custom_Admin_Option_Page
         $default_og_image = get_option('sweetaddons_seo_default_og_image', '');
         $twitter_site = get_option('sweetaddons_seo_twitter_site', '');
         $enable_sitemap = get_option('sweetaddons_seo_enable_sitemap', '1');
-        $google_analytics = get_option('sweetaddons_seo_google_analytics', '');
         $google_search_console = get_option('sweetaddons_seo_google_search_console', '');
 
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
             <h1 class="sad-title">🔍 Pengaturan SEO</h1>
+
+            <!-- Status Summary Cards -->
+            <div class="stats-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+
+                <div class="sad-card" style="text-align: center; margin-bottom: 0; cursor: pointer; transition: transform 0.2s; border-bottom: 4px solid #0073aa;" onclick="document.getElementById('seo-general-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Home SEO</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                        <?php echo !empty($home_title) ? '<span style="color:#00a32a">OK</span>' : '<span style="color:#d63638">Set</span>'; ?>
+                    </div>
+                    <div style="color: #666; font-size: 14px;">Title Configuration</div>
+                </div>
+
+                <div class="sad-card" style="text-align: center; margin-bottom: 0; cursor: pointer; transition: transform 0.2s; border-bottom: 4px solid #0073aa;" onclick="document.getElementById('seo-technical-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Sitemap XML</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                        <?php echo $enable_sitemap ? '<span style="color:#00a32a">Active</span>' : '<span style="color:#999">Off</span>'; ?>
+                    </div>
+                    <div style="color: #666; font-size: 14px;">Search Engine Indexing</div>
+                </div>
+
+                <div class="sad-card" style="text-align: center; margin-bottom: 0; cursor: pointer; transition: transform 0.2s; border-bottom: 4px solid #0073aa;" onclick="document.getElementById('seo-social-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Open Graph</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                        <?php echo !empty($default_og_image) ? '<span style="color:#00a32a">Ready</span>' : '<span style="color:#ff922b">Default</span>'; ?>
+                    </div>
+                    <div style="color: #666; font-size: 14px;">Social Sharing</div>
+                </div>
+            </div>
+
             <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_seo_settings'); ?>
 
-                <!-- General SEO Settings -->
-                <div class="sad-card">
-                    <div class="sad-card-title">🏠 SEO Halaman Utama</div>
+                <div class="charts-section" style="display: grid; grid-template-columns: 7fr 3fr; gap: 20px; margin: 20px 0;">
 
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_seo_home_title">Judul Halaman Utama</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_seo_home_title" name="sweetaddons_seo_home_title" value="<?php echo esc_attr($home_title); ?>" class="large-text" />
-                                <p class="description">Kosongkan untuk menggunakan nama situs dan tagline. Maksimal 60 karakter disarankan.</p>
-                                <div id="home-title-counter" style="font-size: 12px; color: #666;"></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_seo_home_description">Deskripsi Halaman Utama</label>
-                            </th>
-                            <td>
-                                <textarea id="sweetaddons_seo_home_description" name="sweetaddons_seo_home_description" rows="3" class="large-text"><?php echo esc_textarea($home_description); ?></textarea>
-                                <p class="description">Kosongkan untuk menggunakan tagline situs. Maksimal 160 karakter disarankan.</p>
-                                <div id="home-desc-counter" style="font-size: 12px; color: #666;"></div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                    <!-- Left Column (Main Settings) -->
+                    <div class="left-column">
 
-                <!-- Social Media Settings -->
-                <div class="sad-card">
-                    <div class="sad-card-title">📱 Social Media</div>
+                        <!-- General SEO Settings -->
+                        <div class="sad-card" id="seo-general-settings">
+                            <div class="sad-card-title">🏠 SEO Halaman Utama</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_home_title">Judul Halaman Utama</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_home_title" name="sweetaddons_seo_home_title" value="<?php echo esc_attr($home_title); ?>" class="large-text" />
+                                        <p class="description">Kosongkan untuk menggunakan nama situs dan tagline.</p>
+                                        <div id="home-title-counter" style="font-size: 12px; color: #666;"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_home_description">Deskripsi Halaman Utama</label></th>
+                                    <td>
+                                        <textarea id="sweetaddons_seo_home_description" name="sweetaddons_seo_home_description" rows="3" class="large-text"><?php echo esc_textarea($home_description); ?></textarea>
+                                        <p class="description">Kosongkan untuk menggunakan tagline situs.</p>
+                                        <div id="home-desc-counter" style="font-size: 12px; color: #666;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_seo_default_og_image">Default Open Graph Image</label>
-                            </th>
-                            <td>
-                                <div class="og-image-container">
-                                    <input type="url" id="sweetaddons_seo_default_og_image" name="sweetaddons_seo_default_og_image" value="<?php echo esc_url($default_og_image); ?>" style="display: none;" />
-                                    <div class="og-image-preview" style="margin: 10px 0; cursor: pointer;" onclick="document.getElementById('upload-default-og-image').click()">
-                                        <?php if ($default_og_image): ?>
-                                            <div style="position: relative; display: inline-block;">
-                                                <img src="<?php echo esc_url($default_og_image); ?>" alt="Default OG Image Preview" style="max-width: 300px; height: auto; border: 1px solid #ddd; padding: 5px; background: #f9f9f9; border-radius: 4px;" />
-                                                <div style="position: absolute; top: 5px; right: 5px; background: #23282d; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; opacity: 0.8;">Click to change</div>
+                        <!-- Social Media Settings -->
+                        <div class="sad-card" id="seo-social-settings">
+                            <div class="sad-card-title">📱 Social Media</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_default_og_image">Default OG Image</label></th>
+                                    <td>
+                                        <div class="og-image-container">
+                                            <input type="url" id="sweetaddons_seo_default_og_image" name="sweetaddons_seo_default_og_image" value="<?php echo esc_url($default_og_image); ?>" style="display: none;" />
+                                            <div class="og-image-preview" style="margin: 10px 0; cursor: pointer;" onclick="document.getElementById('upload-default-og-image').click()">
+                                                <?php if ($default_og_image): ?>
+                                                    <div style="position: relative; display: inline-block;">
+                                                        <img src="<?php echo esc_url($default_og_image); ?>" alt="Preview" style="max-width: 100%; height: auto; border-radius: 4px;" />
+                                                        <div style="position: absolute; top: 5px; right: 5px; background: #23282d; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; opacity: 0.8;">Click to change</div>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div style="width: 100%; height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; color: #999; background: #f9f9f9; border-radius: 4px;">
+                                                        <span>📷 Select Image</span>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
-                                        <?php else: ?>
-                                            <div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#005a87'; this.style.background='#f0f8ff';" onmouseout="this.style.borderColor='#0073aa'; this.style.background='#f9f9f9';">
-                                                <div style="text-align: center;">
-                                                    <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
-                                                    <div>Click to choose image</div>
-                                                    <div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div>
-                                                </div>
+                                            <div class="og-image-buttons" style="margin-top: 10px;">
+                                                <button type="button" class="button" id="upload-default-og-image">Choose Image</button>
+                                                <?php if ($default_og_image): ?>
+                                                    <button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>
+                                                <?php endif; ?>
                                             </div>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="og-image-buttons" style="margin-top: 10px;">
-                                        <button type="button" class="button" id="upload-default-og-image">Choose Image</button>
-                                        <?php if ($default_og_image): ?>
-                                            <button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>
-                                        <?php endif; ?>
-                                    </div>
-                                    <p class="description">Default image for social media sharing when no featured image is available.</p>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_seo_twitter_site">Twitter Username</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_seo_twitter_site" name="sweetaddons_seo_twitter_site" value="<?php echo esc_attr($twitter_site); ?>" class="regular-text" placeholder="websweetstudio" />
-                                <p class="description">Your Twitter username (without @).</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_twitter_site">Twitter Username</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_twitter_site" name="sweetaddons_seo_twitter_site" value="<?php echo esc_attr($twitter_site); ?>" class="regular-text" placeholder="username" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                <!-- Technical SEO -->
-                <div class="sad-card">
-                    <div class="sad-card-title">⚙️ Technical SEO</div>
+                        <!-- Analytics -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">📊 Analytics & Tools</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_google_search_console">Search Console</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_google_search_console" name="sweetaddons_seo_google_search_console" value="<?php echo esc_attr($google_search_console); ?>" class="large-text" placeholder="Verification Code / File Name" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">XML Sitemap</th>
-                            <td>
+                    </div>
+
+                    <!-- Right Column (Sidebar) -->
+                    <div class="right-column">
+
+                        <!-- Save Button Card -->
+                        <div class="sad-card" style="text-align: center; background: #f0f8ff; border-color: #0073aa;">
+                            <h3 style="margin-top: 0;">💾 Simpan Perubahan</h3>
+                            <p style="margin-bottom: 15px; color: #666;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</p>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
+                        </div>
+
+                        <!-- Technical SEO -->
+                        <div class="sad-card" id="seo-technical-settings">
+                            <div class="sad-card-title">⚙️ Technical SEO</div>
+                            <p>
                                 <label>
                                     <input type="checkbox" name="sweetaddons_seo_enable_sitemap" value="1" <?php checked($enable_sitemap, '1'); ?> />
-                                    Enable XML Sitemap generation
+                                    Enable XML Sitemap
                                 </label>
+                            </p>
+                            <?php if ($enable_sitemap): ?>
                                 <p class="description">
-                                    <?php if ($enable_sitemap): ?>
-                                        <strong>Sitemap URL:</strong> <a href="<?php echo home_url('/?sweetaddons_sitemap=xml'); ?>" target="_blank"><?php echo home_url('/?sweetaddons_sitemap=xml'); ?></a>
-                                    <?php else: ?>
-                                        Enable to generate XML sitemap for search engines.
-                                    <?php endif; ?>
+                                    <a href="<?php echo home_url('/?sweetaddons_sitemap=xml'); ?>" target="_blank" class="button button-small">View Sitemap</a>
                                 </p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                            <?php endif; ?>
+                        </div>
 
-                <!-- Analytics -->
-                <div class="sad-card">
-                    <div class="sad-card-title">📊 Analytics & Alat Webmaster</div>
-
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_seo_google_analytics">ID Google Analytics</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_seo_google_analytics" name="sweetaddons_seo_google_analytics" value="<?php echo esc_attr($google_analytics); ?>" class="regular-text" placeholder="GA4-XXXXXXXXX" />
-                                <p class="description">ID Pengukuran Google Analytics 4 Anda (contoh: GA4-XXXXXXXXX).</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_seo_google_search_console">Google Search Console</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_seo_google_search_console" name="sweetaddons_seo_google_search_console" value="<?php echo esc_attr($google_search_console); ?>" class="large-text" placeholder="google1234567890abcdef.html" />
-                                <p class="description">Konten meta tag verifikasi atau nama file HTML untuk Google Search Console.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <!-- SEO Features Info -->
-                <div class="sad-card" style="background: #f0f8ff;">
-                    <div class="sad-card-title">✨ Fitur SEO yang Disertakan</div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">📝 Optimasi Konten</h4>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                <li>Judul meta dan deskripsi khusus</li>
-                                <li>Dukungan kata kunci meta</li>
-                                <li>URL kanonik</li>
-                                <li>Tag meta robots (noindex, nofollow)</li>
+                        <!-- Features Info -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">✨ Fitur SEO</div>
+                            <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #666;">
+                                <li style="margin-bottom: 5px;">Judul & Deskripsi Meta</li>
+                                <li style="margin-bottom: 5px;">Open Graph Support</li>
+                                <li style="margin-bottom: 5px;">XML Sitemap Generator</li>
+                                <li style="margin-bottom: 5px;">Robots.txt Control</li>
+                                <li>Schema.org Data</li>
                             </ul>
                         </div>
 
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">📱 Media Sosial</h4>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                <li>Tag meta Open Graph</li>
-                                <li>Dukungan Twitter Card</li>
-                                <li>Gambar media sosial khusus</li>
-                                <li>Fallback otomatis</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">🔧 SEO Teknis</h4>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                <li>Data terstruktur Schema.org</li>
-                                <li>Generasi XML sitemap</li>
-                                <li>Integrasi Google Analytics</li>
-                                <li>Verifikasi Search Console</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">📊 Kontrol Per Postingan</h4>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                <li>Meta box SEO di semua postingan/halaman</li>
-                                <li>Penghitung karakter untuk judul/deskripsi</li>
-                                <li>Pengunggah gambar untuk gambar OG</li>
-                                <li>Pengaturan robots individual</li>
-                            </ul>
-                        </div>
                     </div>
-                </div>
-
-                <div class="sad-actions-row" style="justify-content: flex-end;">
-                    <?php submit_button('Save SEO Settings', 'primary', 'submit', false); ?>
                 </div>
             </form>
         </div>
@@ -1410,7 +1385,7 @@ class Custom_Admin_Option_Page
                 }
 
                 // Media uploader for default OG image
-                $('#upload-default-og-image').click(function(e) {
+                $(document).on('click', '#upload-default-og-image', function(e) {
                     e.preventDefault();
 
                     // Check if wp.media exists
@@ -1440,7 +1415,7 @@ class Custom_Admin_Option_Page
                 });
 
                 // Remove default OG image
-                $('#remove-default-og-image').click(function(e) {
+                $(document).on('click', '#remove-default-og-image', function(e) {
                     e.preventDefault();
                     $('#sweetaddons_seo_default_og_image').val('');
                     updateDefaultOGImagePreview('');
