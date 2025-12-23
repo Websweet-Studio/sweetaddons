@@ -1683,7 +1683,8 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whitelabel_author_uri',
                 'sweetaddons_whitelabel_version',
                 'sweetaddons_whitelabel_menu_title',
-                'sweetaddons_whitelabel_hide_original'
+                'sweetaddons_whitelabel_hide_original',
+                'sweetaddons_whitelabel_accent_color'
             );
 
             foreach ($fields as $field) {
@@ -1709,212 +1710,225 @@ class Custom_Admin_Option_Page
         $version = get_option('sweetaddons_whitelabel_version', '2.2.1');
         $menu_title = get_option('sweetaddons_whitelabel_menu_title', 'Sweet Addons');
         $hide_original = get_option('sweetaddons_whitelabel_hide_original', '');
+        $accent_color = get_option('sweetaddons_whitelabel_accent_color', '#2271b1');
 
         // Get current plugin data for reference
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
     ?>
-        <div class="wrap sweetaddons-dashboard">
-            <h1 class="wp-heading-inline">🏷️ Pengaturan White Label</h1>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">🏷️ Pengaturan White Label</h1>
             <p>Kustomisasi branding plugin dan informasi yang ditampilkan kepada pengguna.</p>
 
-            <form method="post" action="">
+            <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_whitelabel_settings'); ?>
-                <div class="sad-grid">
-                    <div class="sad-card">
-                        <div class="sad-card-title">⚙️ Konfigurasi White Label</div>
+                <div class="sad-top">
+                    <div class="sad-top-left">
+                        <div class="sad-card">
+                            <div class="sad-card-title">⚙️ Konfigurasi White Label</div>
 
-                        <!-- Plugin Information -->
-                        <h3 style="margin-bottom: 20px;">📋 Informasi Plugin</h3>
-                        <p style="margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_plugin_name">Nama Plugin</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whitelabel_plugin_name" name="sweetaddons_whitelabel_plugin_name" value="<?php echo esc_attr($plugin_name); ?>" class="large-text" />
-                                    <p class="description">Nama yang muncul di daftar plugin dan menu admin.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_description">Deskripsi Plugin</label>
-                                </th>
-                                <td>
-                                    <textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea>
-                                    <p class="description">Deskripsi yang ditampilkan di daftar plugin.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_version">Versi</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whitelabel_version" name="sweetaddons_whitelabel_version" value="<?php echo esc_attr($version); ?>" class="regular-text" />
-                                    <p class="description">Nomor versi plugin.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label>
-                                </th>
-                                <td>
-                                    <input type="url" id="sweetaddons_whitelabel_plugin_uri" name="sweetaddons_whitelabel_plugin_uri" value="<?php echo esc_url($plugin_uri); ?>" class="large-text" />
-                                    <p class="description">URL yang akan dikunjungi pengguna ketika mengklik nama plugin.</p>
-                                </td>
-                            </tr>
-                        </table>
+                            <!-- Plugin Information -->
+                            <h3 style="margin-bottom: 20px;">📋 Informasi Plugin</h3>
+                            <p style="margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_plugin_name">Nama Plugin</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_plugin_name" name="sweetaddons_whitelabel_plugin_name" value="<?php echo esc_attr($plugin_name); ?>" class="large-text" />
+                                        <p class="description">Nama yang muncul di daftar plugin dan menu admin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_description">Deskripsi Plugin</label>
+                                    </th>
+                                    <td>
+                                        <textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                                        <p class="description">Deskripsi yang ditampilkan di daftar plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_version">Versi</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_version" name="sweetaddons_whitelabel_version" value="<?php echo esc_attr($version); ?>" class="regular-text" />
+                                        <p class="description">Nomor versi plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label>
+                                    </th>
+                                    <td>
+                                        <input type="url" id="sweetaddons_whitelabel_plugin_uri" name="sweetaddons_whitelabel_plugin_uri" value="<?php echo esc_url($plugin_uri); ?>" class="large-text" />
+                                        <p class="description">URL yang akan dikunjungi pengguna ketika mengklik nama plugin.</p>
+                                    </td>
+                                </tr>
+                            </table>
 
-                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
-                        <!-- Author Information -->
-                        <h3 style="margin-bottom: 20px;">👤 Informasi Penulis</h3>
-                        <p style="margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
+                            <!-- Author Information -->
+                            <h3 style="margin-bottom: 20px;">👤 Informasi Penulis</h3>
+                            <p style="margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
 
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_author">Nama Penulis</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whitelabel_author" name="sweetaddons_whitelabel_author" value="<?php echo esc_attr($author); ?>" class="large-text" />
-                                    <p class="description">Nama penulis yang ditampilkan di detail plugin.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_author_uri">URI Penulis</label>
-                                </th>
-                                <td>
-                                    <input type="url" id="sweetaddons_whitelabel_author_uri" name="sweetaddons_whitelabel_author_uri" value="<?php echo esc_url($author_uri); ?>" class="large-text" />
-                                    <p class="description">The URL users will visit when clicking the author name.</p>
-                                </td>
-                            </tr>
-                        </table>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_author">Nama Penulis</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_author" name="sweetaddons_whitelabel_author" value="<?php echo esc_attr($author); ?>" class="large-text" />
+                                        <p class="description">Nama penulis yang ditampilkan di detail plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_author_uri">URI Penulis</label>
+                                    </th>
+                                    <td>
+                                        <input type="url" id="sweetaddons_whitelabel_author_uri" name="sweetaddons_whitelabel_author_uri" value="<?php echo esc_url($author_uri); ?>" class="large-text" />
+                                        <p class="description">The URL users will visit when clicking the author name.</p>
+                                    </td>
+                                </tr>
+                            </table>
 
-                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                            <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
-                        <!-- Admin Customization -->
-                        <h3 style="margin-bottom: 20px;">⚙️ Admin Customization</h3>
-                        <p style="margin-bottom: 20px;">Customize the admin interface appearance.</p>
+                            <!-- Admin Customization -->
+                            <h3 style="margin-bottom: 20px;">⚙️ Admin Customization</h3>
+                            <p style="margin-bottom: 20px;">Customize the admin interface appearance.</p>
 
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_menu_title">Judul Menu Admin</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whitelabel_menu_title" name="sweetaddons_whitelabel_menu_title" value="<?php echo esc_attr($menu_title); ?>" class="large-text" />
-                                    <p class="description">The title shown in the WordPress admin menu.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Sembunyikan Branding Asli</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="sweetaddons_whitelabel_hide_original" value="1" <?php checked($hide_original, '1'); ?> />
-                                        Hide references to WebsweetStudio in admin interface
-                                    </label>
-                                    <p class="description">Remove WebsweetStudio branding from admin pages and footers.</p>
-                                </td>
-                            </tr>
-                        </table>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_menu_title">Judul Menu Admin</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_menu_title" name="sweetaddons_whitelabel_menu_title" value="<?php echo esc_attr($menu_title); ?>" class="large-text" />
+                                        <p class="description">The title shown in the WordPress admin menu.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Sembunyikan Branding Asli</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="sweetaddons_whitelabel_hide_original" value="1" <?php checked($hide_original, '1'); ?> />
+                                            Hide references to WebsweetStudio in admin interface
+                                        </label>
+                                        <p class="description">Remove WebsweetStudio branding from admin pages and footers.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="sad-card">
+                            <div class="sad-card-title">🎨 Warna Brand</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_whitelabel_accent_color">Accent Color</label></th>
+                                    <td>
+                                        <input type="color" id="sweetaddons_whitelabel_accent_color" name="sweetaddons_whitelabel_accent_color" value="<?php echo esc_attr($accent_color); ?>" />
+                                        <div class="sad-color-swatches" style="margin-top:10px;">
+                                            <?php
+                                            $swatches = array('#2271b1', '#00a32a', '#d63638', '#ff922b', '#7c3aed', '#db2777', '#059669', '#dc2626');
+                                            foreach ($swatches as $sw) {
+                                                echo '<span class="sad-swatch" data-color="' . esc_attr($sw) . '" style="display:inline-block;width:22px;height:22px;border-radius:4px;margin-right:6px;border:1px solid #ccd0d4; background:' . esc_attr($sw) . '; cursor:pointer;"></span>';
+                                            }
+                                            ?>
+                                        </div>
+                                        <p class="description">Warna aksen untuk branding admin. Gunakan palet cepat di atas atau pilih manual.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <script>
+                                jQuery(function($) {
+                                    $('.sad-swatch').on('click', function() {
+                                        var c = $(this).data('color');
+                                        $('#sweetaddons_whitelabel_accent_color').val(c);
+                                    });
+                                });
+                            </script>
+                        </div>
+
+                        <div class="sad-card">
+                            <div class="sad-card-title">📊 Perbandingan Branding</div>
+                            <div class="sad-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="sad-card">
+                                    <div class="sad-card-title">🔴 Current (Original)</div>
+                                    <table class="form-table">
+                                        <tr>
+                                            <th>Plugin Name</th>
+                                            <td><?php echo esc_html($plugin_data['Name']); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Description</th>
+                                            <td><?php echo esc_html($plugin_data['Description']); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Version</th>
+                                            <td><?php echo esc_html($plugin_data['Version']); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Author</th>
+                                            <td><?php echo esc_html($plugin_data['Author']); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Plugin URI</th>
+                                            <td><?php echo esc_html($plugin_data['PluginURI']); ?></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="sad-card">
+                                    <div class="sad-card-title">🟢 New (White Labeled)</div>
+                                    <table class="form-table">
+                                        <tr>
+                                            <th>Plugin Name</th>
+                                            <td><?php echo esc_html($plugin_name); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Description</th>
+                                            <td><?php echo esc_html($description); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Version</th>
+                                            <td><?php echo esc_html($version); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Author</th>
+                                            <td><?php echo esc_html($author); ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Plugin URI</th>
+                                            <td><?php echo esc_html($plugin_uri); ?></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Current vs New Comparison -->
-                    <div class="sad-card">
-                        <div class="sad-card-title">📊 Before vs After Comparison</div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div>
-                                <h4 style="color: #d63638; margin-bottom: 15px;">🔴 Current (Original)</h4>
-                                <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
-                                    <p><strong>Plugin Name:</strong> <?php echo esc_html($plugin_data['Name']); ?></p>
-                                    <p><strong>Description:</strong> <?php echo esc_html($plugin_data['Description']); ?></p>
-                                    <p><strong>Version:</strong> <?php echo esc_html($plugin_data['Version']); ?></p>
-                                    <p><strong>Author:</strong> <?php echo esc_html($plugin_data['Author']); ?></p>
-                                    <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_data['PluginURI']); ?></p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h4 style="color: #00a32a; margin-bottom: 15px;">🟢 New (White Labeled)</h4>
-                                <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
-                                    <p><strong>Plugin Name:</strong> <?php echo esc_html($plugin_name); ?></p>
-                                    <p><strong>Description:</strong> <?php echo esc_html($description); ?></p>
-                                    <p><strong>Version:</strong> <?php echo esc_html($version); ?></p>
-                                    <p><strong>Author:</strong> <?php echo esc_html($author); ?></p>
-                                    <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_uri); ?></p>
-                                </div>
-                            </div>
+                    <div class="sad-top-right">
+                        <div class="sad-card">
+                            <div class="sad-card-title">💾 Simpan Perubahan</div>
+                            <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
                         </div>
                     </div>
                 </div>
-
-                <!-- Right Column -->
-                <div class="sad-top-right">
-                    <!-- Save Actions -->
-                    <div class="sad-card" style="position: sticky; top: 20px;">
-                        <div class="sad-card-title">Simpan Perubahan</div>
-                        <div class="sad-subtext" style="margin-bottom: 15px;">
-                            Klik tombol di bawah untuk menyimpan pengaturan White Label.
-                        </div>
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%; margin-bottom: 10px;')); ?>
-                        <div class="sad-subtext" style="font-size: 12px; color: #888; text-align: center; margin-top: 10px;">
-                            Perubahan akan langsung diterapkan.
-                        </div>
-                    </div>
-
-                    <!-- Benefits Card -->
-                    <div class="sad-card">
-                        <div class="sad-card-title">✨ White Label Benefits</div>
-
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">🏢 Professional Branding</h4>
-                            <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
-                                <li>Display your company name</li>
-                                <li>Use your website URL</li>
-                                <li>Custom plugin description</li>
-                                <li>Professional appearance</li>
-                            </ul>
-                        </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">👥 Client Relations</h4>
-                            <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
-                                <li>Hide third-party references</li>
-                                <li>Consistent brand experience</li>
-                                <li>Professional credibility</li>
-                            </ul>
-                        </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">⚙️ Easy Management</h4>
-                            <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
-                                <li>One-click customization</li>
-                                <li>Instant preview</li>
-                                <li>No code modifications</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">🔄 Full Control</h4>
-                            <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
-                                <li>Custom version numbers</li>
-                                <li>Your support links</li>
-                                <li>Branded admin interface</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-        </div>
-        </form>
+            </form>
         </div>
     <?php
     }
 
     public function login_customizer_page_callback()
     {
+        // Enqueue media scripts
+        wp_enqueue_media();
+        $upload_nonce = wp_create_nonce('media-form');
+
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
             $login_data = array();
@@ -1947,6 +1961,48 @@ class Custom_Admin_Option_Page
         $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
     ?>
+        <style>
+            .sad-drop-zone {
+                border: 2px dashed #b4b9be;
+                padding: 20px;
+                text-align: center;
+                background: #fff;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.2s;
+                border-radius: 4px;
+            }
+
+            .sad-drop-zone:hover,
+            .sad-drop-zone.drag-over {
+                border-color: #2271b1;
+                background: #f0f6fc;
+            }
+
+            .sad-drop-zone img {
+                max-width: 100%;
+                height: auto;
+                max-height: 150px;
+                display: block;
+                margin: 0 auto 10px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .sad-drop-zone .sad-placeholder {
+                color: #646970;
+                padding: 20px 0;
+            }
+
+            .sad-drop-zone .sad-remove {
+                margin-top: 10px;
+                color: #d63638;
+                cursor: pointer;
+                display: inline-block;
+                font-size: 13px;
+                text-decoration: underline;
+            }
+        </style>
+
         <div class="wrap vd-ons sweetaddons-dashboard">
             <h1 class="sad-title">🎨 Login Page Customizer</h1>
 
@@ -1961,8 +2017,20 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Logo URL</th>
                                     <td>
-                                        <input type="text" name="login_logo_url" id="login_logo_url" value="<?php echo esc_attr($logo_url); ?>" class="regular-text" />
-                                        <button type="button" class="button button-secondary" id="upload_logo_button">Upload Logo</button>
+                                        <div class="sad-drop-zone" id="logo-drop-zone">
+                                            <input type="hidden" name="login_logo_url" id="login_logo_url" value="<?php echo esc_attr($logo_url); ?>">
+                                            <div class="sad-preview">
+                                                <?php if ($logo_url): ?>
+                                                    <img src="<?php echo esc_url($logo_url); ?>">
+                                                    <span class="sad-remove">Hapus Logo</span>
+                                                <?php else: ?>
+                                                    <div class="sad-placeholder">
+                                                        <span class="dashicons dashicons-upload" style="font-size: 32px; width: 32px; height: 32px;"></span><br>
+                                                        <strong>Drag & Drop Logo</strong><br>atau klik untuk memilih
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
                                         <p class="description">Upload atau masukkan URL logo untuk halaman login.</p>
                                     </td>
                                 </tr>
@@ -1975,8 +2043,20 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Gambar Background</th>
                                     <td>
-                                        <input type="text" name="login_bg_image" id="login_bg_image" value="<?php echo esc_attr($bg_image); ?>" class="regular-text" />
-                                        <button type="button" class="button button-secondary" id="upload_bg_button">Upload Background</button>
+                                        <div class="sad-drop-zone" id="bg-drop-zone">
+                                            <input type="hidden" name="login_bg_image" id="login_bg_image" value="<?php echo esc_attr($bg_image); ?>">
+                                            <div class="sad-preview">
+                                                <?php if ($bg_image): ?>
+                                                    <img src="<?php echo esc_url($bg_image); ?>">
+                                                    <span class="sad-remove">Hapus Background</span>
+                                                <?php else: ?>
+                                                    <div class="sad-placeholder">
+                                                        <span class="dashicons dashicons-upload" style="font-size: 32px; width: 32px; height: 32px;"></span><br>
+                                                        <strong>Drag & Drop Background</strong><br>atau klik untuk memilih
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
                                         <p class="description">Upload atau masukkan URL gambar background.</p>
                                     </td>
                                 </tr>
@@ -2007,48 +2087,123 @@ class Custom_Admin_Option_Page
 
             <script>
                 jQuery(document).ready(function($) {
-                    var mediaUploader;
 
-                    $('#upload_logo_button').click(function(e) {
-                        e.preventDefault();
-                        if (mediaUploader) {
-                            mediaUploader.open();
-                            return;
-                        }
-                        mediaUploader = wp.media.frames.file_frame = wp.media({
-                            title: 'Pilih Logo',
-                            button: {
-                                text: 'Pilih Logo'
-                            },
-                            multiple: false
-                        });
-                        mediaUploader.on('select', function() {
-                            var attachment = mediaUploader.state().get('selection').first().toJSON();
-                            $('#login_logo_url').val(attachment.url);
-                        });
-                        mediaUploader.open();
-                    });
+                    // Reusable function for handling drop zones
+                    function initDropZone(zoneId, inputId) {
+                        var $zone = $('#' + zoneId);
+                        var $input = $('#' + inputId);
 
-                    var bgUploader;
-                    $('#upload_bg_button').click(function(e) {
-                        e.preventDefault();
-                        if (bgUploader) {
-                            bgUploader.open();
-                            return;
+                        // Click to open media frame
+                        $zone.on('click', function(e) {
+                            if ($(e.target).hasClass('sad-remove')) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                $input.val('');
+                                renderPreview($zone, '');
+                                return;
+                            }
+
+                            e.preventDefault();
+
+                            var frame = wp.media({
+                                title: 'Pilih Gambar',
+                                button: {
+                                    text: 'Gunakan Gambar Ini'
+                                },
+                                multiple: false
+                            });
+
+                            frame.on('select', function() {
+                                var attachment = frame.state().get('selection').first().toJSON();
+                                $input.val(attachment.url);
+                                renderPreview($zone, attachment.url);
+                            });
+
+                            frame.open();
+                        });
+
+                        // Drag & Drop events
+                        $zone.on('dragover dragenter', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $zone.addClass('drag-over');
+                        });
+
+                        $zone.on('dragleave dragend drop', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $zone.removeClass('drag-over');
+                        });
+
+                        $zone.on('drop', function(e) {
+                            var files = e.originalEvent.dataTransfer.files;
+                            if (files.length > 0) {
+                                uploadFile(files[0], $zone, $input);
+                            }
+                        });
+                    }
+
+                    function renderPreview($zone, url) {
+                        var html = '';
+                        if (url) {
+                            html = '<img src="' + url + '"><span class="sad-remove">Hapus Gambar</span>';
+                        } else {
+                            html = '<div class="sad-placeholder"><span class="dashicons dashicons-upload" style="font-size: 32px; width: 32px; height: 32px;"></span><br><strong>Drag & Drop Gambar</strong><br>atau klik untuk memilih</div>';
                         }
-                        bgUploader = wp.media.frames.file_frame = wp.media({
-                            title: 'Pilih Background',
-                            button: {
-                                text: 'Pilih Background'
+                        $zone.find('.sad-preview').html(html);
+                    }
+
+                    function uploadFile(file, $zone, $input) {
+                        // Show loading state
+                        $zone.find('.sad-preview').html('<div class="sad-placeholder">Mengupload...</div>');
+
+                        var formData = new FormData();
+                        formData.append('action', 'upload-attachment');
+                        formData.append('async-upload', file);
+                        formData.append('name', file.name);
+                        formData.append('_wpnonce', '<?php echo $upload_nonce; ?>');
+
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                try {
+                                    // WordPress AJAX response handling
+                                    var res = typeof response === 'string' ? JSON.parse(response) : response;
+
+                                    if (res.success) {
+                                        var attachment = res.data;
+                                        var url = attachment.url;
+                                        $input.val(url);
+                                        renderPreview($zone, url);
+                                    } else {
+                                        // Fallback logic for some WP versions
+                                        if (res.data && res.data.url) {
+                                            $input.val(res.data.url);
+                                            renderPreview($zone, res.data.url);
+                                        } else {
+                                            alert('Upload gagal: ' + (res.data.message || 'Unknown error'));
+                                            renderPreview($zone, $input.val());
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error('Upload Error:', e);
+                                    alert('Terjadi kesalahan saat upload.');
+                                    renderPreview($zone, $input.val());
+                                }
                             },
-                            multiple: false
+                            error: function() {
+                                alert('Upload gagal. Silakan coba lagi.');
+                                renderPreview($zone, $input.val());
+                            }
                         });
-                        bgUploader.on('select', function() {
-                            var attachment = bgUploader.state().get('selection').first().toJSON();
-                            $('#login_bg_image').val(attachment.url);
-                        });
-                        bgUploader.open();
-                    });
+                    }
+
+                    initDropZone('logo-drop-zone', 'login_logo_url');
+                    initDropZone('bg-drop-zone', 'login_bg_image');
                 });
             </script>
         </div>
@@ -2088,23 +2243,23 @@ class Custom_Admin_Option_Page
                             <table class="form-table">
                                 <tr>
                                     <th scope="row"><input type="checkbox" name="items[]" value="revisions" checked> Post Revisions</th>
-                                    <td><span class="sad-badge sad-badge-warning"><?php echo $stats['revisions']; ?> items</span></td>
+                                    <td><span class="sad-badge sad-badge-warning"><?php echo $stats['revisions']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_revisions'])); ?></span></td>
                                 </tr>
                                 <tr>
                                     <th scope="row"><input type="checkbox" name="items[]" value="auto_drafts" checked> Auto Drafts</th>
-                                    <td><span class="sad-badge sad-badge-warning"><?php echo $stats['auto_drafts']; ?> items</span></td>
+                                    <td><span class="sad-badge sad-badge-warning"><?php echo $stats['auto_drafts']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_auto_drafts'])); ?></span></td>
                                 </tr>
                                 <tr>
                                     <th scope="row"><input type="checkbox" name="items[]" value="spam_comments" checked> Spam Comments</th>
-                                    <td><span class="sad-badge sad-badge-danger"><?php echo $stats['spam_comments']; ?> items</span></td>
+                                    <td><span class="sad-badge sad-badge-danger"><?php echo $stats['spam_comments']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_spam_comments'])); ?></span></td>
                                 </tr>
                                 <tr>
                                     <th scope="row"><input type="checkbox" name="items[]" value="trashed_comments" checked> Trashed Comments</th>
-                                    <td><span class="sad-badge sad-badge-danger"><?php echo $stats['trashed_comments']; ?> items</span></td>
+                                    <td><span class="sad-badge sad-badge-danger"><?php echo $stats['trashed_comments']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_trashed_comments'])); ?></span></td>
                                 </tr>
                                 <tr>
                                     <th scope="row"><input type="checkbox" name="items[]" value="expired_transients" checked> Expired Transients</th>
-                                    <td><span class="sad-badge sad-badge-info"><?php echo $stats['expired_transients']; ?> items</span></td>
+                                    <td><span class="sad-badge sad-badge-info"><?php echo $stats['expired_transients']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_expired_transients'])); ?></span></td>
                                 </tr>
                             </table>
                         </div>
@@ -2182,254 +2337,252 @@ class Custom_Admin_Option_Page
         $display_phone = !empty($phone) ? $phone : 'Not Configured';
         $display_position = ucwords(str_replace('-', ' ', $position));
     ?>
-        <div class="wrap sweetaddons-dashboard">
-            <h1 class="wp-heading-inline">💬 Pengaturan Chat WhatsApp</h1>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">💬 Pengaturan Chat WhatsApp</h1>
+            <form method="post" action="" class="sad-form">
+                <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
+                <div class="sad-top">
+                    <div class="sad-top-left">
+                        <div class="sad-card">
+                            <div class="sad-card-title">⚙️ Pengaturan Dasar</div>
 
-            <div class="sad-grid">
-                <div class="sad-card">
-                    <div class="sad-card-title">⚙️ Pengaturan Dasar</div>
-                    <form method="post" action="">
-                        <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">Aktifkan Chat WhatsApp</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" id="sweetaddons_whatsapp_enable" name="sweetaddons_whatsapp_enable" value="1" <?php checked($enable, '1'); ?> />
+                                            Enable floating WhatsApp chat button
+                                        </label>
+                                        <p class="description">Show WhatsApp chat widget on your website.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_phone">WhatsApp Number</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whatsapp_phone" name="sweetaddons_whatsapp_phone" value="<?php echo esc_attr($phone); ?>" class="large-text" placeholder="+62812345678901" />
+                                        <p class="description">Your WhatsApp number with country code (e.g., +62812345678901).</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_message">Pesan Default</label>
+                                    </th>
+                                    <td>
+                                        <textarea id="sweetaddons_whatsapp_message" name="sweetaddons_whatsapp_message" rows="3" class="large-text"><?php echo esc_textarea($message); ?></textarea>
+                                        <p class="description">Default message that will be pre-filled when users click the chat button.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_button_text">Teks Tombol</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whatsapp_button_text" name="sweetaddons_whatsapp_button_text" value="<?php echo esc_attr($button_text); ?>" class="large-text" />
+                                        <p class="description">Text shown on the button (for extended style) and tooltip.</p>
+                                    </td>
+                                </tr>
+                                <!-- Appearance Section Header -->
+                                <tr>
+                                    <td colspan="2">
+                                        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="padding-left: 0;">
+                                        <h3 style="margin: 0;">🎨 Pengaturan Tampilan</h3>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_bubble_style">Button Style</label>
+                                    </th>
+                                    <td>
+                                        <select id="sweetaddons_whatsapp_bubble_style" name="sweetaddons_whatsapp_bubble_style">
+                                            <option value="circle" <?php selected($bubble_style, 'circle'); ?>>Circle (Icon Only)</option>
+                                            <option value="extended" <?php selected($bubble_style, 'extended'); ?>>Extended (Icon + Text)</option>
+                                        </select>
+                                        <p class="description">Choose between circle icon or extended button with text.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_color">Warna Tombol</label>
+                                    </th>
+                                    <td>
+                                        <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
+                                        <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly />
+                                        <p class="description">Background color of the WhatsApp button.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_size">Ukuran Tombol</label>
+                                    </th>
+                                    <td>
+                                        <input type="number" id="sweetaddons_whatsapp_size" name="sweetaddons_whatsapp_size" value="<?php echo esc_attr($size); ?>" min="40" max="100" class="small-text" /> px
+                                        <p class="description">Ukuran tombol chat (40-100px).</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_animation">Animasi</label>
+                                    </th>
+                                    <td>
+                                        <select id="sweetaddons_whatsapp_animation" name="sweetaddons_whatsapp_animation">
+                                            <option value="none" <?php selected($animation, 'none'); ?>>Tanpa Animasi</option>
+                                            <option value="pulse" <?php selected($animation, 'pulse'); ?>>Pulse</option>
+                                            <option value="bounce" <?php selected($animation, 'bounce'); ?>>Bounce</option>
+                                            <option value="shake" <?php selected($animation, 'shake'); ?>>Shake</option>
+                                        </select>
+                                        <p class="description">Efek animasi untuk tombol chat.</p>
+                                    </td>
+                                </tr>
+                                <!-- Position Section Header -->
+                                <tr>
+                                    <td colspan="2">
+                                        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="padding-left: 0;">
+                                        <h3 style="margin: 0;">📍 Pengaturan Posisi</h3>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
 
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">Aktifkan Chat WhatsApp</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" id="sweetaddons_whatsapp_enable" name="sweetaddons_whatsapp_enable" value="1" <?php checked($enable, '1'); ?> />
-                                        Enable floating WhatsApp chat button
-                                    </label>
-                                    <p class="description">Show WhatsApp chat widget on your website.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_phone">WhatsApp Number</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whatsapp_phone" name="sweetaddons_whatsapp_phone" value="<?php echo esc_attr($phone); ?>" class="large-text" placeholder="+62812345678901" />
-                                    <p class="description">Your WhatsApp number with country code (e.g., +62812345678901).</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_message">Pesan Default</label>
-                                </th>
-                                <td>
-                                    <textarea id="sweetaddons_whatsapp_message" name="sweetaddons_whatsapp_message" rows="3" class="large-text"><?php echo esc_textarea($message); ?></textarea>
-                                    <p class="description">Default message that will be pre-filled when users click the chat button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_button_text">Teks Tombol</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whatsapp_button_text" name="sweetaddons_whatsapp_button_text" value="<?php echo esc_attr($button_text); ?>" class="large-text" />
-                                    <p class="description">Text shown on the button (for extended style) and tooltip.</p>
-                                </td>
-                            </tr>
-                            <!-- Appearance Section Header -->
-                            <tr>
-                                <td colspan="2">
-                                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;">🎨 Pengaturan Tampilan</h3>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_bubble_style">Button Style</label>
-                                </th>
-                                <td>
-                                    <select id="sweetaddons_whatsapp_bubble_style" name="sweetaddons_whatsapp_bubble_style">
-                                        <option value="circle" <?php selected($bubble_style, 'circle'); ?>>Circle (Icon Only)</option>
-                                        <option value="extended" <?php selected($bubble_style, 'extended'); ?>>Extended (Icon + Text)</option>
-                                    </select>
-                                    <p class="description">Choose between circle icon or extended button with text.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_color">Warna Tombol</label>
-                                </th>
-                                <td>
-                                    <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
-                                    <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly />
-                                    <p class="description">Background color of the WhatsApp button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_size">Ukuran Tombol</label>
-                                </th>
-                                <td>
-                                    <input type="number" id="sweetaddons_whatsapp_size" name="sweetaddons_whatsapp_size" value="<?php echo esc_attr($size); ?>" min="40" max="100" class="small-text" /> px
-                                    <p class="description">Ukuran tombol chat (40-100px).</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_animation">Animasi</label>
-                                </th>
-                                <td>
-                                    <select id="sweetaddons_whatsapp_animation" name="sweetaddons_whatsapp_animation">
-                                        <option value="none" <?php selected($animation, 'none'); ?>>Tanpa Animasi</option>
-                                        <option value="pulse" <?php selected($animation, 'pulse'); ?>>Pulse</option>
-                                        <option value="bounce" <?php selected($animation, 'bounce'); ?>>Bounce</option>
-                                        <option value="shake" <?php selected($animation, 'shake'); ?>>Shake</option>
-                                    </select>
-                                    <p class="description">Efek animasi untuk tombol chat.</p>
-                                </td>
-                            </tr>
-                            <!-- Position Section Header -->
-                            <tr>
-                                <td colspan="2">
-                                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;">📍 Pengaturan Posisi</h3>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th scope="row">
+                                        <label for="sweetaddons_whatsapp_position">Posisi Tombol</label>
+                                    </th>
+                                    <td>
+                                        <select id="sweetaddons_whatsapp_position" name="sweetaddons_whatsapp_position">
+                                            <option value="bottom-right" <?php selected($position, 'bottom-right'); ?>>Kanan Bawah</option>
+                                            <option value="bottom-left" <?php selected($position, 'bottom-left'); ?>>Kiri Bawah</option>
+                                            <option value="top-right" <?php selected($position, 'top-right'); ?>>Kanan Atas</option>
+                                            <option value="top-left" <?php selected($position, 'top-left'); ?>>Kiri Atas</option>
+                                            <option value="center-right" <?php selected($position, 'center-right'); ?>>Center Right</option>
+                                            <option value="center-left" <?php selected($position, 'center-left'); ?>>Center Left</option>
+                                        </select>
+                                        <p class="description">Where to position the chat button on your website.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Jarak Offset</th>
+                                    <td>
+                                        <label>
+                                            X: <input type="number" id="sweetaddons_whatsapp_offset_x" name="sweetaddons_whatsapp_offset_x" value="<?php echo esc_attr($offset_x); ?>" min="0" max="100" class="small-text" /> px
+                                        </label>
+                                        <label style="margin-left: 20px;">
+                                            Y: <input type="number" id="sweetaddons_whatsapp_offset_y" name="sweetaddons_whatsapp_offset_y" value="<?php echo esc_attr($offset_y); ?>" min="0" max="100" class="small-text" /> px
+                                        </label>
+                                        <p class="description">Distance from screen edges (X = horizontal, Y = vertical).</p>
+                                    </td>
+                                </tr>
+                                <!-- Visibility Section Header -->
+                                <tr>
+                                    <td colspan="2">
+                                        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="2" style="padding-left: 0;">
+                                        <h3 style="margin: 0;">👁️ Visibility Settings</h3>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Device Visibility</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> />
+                                            Tampilkan di perangkat Mobile
+                                        </label><br>
+                                        <label>
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> />
+                                            Tampilkan di perangkat Desktop
+                                        </label>
+                                        <p class="description">Choose on which devices to display the chat button.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Tooltip</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> />
+                                            Show tooltip on hover
+                                        </label>
+                                        <p class="description">Display tooltip text when hovering over the chat button.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                                    <label for="sweetaddons_whatsapp_position">Posisi Tombol</label>
-                                </th>
-                                <td>
-                                    <select id="sweetaddons_whatsapp_position" name="sweetaddons_whatsapp_position">
-                                        <option value="bottom-right" <?php selected($position, 'bottom-right'); ?>>Kanan Bawah</option>
-                                        <option value="bottom-left" <?php selected($position, 'bottom-left'); ?>>Kiri Bawah</option>
-                                        <option value="top-right" <?php selected($position, 'top-right'); ?>>Kanan Atas</option>
-                                        <option value="top-left" <?php selected($position, 'top-left'); ?>>Kiri Atas</option>
-                                        <option value="center-right" <?php selected($position, 'center-right'); ?>>Center Right</option>
-                                        <option value="center-left" <?php selected($position, 'center-left'); ?>>Center Left</option>
-                                    </select>
-                                    <p class="description">Where to position the chat button on your website.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Jarak Offset</th>
-                                <td>
-                                    <label>
-                                        X: <input type="number" id="sweetaddons_whatsapp_offset_x" name="sweetaddons_whatsapp_offset_x" value="<?php echo esc_attr($offset_x); ?>" min="0" max="100" class="small-text" /> px
-                                    </label>
-                                    <label style="margin-left: 20px;">
-                                        Y: <input type="number" id="sweetaddons_whatsapp_offset_y" name="sweetaddons_whatsapp_offset_y" value="<?php echo esc_attr($offset_y); ?>" min="0" max="100" class="small-text" /> px
-                                    </label>
-                                    <p class="description">Distance from screen edges (X = horizontal, Y = vertical).</p>
-                                </td>
-                            </tr>
-                            <!-- Visibility Section Header -->
-                            <tr>
-                                <td colspan="2">
-                                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;">👁️ Visibility Settings</h3>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th scope="row">Device Visibility</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> />
-                                        Tampilkan di perangkat Mobile
-                                    </label><br>
-                                    <label>
-                                        <input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> />
-                                        Tampilkan di perangkat Desktop
-                                    </label>
-                                    <p class="description">Choose on which devices to display the chat button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Tooltip</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> />
-                                        Show tooltip on hover
-                                    </label>
-                                    <p class="description">Display tooltip text when hovering over the chat button.</p>
-                                </td>
-                            </tr>
-                        </table>
-                </div>
+                        <div class="sad-card">
+                            <div class="sad-card-title">👁️ Live Preview</div>
+                            <p style="margin-bottom: 20px;">This is how your WhatsApp chat button will look:</p>
 
-                <!-- Live Preview -->
-                <div class="sad-card">
-                    <div class="sad-card-title">👁️ Live Preview</div>
-                    <p style="margin-bottom: 20px;">This is how your WhatsApp chat button will look:</p>
+                            <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
+                                <div style="position: absolute; top: 10px; left: 10px; color: #666; font-size: 12px;">Preview Area</div>
 
-                    <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
-                        <div style="position: absolute; top: 10px; left: 10px; color: #666; font-size: 12px;">Preview Area</div>
+                                <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
+                                    <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
+                                        <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                                            <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
+                                                <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                                            </svg>
+                                            <span id="whatsapp-preview-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
-                            <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
-                                <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
-                                    <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
-                                        <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                                    </svg>
-                                    <span id="whatsapp-preview-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $phone) ? 'none' : 'block'; ?>;">
+                                    <p>Aktifkan WhatsApp dan tambahkan nomor telepon untuk melihat preview</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $phone) ? 'none' : 'block'; ?>;">
-                            <p>Aktifkan WhatsApp dan tambahkan nomor telepon untuk melihat preview</p>
+                    <div class="sad-top-right">
+                        <div class="sad-card">
+                            <div class="sad-card-title">💾 Simpan Perubahan</div>
+                            <div class="sad-actions-row" style="justify-content: flex-end;">
+                                <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                            </div>
+                        </div>
+
+                        <div class="sad-card">
+                            <div class="sad-card-title">Ringkasan</div>
+                            <table class="widefat striped" style="border:none; box-shadow:none;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f1;">
+                                        <th>Fitur</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Status Widget</td>
+                                        <td><span style="color: <?php echo $status_color; ?>; font-weight:bold;"><?php echo $status_text; ?></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Target Number</td>
+                                        <td><?php echo esc_html($display_phone); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Position</td>
+                                        <td><?php echo esc_html($display_position); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Button Style</td>
+                                        <td><?php echo ucfirst($bubble_style); ?></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="sad-top-right">
-                <!-- Save Actions -->
-                <div class="sad-card" style="position: sticky; top: 20px;">
-                    <div class="sad-card-title">Simpan Perubahan</div>
-                    <div class="sad-actions-row" style="justify-content: flex-end;">
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
-                    </div>
-                    </form>
-                </div>
-
-                <div class="sad-card">
-                    <div class="sad-card-title">Ringkasan</div>
-                    <table class="widefat striped" style="border:none; box-shadow:none;">
-                        <thead>
-                            <tr style="background-color: #f0f0f1;">
-                                <th>Fitur</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Status Widget</td>
-                                <td><span style="color: <?php echo $status_color; ?>; font-weight:bold;"><?php echo $status_text; ?></span></td>
-                            </tr>
-                            <tr>
-                                <td>Target Number</td>
-                                <td><?php echo esc_html($display_phone); ?></td>
-                            </tr>
-                            <tr>
-                                <td>Position</td>
-                                <td><?php echo esc_html($display_position); ?></td>
-                            </tr>
-                            <tr>
-                                <td>Button Style</td>
-                                <td><?php echo ucfirst($bubble_style); ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </form>
         </div>
 
         <script>
