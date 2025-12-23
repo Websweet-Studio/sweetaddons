@@ -1486,9 +1486,9 @@ class Custom_Admin_Option_Page
                                     <td>
                                         <label>
                                             <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
-                                            Aktifkan CAPTCHA Tulisan di Gambar
+                                            Aktifkan CAPTCHA
                                         </label>
-                                        <p class="description">Aktifkan perlindungan CAPTCHA berbasis gambar tanpa API eksternal.</p>
+                                        <p class="description">Aktifkan perlindungan CAPTCHA.</p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -1611,9 +1611,7 @@ class Custom_Admin_Option_Page
                             </ul>
                             <h4 style="margin: 10px 0 5px; color: #23282d;">2. Contact Form 7</h4>
                             <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Gunakan tag berikut:</p>
-                            <code style="display: block; background: #f0f0f1; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px;">[sweetcaptcha]</code>
-                            <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Tag <code>[recaptcha]</code> juga otomatis menampilkan CAPTCHA gambar.</p>
-                            <h4 style="margin: 10px 0 5px; color: #23282d;">3. Testing</h4>
+                            <code style="display: block; background: #f0f0f1; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px;">[recaptcha]</code>
                             <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px;">
                                 <li>Logout untuk tes form login</li>
                                 <li>Buka postingan untuk tes komentar</li>

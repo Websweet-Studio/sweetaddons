@@ -9,6 +9,7 @@ Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan U
   - Batasi percobaan login per IP (limit login attempts)
   - Blokir akses `wp-login.php` berdasarkan whitelist IP/negara dan redirect
   - CAPTCHA gambar teks: login, komentar, lostpassword, register, integrasi Contact Form 7
+  - Tingkat kesulitan CAPTCHA yang dapat diatur: Mudah, Sedang, Sulit
   - Nonaktifkan XML-RPC
   - Nonaktifkan REST API (dengan pengecualian endpoint widget)
 
@@ -48,7 +49,7 @@ Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan U
 - `[breadcrumb]` — menampilkan breadcrumb navigasi (opsi: `separator`, `home_text`, `show_home`, `show_current`, `style`).
 - `[sweet_recaptcha]` — menampilkan reCaptcha v2 sebagai shortcode.
 - `[sweet_captcha]` — menampilkan CAPTCHA gambar teks sebagai shortcode.
-- Contact Form 7: tag `sweetcaptcha` (tag `recaptcha` juga otomatis menampilkan CAPTCHA gambar).
+- Contact Form 7: tag `recaptcha`
 
 ## Pengaturan Admin
 

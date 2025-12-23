@@ -197,7 +197,7 @@ class Sweetaddons_Captcha
 
     public function wpcf7_form_captcha()
     {
-        wpcf7_add_form_tag('sweetcaptcha', array($this, 'wpcf7_display_captcha'));
+        wpcf7_add_form_tag('recaptcha', array($this, 'wpcf7_display_captcha'));
         wpcf7_add_form_tag('recaptcha', array($this, 'wpcf7_display_captcha'));
     }
 
