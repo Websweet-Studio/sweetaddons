@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 /**
@@ -16,8 +16,8 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
 class Sweetaddons_Deactivator
@@ -30,7 +30,8 @@ class Sweetaddons_Deactivator
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
+	public static function deactivate()
+	{
 		// Clear scheduled cron jobs
 		$timestamp = wp_next_scheduled('sweetaddons_daily_aggregation');
 		if ($timestamp) {

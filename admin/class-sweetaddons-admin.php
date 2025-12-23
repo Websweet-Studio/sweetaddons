@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/admin
+ * @package    sweetaddons
+ * @subpackage sweetaddons/admin
  */
 
 /**
@@ -16,8 +16,8 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/admin
+ * @package    sweetaddons
+ * @subpackage sweetaddons/admin
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
 class Sweetaddons_Admin

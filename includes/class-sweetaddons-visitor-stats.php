@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 class Sweetaddons_Visitor_Stats
@@ -26,7 +26,7 @@ class Sweetaddons_Visitor_Stats
         $this->monthly_stats_table = $wpdb->prefix . 'sweetaddons_monthly_stats';
         $this->page_stats_table = $wpdb->prefix . 'sweetaddons_page_stats';
         $this->referrer_stats_table = $wpdb->prefix . 'sweetaddons_referrer_stats';
-        
+
         add_action('wp', array($this, 'track_visitor'));
         add_action('sweetaddons_daily_aggregation', array($this, 'run_daily_aggregation'));
         add_shortcode('statistic', array($this, 'statistics_shortcode'));
@@ -51,21 +51,26 @@ class Sweetaddons_Visitor_Stats
         $existing = $wpdb->get_var($wpdb->prepare(
             "SELECT id FROM {$this->logs_table}
              WHERE visitor_ip = %s AND page_url = %s AND visit_date = %s",
-            $visitor_ip, $page_url, $visit_date
+            $visitor_ip,
+            $page_url,
+            $visit_date
         ));
 
         // Check if this is a unique visitor for today (before inserting)
         $is_unique_today = !$wpdb->get_var($wpdb->prepare(
             "SELECT id FROM {$this->logs_table}
              WHERE visitor_ip = %s AND visit_date = %s",
-            $visitor_ip, $visit_date
+            $visitor_ip,
+            $visit_date
         ));
 
         // Check if this is a unique visitor for this page today (before inserting)
         $is_unique_page_today = !$wpdb->get_var($wpdb->prepare(
             "SELECT id FROM {$this->logs_table}
              WHERE visitor_ip = %s AND page_url = %s AND visit_date = %s",
-            $visitor_ip, $page_url, $visit_date
+            $visitor_ip,
+            $page_url,
+            $visit_date
         ));
 
         if (!$existing) {
@@ -93,7 +98,7 @@ class Sweetaddons_Visitor_Stats
     private function get_visitor_ip()
     {
         $ip_keys = array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR');
-        
+
         foreach ($ip_keys as $key) {
             if (array_key_exists($key, $_SERVER) === true) {
                 foreach (explode(',', $_SERVER[$key]) as $ip) {
@@ -104,7 +109,7 @@ class Sweetaddons_Visitor_Stats
                 }
             }
         }
-        
+
         return isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '0.0.0.0';
     }
 
@@ -124,7 +129,9 @@ class Sweetaddons_Visitor_Stats
                  ELSE unique_visitors
              END,
              total_pageviews = total_pageviews + 1",
-            $visit_date, $is_unique_today, $is_unique_today
+            $visit_date,
+            $is_unique_today,
+            $is_unique_today
         ));
     }
 
@@ -143,16 +150,19 @@ class Sweetaddons_Visitor_Stats
                  ELSE unique_visitors
              END,
              total_views = total_views + 1",
-            $page_url, $visit_date, $is_unique_page_today, $is_unique_page_today
+            $page_url,
+            $visit_date,
+            $is_unique_page_today,
+            $is_unique_page_today
         ));
     }
 
     private function update_referrer_stats($referer, $visit_date)
     {
         if (empty($referer)) return;
-        
+
         global $wpdb;
-        
+
         $referrer_domain = parse_url($referer, PHP_URL_HOST) ?: $referer;
 
         $wpdb->query($wpdb->prepare(
@@ -160,7 +170,8 @@ class Sweetaddons_Visitor_Stats
              VALUES (%s, %s, 1)
              ON DUPLICATE KEY UPDATE
              total_visits = total_visits + 1",
-            $referrer_domain, $visit_date
+            $referrer_domain,
+            $visit_date
         ));
     }
 
@@ -173,10 +184,10 @@ class Sweetaddons_Visitor_Stats
     private function aggregate_monthly_stats()
     {
         global $wpdb;
-        
+
         $current_month = date('n');
         $current_year = date('Y');
-        
+
         // Aggregate current month data
         $monthly_data = $wpdb->get_row($wpdb->prepare(
             "SELECT 
@@ -185,7 +196,8 @@ class Sweetaddons_Visitor_Stats
                 AVG(bounce_rate) as avg_bounce_rate
              FROM {$this->daily_stats_table}
              WHERE MONTH(stat_date) = %d AND YEAR(stat_date) = %d",
-            $current_month, $current_year
+            $current_month,
+            $current_year
         ));
 
         if ($monthly_data) {
@@ -196,9 +208,14 @@ class Sweetaddons_Visitor_Stats
                  unique_visitors = %d,
                  total_pageviews = %d,
                  avg_bounce_rate = %f",
-                $current_year, $current_month, 
-                $monthly_data->unique_visitors, $monthly_data->total_pageviews, $monthly_data->avg_bounce_rate,
-                $monthly_data->unique_visitors, $monthly_data->total_pageviews, $monthly_data->avg_bounce_rate
+                $current_year,
+                $current_month,
+                $monthly_data->unique_visitors,
+                $monthly_data->total_pageviews,
+                $monthly_data->avg_bounce_rate,
+                $monthly_data->unique_visitors,
+                $monthly_data->total_pageviews,
+                $monthly_data->avg_bounce_rate
             ));
         }
     }
@@ -206,7 +223,7 @@ class Sweetaddons_Visitor_Stats
     private function cleanup_old_logs()
     {
         global $wpdb;
-        
+
         // Keep only last 90 days of raw logs (untuk performance)
         $wpdb->query(
             "DELETE FROM {$this->logs_table} 
@@ -218,7 +235,7 @@ class Sweetaddons_Visitor_Stats
     public function get_daily_stats($days = 30)
     {
         global $wpdb;
-        
+
         return $wpdb->get_results($wpdb->prepare(
             "SELECT 
                 stat_date as visit_date,
@@ -234,7 +251,7 @@ class Sweetaddons_Visitor_Stats
     public function get_page_stats($days = 30)
     {
         global $wpdb;
-        
+
         return $wpdb->get_results($wpdb->prepare(
             "SELECT 
                 page_url,
@@ -252,7 +269,7 @@ class Sweetaddons_Visitor_Stats
     public function get_referer_stats($days = 30)
     {
         global $wpdb;
-        
+
         return $wpdb->get_results($wpdb->prepare(
             "SELECT 
                 referrer_domain as referer,
@@ -269,7 +286,7 @@ class Sweetaddons_Visitor_Stats
     public function get_summary_stats()
     {
         global $wpdb;
-        
+
         // Today's stats from daily aggregation
         $today = $wpdb->get_row(
             "SELECT 
@@ -319,10 +336,10 @@ class Sweetaddons_Visitor_Stats
     public function rebuild_daily_stats()
     {
         global $wpdb;
-        
+
         // Clear existing daily stats
         $wpdb->query("TRUNCATE TABLE {$this->daily_stats_table}");
-        
+
         // Rebuild from logs
         $daily_data = $wpdb->get_results(
             "SELECT 
@@ -333,7 +350,7 @@ class Sweetaddons_Visitor_Stats
              GROUP BY visit_date
              ORDER BY visit_date"
         );
-        
+
         foreach ($daily_data as $data) {
             $wpdb->insert(
                 $this->daily_stats_table,
@@ -345,17 +362,17 @@ class Sweetaddons_Visitor_Stats
                 array('%s', '%d', '%d')
             );
         }
-        
+
         return count($daily_data);
     }
 
     public function rebuild_page_stats()
     {
         global $wpdb;
-        
+
         // Clear existing page stats
         $wpdb->query("TRUNCATE TABLE {$this->page_stats_table}");
-        
+
         // Rebuild from logs
         $page_data = $wpdb->get_results(
             "SELECT 
@@ -367,7 +384,7 @@ class Sweetaddons_Visitor_Stats
              GROUP BY page_url, visit_date
              ORDER BY visit_date, page_url"
         );
-        
+
         foreach ($page_data as $data) {
             $wpdb->insert(
                 $this->page_stats_table,
@@ -380,7 +397,7 @@ class Sweetaddons_Visitor_Stats
                 array('%s', '%s', '%d', '%d')
             );
         }
-        
+
         return count($page_data);
     }
 
@@ -393,164 +410,164 @@ class Sweetaddons_Visitor_Stats
         ), $atts, 'statistic');
 
         $stats = $this->get_summary_stats();
-        
+
         ob_start();
-        
+
         $style_class = 'sweetaddons-stats-' . sanitize_html_class($atts['style']);
         $columns_class = 'sweetaddons-stats-cols-' . sanitize_html_class($atts['columns']);
-        
+
         echo '<div class="sweetaddons-statistics-widget ' . $style_class . ' ' . $columns_class . '">';
-        
+
         if ($atts['show'] === 'all' || $atts['show'] === 'today') {
             echo '<div class="stat-item">';
             echo '<div class="stat-number">' . number_format($stats['today']->total_visits) . '</div>';
             echo '<div class="stat-label">Kunjungan Hari Ini</div>';
             echo '</div>';
-            
+
             echo '<div class="stat-item">';
             echo '<div class="stat-number">' . number_format($stats['today']->unique_visitors) . '</div>';
             echo '<div class="stat-label">Pengunjung Hari Ini</div>';
             echo '</div>';
         }
-        
+
         if ($atts['show'] === 'all' || $atts['show'] === 'total') {
             echo '<div class="stat-item">';
             echo '<div class="stat-number">' . number_format($stats['all_time']->total_visits) . '</div>';
             echo '<div class="stat-label">Total Kunjungan</div>';
             echo '</div>';
-            
+
             echo '<div class="stat-item">';
             echo '<div class="stat-number">' . number_format($stats['all_time']->unique_visitors) . '</div>';
             echo '<div class="stat-label">Total Pengunjung</div>';
             echo '</div>';
         }
-        
+
         echo '</div>';
-        
+
         // Add CSS if not already added
         if (!wp_style_is('sweetaddons-stats-shortcode', 'enqueued')) {
             $this->add_shortcode_styles();
         }
-        
+
         return ob_get_clean();
     }
 
     private function add_shortcode_styles()
     {
-        ?>
+?>
         <style>
-        .sweetaddons-statistics-widget {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 20px 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .sweetaddons-statistics-widget .stat-item {
-            flex: 1;
-            min-width: 150px;
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-
-        .sweetaddons-statistics-widget .stat-item:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .sweetaddons-statistics-widget .stat-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: #0073aa;
-            margin-bottom: 8px;
-            line-height: 1;
-        }
-
-        .sweetaddons-statistics-widget .stat-label {
-            font-size: 14px;
-            color: #666;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Style variations */
-        .sweetaddons-stats-minimal .stat-item {
-            background: transparent;
-            border: none;
-            padding: 10px;
-        }
-
-        .sweetaddons-stats-minimal .stat-item:hover {
-            background: #f8f9fa;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .sweetaddons-stats-cards .stat-item {
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border: none;
-        }
-
-        .sweetaddons-stats-cards .stat-item:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-
-        /* Column variations */
-        .sweetaddons-stats-cols-1 {
-            flex-direction: column;
-            max-width: 200px;
-        }
-
-        .sweetaddons-stats-cols-2 .stat-item {
-            flex-basis: calc(50% - 7.5px);
-        }
-
-        .sweetaddons-stats-cols-3 .stat-item {
-            flex-basis: calc(33.333% - 10px);
-        }
-
-        .sweetaddons-stats-cols-4 .stat-item {
-            flex-basis: calc(25% - 11.25px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
             .sweetaddons-statistics-widget {
-                flex-direction: column;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin: 20px 0;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             }
-            
-            .sweetaddons-statistics-widget .stat-item {
-                flex-basis: auto !important;
-            }
-            
-            .sweetaddons-statistics-widget .stat-number {
-                font-size: 24px;
-            }
-        }
 
-        @media (max-width: 480px) {
             .sweetaddons-statistics-widget .stat-item {
-                padding: 15px;
-                min-width: auto;
+                flex: 1;
+                min-width: 150px;
+                text-align: center;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                border: 1px solid #e9ecef;
+                transition: all 0.3s ease;
             }
-            
+
+            .sweetaddons-statistics-widget .stat-item:hover {
+                background: #e9ecef;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
             .sweetaddons-statistics-widget .stat-number {
-                font-size: 20px;
+                font-size: 28px;
+                font-weight: bold;
+                color: #0073aa;
+                margin-bottom: 8px;
+                line-height: 1;
             }
-            
+
             .sweetaddons-statistics-widget .stat-label {
-                font-size: 12px;
+                font-size: 14px;
+                color: #666;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
-        }
+
+            /* Style variations */
+            .sweetaddons-stats-minimal .stat-item {
+                background: transparent;
+                border: none;
+                padding: 10px;
+            }
+
+            .sweetaddons-stats-minimal .stat-item:hover {
+                background: #f8f9fa;
+                transform: none;
+                box-shadow: none;
+            }
+
+            .sweetaddons-stats-cards .stat-item {
+                background: #fff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                border: none;
+            }
+
+            .sweetaddons-stats-cards .stat-item:hover {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Column variations */
+            .sweetaddons-stats-cols-1 {
+                flex-direction: column;
+                max-width: 200px;
+            }
+
+            .sweetaddons-stats-cols-2 .stat-item {
+                flex-basis: calc(50% - 7.5px);
+            }
+
+            .sweetaddons-stats-cols-3 .stat-item {
+                flex-basis: calc(33.333% - 10px);
+            }
+
+            .sweetaddons-stats-cols-4 .stat-item {
+                flex-basis: calc(25% - 11.25px);
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .sweetaddons-statistics-widget {
+                    flex-direction: column;
+                }
+
+                .sweetaddons-statistics-widget .stat-item {
+                    flex-basis: auto !important;
+                }
+
+                .sweetaddons-statistics-widget .stat-number {
+                    font-size: 24px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .sweetaddons-statistics-widget .stat-item {
+                    padding: 15px;
+                    min-width: auto;
+                }
+
+                .sweetaddons-statistics-widget .stat-number {
+                    font-size: 20px;
+                }
+
+                .sweetaddons-statistics-widget .stat-label {
+                    font-size: 12px;
+                }
+            }
         </style>
-        <?php
+<?php
     }
 }

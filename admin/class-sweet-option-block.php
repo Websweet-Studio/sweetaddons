@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/admin
+ * @package    sweetaddons
+ * @subpackage sweetaddons/admin
  */
 
 class Sweet_Option_Block

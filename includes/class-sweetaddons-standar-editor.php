@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 /**
@@ -17,8 +17,8 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
 
@@ -87,7 +87,7 @@ class Sweetaddons_Standar_Editor
 
     function mce_register_plugin($plugin_array)
     {
-        $plugin_array['table'] = Sweetaddons_PLUGIN_DIR_URL . 'admin/js/tinymce-table-plugin.min.js';
+        $plugin_array['table'] = SWEETADDONS_PLUGIN_DIR_URL . 'admin/js/tinymce-table-plugin.min.js';
         return $plugin_array;
     }
 }

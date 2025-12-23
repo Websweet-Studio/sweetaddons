@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 class Sweetaddons_Breadcrumb
@@ -29,7 +29,7 @@ class Sweetaddons_Breadcrumb
 
         if (!is_front_page()) {
             ob_start();
-            
+
             $style_class = 'sweetaddons-breadcrumb-' . sanitize_html_class($atts['style']);
             echo '<nav class="sweetaddons-breadcrumb ' . $style_class . '" aria-label="Breadcrumb">';
             echo '<ol class="breadcrumb-list">';
@@ -78,20 +78,20 @@ class Sweetaddons_Breadcrumb
     private function render_category_breadcrumb($atts)
     {
         $category = get_queried_object();
-        
+
         // Show parent categories
         if ($category->parent != 0) {
             $parent_categories = array();
             $parent = $category->parent;
-            
+
             while ($parent) {
                 $parent_cat = get_category($parent);
                 $parent_categories[] = $parent_cat;
                 $parent = $parent_cat->parent;
             }
-            
+
             $parent_categories = array_reverse($parent_categories);
-            
+
             foreach ($parent_categories as $parent_cat) {
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-category">';
@@ -135,7 +135,7 @@ class Sweetaddons_Breadcrumb
             echo '<li class="breadcrumb-item breadcrumb-date">';
             echo '<a href="' . get_year_link(get_the_date('Y')) . '">' . get_the_date('Y') . '</a>';
             echo '</li>';
-            
+
             if ($atts['show_current'] === 'true') {
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-current" aria-current="page">' . get_the_date('F') . '</li>';
@@ -145,12 +145,12 @@ class Sweetaddons_Breadcrumb
             echo '<li class="breadcrumb-item breadcrumb-date">';
             echo '<a href="' . get_year_link(get_the_date('Y')) . '">' . get_the_date('Y') . '</a>';
             echo '</li>';
-            
+
             echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
             echo '<li class="breadcrumb-item breadcrumb-date">';
             echo '<a href="' . get_month_link(get_the_date('Y'), get_the_date('m')) . '">' . get_the_date('F') . '</a>';
             echo '</li>';
-            
+
             if ($atts['show_current'] === 'true') {
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-current" aria-current="page">' . get_the_date('j') . '</li>';
@@ -177,26 +177,26 @@ class Sweetaddons_Breadcrumb
     private function render_single_breadcrumb($atts)
     {
         $post = get_queried_object();
-        
+
         // Show categories for posts
         if ($post->post_type === 'post') {
             $categories = get_the_category();
             if (!empty($categories)) {
                 $category = $categories[0];
-                
+
                 // Show parent categories
                 if ($category->parent != 0) {
                     $parent_categories = array();
                     $parent = $category->parent;
-                    
+
                     while ($parent) {
                         $parent_cat = get_category($parent);
                         $parent_categories[] = $parent_cat;
                         $parent = $parent_cat->parent;
                     }
-                    
+
                     $parent_categories = array_reverse($parent_categories);
-                    
+
                     foreach ($parent_categories as $parent_cat) {
                         echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                         echo '<li class="breadcrumb-item breadcrumb-category">';
@@ -204,7 +204,7 @@ class Sweetaddons_Breadcrumb
                         echo '</li>';
                     }
                 }
-                
+
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-category">';
                 echo '<a href="' . get_category_link($category->term_id) . '">' . esc_html($category->name) . '</a>';
@@ -222,20 +222,20 @@ class Sweetaddons_Breadcrumb
     private function render_page_breadcrumb($atts)
     {
         $post = get_queried_object();
-        
+
         // Show parent pages
         if ($post->post_parent) {
             $parent_pages = array();
             $parent = $post->post_parent;
-            
+
             while ($parent) {
                 $parent_page = get_post($parent);
                 $parent_pages[] = $parent_page;
                 $parent = $parent_page->post_parent;
             }
-            
+
             $parent_pages = array_reverse($parent_pages);
-            
+
             foreach ($parent_pages as $parent_page) {
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-page">';
@@ -261,97 +261,97 @@ class Sweetaddons_Breadcrumb
 
     private function add_breadcrumb_styles()
     {
-        ?>
+?>
         <style>
-        .sweetaddons-breadcrumb {
-            margin: 20px 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+            .sweetaddons-breadcrumb {
+                margin: 20px 0;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }
 
-        .sweetaddons-breadcrumb .breadcrumb-list {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            font-size: 14px;
-        }
-
-        .sweetaddons-breadcrumb .breadcrumb-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .sweetaddons-breadcrumb .breadcrumb-separator {
-            margin: 0 8px;
-            color: #666;
-            opacity: 0.7;
-        }
-
-        .sweetaddons-breadcrumb a {
-            color: #0073aa;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .sweetaddons-breadcrumb a:hover {
-            color: #005177;
-            text-decoration: underline;
-        }
-
-        .sweetaddons-breadcrumb .breadcrumb-current {
-            color: #666;
-            font-weight: 500;
-        }
-
-        /* Style variations */
-        .sweetaddons-breadcrumb-minimal {
-            margin: 10px 0;
-        }
-
-        .sweetaddons-breadcrumb-minimal .breadcrumb-list {
-            font-size: 13px;
-        }
-
-        .sweetaddons-breadcrumb-minimal .breadcrumb-separator {
-            margin: 0 6px;
-        }
-
-        .sweetaddons-breadcrumb-arrow .breadcrumb-separator::before {
-            content: '→';
-            margin: 0 6px;
-        }
-
-        .sweetaddons-breadcrumb-arrow .breadcrumb-separator {
-            margin: 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
             .sweetaddons-breadcrumb .breadcrumb-list {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                font-size: 14px;
+            }
+
+            .sweetaddons-breadcrumb .breadcrumb-item {
+                display: flex;
+                align-items: center;
+            }
+
+            .sweetaddons-breadcrumb .breadcrumb-separator {
+                margin: 0 8px;
+                color: #666;
+                opacity: 0.7;
+            }
+
+            .sweetaddons-breadcrumb a {
+                color: #0073aa;
+                text-decoration: none;
+                transition: color 0.2s ease;
+            }
+
+            .sweetaddons-breadcrumb a:hover {
+                color: #005177;
+                text-decoration: underline;
+            }
+
+            .sweetaddons-breadcrumb .breadcrumb-current {
+                color: #666;
+                font-weight: 500;
+            }
+
+            /* Style variations */
+            .sweetaddons-breadcrumb-minimal {
+                margin: 10px 0;
+            }
+
+            .sweetaddons-breadcrumb-minimal .breadcrumb-list {
                 font-size: 13px;
             }
-            
-            .sweetaddons-breadcrumb .breadcrumb-separator {
+
+            .sweetaddons-breadcrumb-minimal .breadcrumb-separator {
                 margin: 0 6px;
             }
-        }
 
-        @media (max-width: 480px) {
-            .sweetaddons-breadcrumb {
-                margin: 15px 0;
+            .sweetaddons-breadcrumb-arrow .breadcrumb-separator::before {
+                content: '→';
+                margin: 0 6px;
             }
-            
-            .sweetaddons-breadcrumb .breadcrumb-list {
-                font-size: 12px;
+
+            .sweetaddons-breadcrumb-arrow .breadcrumb-separator {
+                margin: 0;
             }
-            
-            .sweetaddons-breadcrumb .breadcrumb-separator {
-                margin: 0 4px;
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .sweetaddons-breadcrumb .breadcrumb-list {
+                    font-size: 13px;
+                }
+
+                .sweetaddons-breadcrumb .breadcrumb-separator {
+                    margin: 0 6px;
+                }
             }
-        }
+
+            @media (max-width: 480px) {
+                .sweetaddons-breadcrumb {
+                    margin: 15px 0;
+                }
+
+                .sweetaddons-breadcrumb .breadcrumb-list {
+                    font-size: 12px;
+                }
+
+                .sweetaddons-breadcrumb .breadcrumb-separator {
+                    margin: 0 4px;
+                }
+            }
         </style>
-        <?php
+<?php
     }
 }

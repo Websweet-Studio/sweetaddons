@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 /**
@@ -17,8 +17,8 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
 class Sweetaddons_Loader

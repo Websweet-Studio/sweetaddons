@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 class Sweetaddons_Login_Customizer
@@ -29,9 +29,9 @@ class Sweetaddons_Login_Customizer
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
 
         echo '<style type="text/css">';
-        
+
         echo 'body.login { background-color: ' . esc_attr($bg_color) . ' !important; }';
-        
+
         if ($bg_image) {
             echo 'body.login { background-image: url(' . esc_url($bg_image) . ') !important; background-size: cover; background-position: center; background-repeat: no-repeat; }';
         }
@@ -42,7 +42,7 @@ class Sweetaddons_Login_Customizer
 
         echo '.wp-core-ui .button-primary { background: ' . esc_attr($btn_color) . ' !important; border-color: ' . esc_attr($btn_color) . ' !important; color: ' . esc_attr($btn_text_color) . ' !important; text-shadow: none; box-shadow: none; }';
         echo '.wp-core-ui .button-primary:hover { background: ' . esc_attr($this->adjust_brightness($btn_color, -20)) . ' !important; border-color: ' . esc_attr($this->adjust_brightness($btn_color, -20)) . ' !important; }';
-        
+
         echo '</style>';
     }
 

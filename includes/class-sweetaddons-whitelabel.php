@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 class Sweetaddons_WhiteLabel
@@ -24,7 +24,7 @@ class Sweetaddons_WhiteLabel
     public function modify_plugin_info($plugins)
     {
         $plugin_file = 'sweetaddons/sweetaddons.php';
-        
+
         if (!isset($plugins[$plugin_file])) {
             return $plugins;
         }
@@ -42,24 +42,24 @@ class Sweetaddons_WhiteLabel
             $plugins[$plugin_file]['Name'] = $plugin_name;
             $plugins[$plugin_file]['Title'] = $plugin_name;
         }
-        
+
         if ($plugin_uri) {
             $plugins[$plugin_file]['PluginURI'] = $plugin_uri;
         }
-        
+
         if ($description) {
             $plugins[$plugin_file]['Description'] = $description;
         }
-        
+
         if ($author) {
             $plugins[$plugin_file]['Author'] = $author;
             $plugins[$plugin_file]['AuthorName'] = $author;
         }
-        
+
         if ($author_uri) {
             $plugins[$plugin_file]['AuthorURI'] = $author_uri;
         }
-        
+
         if ($version) {
             $plugins[$plugin_file]['Version'] = $version;
         }
@@ -74,12 +74,12 @@ class Sweetaddons_WhiteLabel
         }
 
         $hide_original = get_option('sweetaddons_whitelabel_hide_original');
-        
+
         if ($hide_original) {
             // Remove original author links and references
-            $plugin_meta = array_filter($plugin_meta, function($meta) {
-                return !strpos($meta, 'websweetstudio.com') && 
-                       !strpos($meta, 'WebsweetStudio');
+            $plugin_meta = array_filter($plugin_meta, function ($meta) {
+                return !strpos($meta, 'websweetstudio.com') &&
+                    !strpos($meta, 'WebsweetStudio');
             });
         }
 
@@ -89,24 +89,24 @@ class Sweetaddons_WhiteLabel
     public function custom_admin_styles()
     {
         $hide_original = get_option('sweetaddons_whitelabel_hide_original');
-        
+
         if ($hide_original) {
-            ?>
+?>
             <style>
-            /* Hide WebsweetStudio references in admin */
-            .sweetaddons-branding,
-            .websweetstudio-link,
-            [href*="websweetstudio.com"] {
-                display: none !important;
-            }
-            
-            /* Custom branding styles */
-            .sweetaddons-whitelabel .custom-branding {
-                font-weight: bold;
-                color: #0073aa;
-            }
+                /* Hide WebsweetStudio references in admin */
+                .sweetaddons-branding,
+                .websweetstudio-link,
+                [href*="websweetstudio.com"] {
+                    display: none !important;
+                }
+
+                /* Custom branding styles */
+                .sweetaddons-whitelabel .custom-branding {
+                    font-weight: bold;
+                    color: #0073aa;
+                }
             </style>
-            <?php
+<?php
         }
     }
 
@@ -140,9 +140,9 @@ class Sweetaddons_WhiteLabel
     public function update_menu_title()
     {
         global $menu, $submenu;
-        
+
         $custom_menu_title = get_option('sweetaddons_whitelabel_menu_title');
-        
+
         if ($custom_menu_title) {
             // Update main menu title
             foreach ($menu as $key => $menu_item) {
@@ -151,7 +151,7 @@ class Sweetaddons_WhiteLabel
                     break;
                 }
             }
-            
+
             // Update submenu titles if needed
             if (isset($submenu['custom_admin_options'])) {
                 foreach ($submenu['custom_admin_options'] as $key => $submenu_item) {
@@ -192,12 +192,12 @@ class Sweetaddons_WhiteLabel
     public static function get_branding_html()
     {
         $hide_original = get_option('sweetaddons_whitelabel_hide_original');
-        
+
         if ($hide_original) {
             $plugin_name = self::get_white_labeled_info('plugin_name');
             $author = self::get_white_labeled_info('author');
             $author_uri = self::get_white_labeled_info('author_uri');
-            
+
             return sprintf(
                 '<div class="sweetaddons-whitelabel"><span class="custom-branding">%s</span> by <a href="%s" target="_blank">%s</a></div>',
                 esc_html($plugin_name),
@@ -205,7 +205,7 @@ class Sweetaddons_WhiteLabel
                 esc_html($author)
             );
         }
-        
+
         return '<div class="sweetaddons-branding">Sweet Addons by <a href="https://websweetstudio.com" target="_blank">WebsweetStudio</a></div>';
     }
 }

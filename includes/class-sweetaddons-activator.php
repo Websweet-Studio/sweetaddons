@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 /**
@@ -16,8 +16,8 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
 class Sweetaddons_Activator
@@ -33,9 +33,9 @@ class Sweetaddons_Activator
 	public static function activate()
 	{
 		global $wpdb;
-		
+
 		$charset_collate = $wpdb->get_charset_collate();
-		
+
 		// Table untuk raw visitor data (tetap untuk detail tracking)
 		$visitor_logs_table = $wpdb->prefix . 'sweetaddons_visitor_logs';
 		$sql1 = "CREATE TABLE $visitor_logs_table (
@@ -52,7 +52,7 @@ class Sweetaddons_Activator
 			KEY visitor_ip (visitor_ip),
 			KEY page_url (page_url)
 		) $charset_collate;";
-		
+
 		// Table untuk daily aggregation (untuk performa)
 		$daily_stats_table = $wpdb->prefix . 'sweetaddons_daily_stats';
 		$sql2 = "CREATE TABLE $daily_stats_table (
@@ -66,7 +66,7 @@ class Sweetaddons_Activator
 			PRIMARY KEY (id),
 			UNIQUE KEY stat_date (stat_date)
 		) $charset_collate;";
-		
+
 		// Table untuk monthly aggregation
 		$monthly_stats_table = $wpdb->prefix . 'sweetaddons_monthly_stats';
 		$sql3 = "CREATE TABLE $monthly_stats_table (
@@ -81,7 +81,7 @@ class Sweetaddons_Activator
 			PRIMARY KEY (id),
 			UNIQUE KEY year_month (stat_year, stat_month)
 		) $charset_collate;";
-		
+
 		// Table untuk page statistics
 		$page_stats_table = $wpdb->prefix . 'sweetaddons_page_stats';
 		$sql4 = "CREATE TABLE $page_stats_table (
@@ -97,7 +97,7 @@ class Sweetaddons_Activator
 			KEY page_url (page_url),
 			KEY stat_date (stat_date)
 		) $charset_collate;";
-		
+
 		// Table untuk referrer statistics
 		$referrer_stats_table = $wpdb->prefix . 'sweetaddons_referrer_stats';
 		$sql5 = "CREATE TABLE $referrer_stats_table (
@@ -112,19 +112,19 @@ class Sweetaddons_Activator
 			KEY referrer_domain (referrer_domain),
 			KEY stat_date (stat_date)
 		) $charset_collate;";
-		
+
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta($sql1);
 		dbDelta($sql2);
 		dbDelta($sql3);
 		dbDelta($sql4);
 		dbDelta($sql5);
-		
+
 		// Schedule daily aggregation cron job
 		if (!wp_next_scheduled('sweetaddons_daily_aggregation')) {
 			wp_schedule_event(time(), 'daily', 'sweetaddons_daily_aggregation');
 		}
-		
+
 		// Mengarahkan pengguna ke halaman custom_admin_options saat plugin diaktifkan
 		// wp_redirect(admin_url('options-general.php?page=custom_admin_options'));
 		// exit;

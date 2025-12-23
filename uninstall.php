@@ -22,7 +22,7 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
+ * @package    sweetaddons
  */
 
 // If uninstall not called from WordPress, then exit.

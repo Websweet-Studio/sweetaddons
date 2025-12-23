@@ -6,8 +6,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/public
+ * @package    sweetaddons
+ * @subpackage sweetaddons/public
  */
 
 /**
@@ -16,8 +16,8 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/public
+ * @package    sweetaddons
+ * @subpackage sweetaddons/public
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
 class Sweetaddons_Public

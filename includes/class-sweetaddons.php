@@ -9,8 +9,8 @@
  * @link       https://websweetstudio.com
  * @since      1.0.0
  *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  */
 
 /**
@@ -23,11 +23,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
+ * @package    sweetaddons
+ * @subpackage sweetaddons/includes
  * @author     WebsweetStudio <websweetstudio@gmail.com>
  */
-class Sweetaddons
+class sweetaddons
 {
 
     /**
@@ -69,8 +69,8 @@ class Sweetaddons
      */
     public function __construct()
     {
-        if (defined('Sweetaddons_VERSION')) {
-            $this->version = Sweetaddons_VERSION;
+        if (defined('SWEETADDONS_VERSION')) {
+            $this->version = SWEETADDONS_VERSION;
         } else {
             $this->version = '1.0.0';
         }
