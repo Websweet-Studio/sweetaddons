@@ -113,51 +113,87 @@ class Sweet_Option_Block
             [
                 'id'    => 'whitelist_block_wp_login',
                 'type'  => 'text',
-                'title' => 'IP Whitelist untuk Blokir wp-login.php',
+                'title' => 'IP Whitelist',
                 'std'   => '',
-                'label' => 'Tambahkan daftar IP yang dikecualikan dari pemblokiran akses ke file wp-login.php. Pisahkan dengan koma untuk beberapa IP.',
+                'label' => 'Daftar IP yang dikecualikan (pisahkan dengan koma).',
             ],
             [
                 'id'    => 'whitelist_country',
                 'type'  => 'text',
-                'title' => 'Negara yang Diizinkan',
+                'title' => 'Negara Diizinkan',
                 'std'   => 'ID',
-                'label' => 'Batasi akses ke situs WordPress hanya untuk negara-negara tertentu dengan menggunakan ID negara sebagai pemisah, seperti contoh ID,MY,US.',
+                'label' => 'Kode negara (ID, MY, US) yang diizinkan mengakses.',
             ],
             [
                 'id'    => 'redirect_to',
                 'type'  => 'text',
-                'title' => 'Arahkan Ke',
+                'title' => 'Redirect URL',
                 'std'   => 'http://127.0.0.1',
-                'label' => 'Tujuan redirect wp-login.php, jika Block wp-login.php aktif.',
+                'label' => 'Tujuan redirect jika diblokir.',
             ],
         ];
 
+        // Get current values for summary
+        $block_active = get_option('block_wp_login', 0);
+        $whitelist_count = 0;
+        $wl_ip = get_option('whitelist_block_wp_login', '');
+        if (!empty($wl_ip)) {
+            $whitelist_count = count(explode(',', $wl_ip));
+        }
 ?>
-        <div class="wrap vd-ons">
-            <h1>Pengaturan Blokir Login</h1>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">🔒 Pengaturan Blokir Login</h1>
+
+            <!-- Status Summary Cards -->
+            <div class="sad-grid" style="margin-bottom: 20px;">
+                <div class="sad-card" style="text-align: center; border-bottom: 4px solid #0073aa;">
+                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Status Blokir</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                        <?php echo $block_active ? '<span style="color:#00a32a">AKTIF</span>' : '<span style="color:#d63638">NONAKTIF</span>'; ?>
+                    </div>
+                    <div style="color: #666; font-size: 14px;">Proteksi wp-login.php</div>
+                </div>
+
+                <div class="sad-card" style="text-align: center; border-bottom: 4px solid #0073aa;">
+                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">IP Whitelist</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                        <?php echo $whitelist_count; ?>
+                    </div>
+                    <div style="color: #666; font-size: 14px;">IP Terdaftar</div>
+                </div>
+            </div>
 
             <form method="post" action="options.php">
                 <?php settings_fields('Sweetaddons_block_group'); ?>
-                <?php do_settings_sections('Sweetaddons_block_group'); ?>
 
-                <table class="form-table">
-                    <?php
-                    foreach ($block_fields as $data) :
-                        echo '<tr>';
-                        echo '<th scope="row">';
-                        echo $data['title'];
-                        echo '</th>';
-                        echo '<td>';
-                        $this->field($data);
-                        echo '</td>';
-                        echo '</tr>';
-                    endforeach;
-                    ?>
-                </table>
+                <div class="sad-top">
+                    <!-- Left Column -->
+                    <div class="sad-top-left">
+                        <div class="sad-card">
+                            <div class="sad-card-title">⚙️ Konfigurasi Utama</div>
+                            <table class="form-table">
+                                <?php
+                                foreach ($block_fields as $data) :
+                                    echo '<tr>';
+                                    echo '<th scope="row">' . $data['title'] . '</th>';
+                                    echo '<td>';
+                                    $this->field($data);
+                                    echo '</td>';
+                                    echo '</tr>';
+                                endforeach;
+                                ?>
+                            </table>
+                        </div>
+                    </div>
 
-                <div style="float:right;">
-                    <?php submit_button(); ?>
+                    <!-- Right Column -->
+                    <div class="sad-top-right">
+                        <div class="sad-card" style="text-align: center; background: #f0f8ff; border-color: #0073aa;">
+                            <h3 style="margin-top: 0;">💾 Simpan Perubahan</h3>
+                            <p style="margin-bottom: 15px; color: #666;">Jangan lupa simpan pengaturan Anda.</p>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

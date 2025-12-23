@@ -1135,40 +1135,40 @@ class Custom_Admin_Option_Page
             <h1 class="sad-title">🔍 Pengaturan SEO</h1>
 
             <!-- Status Summary Cards -->
-            <div class="stats-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+            <div class="sad-grid" style="margin-bottom: 20px;">
 
-                <div class="sad-card" style="text-align: center; margin-bottom: 0; cursor: pointer; transition: transform 0.2s; border-bottom: 4px solid #0073aa;" onclick="document.getElementById('seo-general-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Home SEO</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                <div class="sad-card sad-stat" onclick="document.getElementById('seo-general-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Home SEO</div>
+                    <div class="sad-card-value">
                         <?php echo !empty($home_title) ? '<span style="color:#00a32a">OK</span>' : '<span style="color:#d63638">Set</span>'; ?>
                     </div>
-                    <div style="color: #666; font-size: 14px;">Title Configuration</div>
+                    <div class="sad-subtext">Title Configuration</div>
                 </div>
 
-                <div class="sad-card" style="text-align: center; margin-bottom: 0; cursor: pointer; transition: transform 0.2s; border-bottom: 4px solid #0073aa;" onclick="document.getElementById('seo-technical-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Sitemap XML</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                <div class="sad-card sad-stat" onclick="document.getElementById('seo-technical-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Sitemap XML</div>
+                    <div class="sad-card-value">
                         <?php echo $enable_sitemap ? '<span style="color:#00a32a">Active</span>' : '<span style="color:#999">Off</span>'; ?>
                     </div>
-                    <div style="color: #666; font-size: 14px;">Search Engine Indexing</div>
+                    <div class="sad-subtext">Search Engine Indexing</div>
                 </div>
 
-                <div class="sad-card" style="text-align: center; margin-bottom: 0; cursor: pointer; transition: transform 0.2s; border-bottom: 4px solid #0073aa;" onclick="document.getElementById('seo-social-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Open Graph</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
+                <div class="sad-card sad-stat" onclick="document.getElementById('seo-social-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Open Graph</div>
+                    <div class="sad-card-value">
                         <?php echo !empty($default_og_image) ? '<span style="color:#00a32a">Ready</span>' : '<span style="color:#ff922b">Default</span>'; ?>
                     </div>
-                    <div style="color: #666; font-size: 14px;">Social Sharing</div>
+                    <div class="sad-subtext">Social Sharing</div>
                 </div>
             </div>
 
             <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_seo_settings'); ?>
 
-                <div class="charts-section" style="display: grid; grid-template-columns: 7fr 3fr; gap: 20px; margin: 20px 0;">
+                <div class="sad-top">
 
                     <!-- Left Column (Main Settings) -->
-                    <div class="left-column">
+                    <div class="sad-top-left">
 
                         <!-- General SEO Settings -->
                         <div class="sad-card" id="seo-general-settings">
@@ -1248,12 +1248,12 @@ class Custom_Admin_Option_Page
                     </div>
 
                     <!-- Right Column (Sidebar) -->
-                    <div class="right-column">
+                    <div class="sad-top-right">
 
                         <!-- Save Button Card -->
-                        <div class="sad-card" style="text-align: center; background: #f0f8ff; border-color: #0073aa;">
-                            <h3 style="margin-top: 0;">💾 Simpan Perubahan</h3>
-                            <p style="margin-bottom: 15px; color: #666;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</p>
+                        <div class="sad-card">
+                            <div class="sad-card-title">💾 Simpan Perubahan</div>
+                            <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
                             <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
                         </div>
 
@@ -1276,7 +1276,7 @@ class Custom_Admin_Option_Page
                         <!-- Features Info -->
                         <div class="sad-card">
                             <div class="sad-card-title">✨ Fitur SEO</div>
-                            <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #666;">
+                            <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
                                 <li style="margin-bottom: 5px;">Judul & Deskripsi Meta</li>
                                 <li style="margin-bottom: 5px;">Open Graph Support</li>
                                 <li style="margin-bottom: 5px;">XML Sitemap Generator</li>
