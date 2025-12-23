@@ -1196,7 +1196,15 @@ class Custom_Admin_Option_Page
                 'sweetaddons_seo_default_og_image',
                 'sweetaddons_seo_twitter_site',
                 'sweetaddons_seo_enable_sitemap',
-                'sweetaddons_seo_google_search_console'
+                'sweetaddons_seo_google_search_console',
+                'sweetaddons_seo_template_single_title',
+                'sweetaddons_seo_template_single_description',
+                'sweetaddons_seo_template_page_title',
+                'sweetaddons_seo_template_page_description',
+                'sweetaddons_seo_template_category_title',
+                'sweetaddons_seo_template_category_description',
+                'sweetaddons_seo_template_tag_title',
+                'sweetaddons_seo_template_tag_description'
             );
 
             foreach ($fields as $field) {
@@ -1219,6 +1227,14 @@ class Custom_Admin_Option_Page
         $twitter_site = get_option('sweetaddons_seo_twitter_site', '');
         $enable_sitemap = get_option('sweetaddons_seo_enable_sitemap', '1');
         $google_search_console = get_option('sweetaddons_seo_google_search_console', '');
+        $tpl_single_title = get_option('sweetaddons_seo_template_single_title', '{post_title} | {site_name}');
+        $tpl_single_desc = get_option('sweetaddons_seo_template_single_description', '{excerpt}');
+        $tpl_page_title = get_option('sweetaddons_seo_template_page_title', '{page_title} | {site_name}');
+        $tpl_page_desc = get_option('sweetaddons_seo_template_page_description', '{excerpt}');
+        $tpl_cat_title = get_option('sweetaddons_seo_template_category_title', '{category_name} | {site_name}');
+        $tpl_cat_desc = get_option('sweetaddons_seo_template_category_description', '{category_description}');
+        $tpl_tag_title = get_option('sweetaddons_seo_template_tag_title', '{tag_name} | {site_name}');
+        $tpl_tag_desc = get_option('sweetaddons_seo_template_tag_description', '{tag_description}');
 
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
@@ -1250,6 +1266,68 @@ class Custom_Admin_Option_Page
                                         <textarea id="sweetaddons_seo_home_description" name="sweetaddons_seo_home_description" rows="3" class="large-text"><?php echo esc_textarea($home_description); ?></textarea>
                                         <p class="description">Kosongkan untuk menggunakan tagline situs.</p>
                                         <div id="home-desc-counter" style="font-size: 12px; color: #666;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="sad-card" id="seo-templates-settings">
+                            <div class="sad-card-title">🧩 Template Judul & Deskripsi</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_single_title">Template Title (Single)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_single_title" name="sweetaddons_seo_template_single_title" value="<?php echo esc_attr($tpl_single_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {post_title}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_single_description">Template Description (Single)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_single_description" name="sweetaddons_seo_template_single_description" value="<?php echo esc_attr($tpl_single_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {excerpt}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_page_title">Template Title (Page)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_page_title" name="sweetaddons_seo_template_page_title" value="<?php echo esc_attr($tpl_page_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {page_title}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_page_description">Template Description (Page)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_page_description" name="sweetaddons_seo_template_page_description" value="<?php echo esc_attr($tpl_page_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {excerpt}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_category_title">Template Title (Category)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_category_title" name="sweetaddons_seo_template_category_title" value="<?php echo esc_attr($tpl_cat_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {category_name}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_category_description">Template Description (Category)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_category_description" name="sweetaddons_seo_template_category_description" value="<?php echo esc_attr($tpl_cat_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {category_description}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_tag_title">Template Title (Tag)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_tag_title" name="sweetaddons_seo_template_tag_title" value="<?php echo esc_attr($tpl_tag_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {tag_name}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_tag_description">Template Description (Tag)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_tag_description" name="sweetaddons_seo_template_tag_description" value="<?php echo esc_attr($tpl_tag_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {tag_description}, {site_tagline}</p>
                                     </td>
                                 </tr>
                             </table>

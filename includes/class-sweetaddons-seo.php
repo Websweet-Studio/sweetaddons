@@ -120,6 +120,24 @@ class Sweetaddons_SEO
             if ($custom_title) {
                 return $custom_title;
             }
+            $site_name = get_bloginfo('name');
+            if (get_post_type($post) === 'page') {
+                $tpl = get_option('sweetaddons_seo_template_page_title');
+                if ($tpl) {
+                    return $this->apply_template($tpl, array(
+                        'page_title' => get_the_title($post->ID),
+                        'site_name' => $site_name
+                    ));
+                }
+            } else {
+                $tpl = get_option('sweetaddons_seo_template_single_title');
+                if ($tpl) {
+                    return $this->apply_template($tpl, array(
+                        'post_title' => get_the_title($post->ID),
+                        'site_name' => $site_name
+                    ));
+                }
+            }
             return get_the_title($post->ID);
         }
 
@@ -132,10 +150,24 @@ class Sweetaddons_SEO
         }
 
         if (is_category()) {
+            $tpl = get_option('sweetaddons_seo_template_category_title');
+            if ($tpl) {
+                return $this->apply_template($tpl, array(
+                    'category_name' => single_cat_title('', false),
+                    'site_name' => get_bloginfo('name')
+                ));
+            }
             return single_cat_title('', false);
         }
 
         if (is_tag()) {
+            $tpl = get_option('sweetaddons_seo_template_tag_title');
+            if ($tpl) {
+                return $this->apply_template($tpl, array(
+                    'tag_name' => single_tag_title('', false),
+                    'site_name' => get_bloginfo('name')
+                ));
+            }
             return single_tag_title('', false);
         }
 
@@ -156,12 +188,29 @@ class Sweetaddons_SEO
                 return $custom_desc;
             }
 
-            // Auto-generate from excerpt or content
             if ($post->post_excerpt) {
-                return wp_trim_words($post->post_excerpt, 25);
+                $excerpt = wp_trim_words($post->post_excerpt, 25);
+            } else {
+                $excerpt = wp_trim_words(strip_tags($post->post_content), 25);
             }
-
-            return wp_trim_words(strip_tags($post->post_content), 25);
+            if (get_post_type($post) === 'page') {
+                $tpl = get_option('sweetaddons_seo_template_page_description');
+                if ($tpl) {
+                    return $this->apply_template($tpl, array(
+                        'excerpt' => $excerpt,
+                        'site_tagline' => get_bloginfo('description')
+                    ));
+                }
+            } else {
+                $tpl = get_option('sweetaddons_seo_template_single_description');
+                if ($tpl) {
+                    return $this->apply_template($tpl, array(
+                        'excerpt' => $excerpt,
+                        'site_tagline' => get_bloginfo('description')
+                    ));
+                }
+            }
+            return $excerpt;
         }
 
         if (is_home() || is_front_page()) {
@@ -175,18 +224,43 @@ class Sweetaddons_SEO
         if (is_category()) {
             $cat_desc = category_description();
             if ($cat_desc) {
-                return wp_trim_words(strip_tags($cat_desc), 25);
+                $desc = wp_trim_words(strip_tags($cat_desc), 25);
+                $tpl = get_option('sweetaddons_seo_template_category_description');
+                if ($tpl) {
+                    return $this->apply_template($tpl, array(
+                        'category_description' => $desc,
+                        'site_tagline' => get_bloginfo('description')
+                    ));
+                }
+                return $desc;
             }
         }
 
         if (is_tag()) {
             $tag_desc = tag_description();
             if ($tag_desc) {
-                return wp_trim_words(strip_tags($tag_desc), 25);
+                $desc = wp_trim_words(strip_tags($tag_desc), 25);
+                $tpl = get_option('sweetaddons_seo_template_tag_description');
+                if ($tpl) {
+                    return $this->apply_template($tpl, array(
+                        'tag_description' => $desc,
+                        'site_tagline' => get_bloginfo('description')
+                    ));
+                }
+                return $desc;
             }
         }
 
         return '';
+    }
+
+    private function apply_template($template, $context)
+    {
+        $map = array();
+        foreach ($context as $k => $v) {
+            $map['{' . $k . '}'] = $v;
+        }
+        return strtr($template, $map);
     }
 
     private function get_meta_keywords()
@@ -478,6 +552,140 @@ class Sweetaddons_SEO
             </tr>
         </table>
 
+        <?php
+        $content = isset($post->post_content) ? $post->post_content : '';
+        $title_check = $title ? $title : get_the_title($post->ID);
+        $desc_check = $description ? $description : ($post->post_excerpt ? wp_trim_words($post->post_excerpt, 25) : wp_trim_words(strip_tags($content), 25));
+        $keywords_list = array();
+        if ($keywords) {
+            foreach (explode(',', $keywords) as $kw) {
+                $kw = trim($kw);
+                if ($kw !== '') {
+                    $keywords_list[] = mb_strtolower($kw);
+                }
+            }
+        } else {
+            $tags = get_the_tags($post->ID);
+            if ($tags) {
+                foreach ($tags as $t) {
+                    $keywords_list[] = mb_strtolower($t->name);
+                }
+            }
+        }
+        $focus_kw = isset($keywords_list[0]) ? $keywords_list[0] : '';
+        $score = 0;
+        $title_len = mb_strlen($title_check);
+        if ($title_len >= 50 && $title_len <= 60) {
+            $score += 10;
+        } elseif ($title_len >= 40 && $title_len <= 70) {
+            $score += 7;
+        }
+        $desc_len = mb_strlen($desc_check);
+        if ($desc_len >= 150 && $desc_len <= 160) {
+            $score += 10;
+        } elseif ($desc_len >= 120 && $desc_len <= 180) {
+            $score += 7;
+        }
+        if ($focus_kw) {
+            if (mb_stripos($title_check, $focus_kw) !== false) {
+                $score += 10;
+            }
+            if (mb_stripos($desc_check, $focus_kw) !== false) {
+                $score += 5;
+            }
+        }
+        $has_og = !empty($og_image) || has_post_thumbnail($post->ID);
+        if ($has_og) {
+            $score += 10;
+        }
+        $plain = wp_strip_all_tags($content);
+        $word_count = str_word_count($plain);
+        if ($word_count >= 700) {
+            $score += 15;
+        } elseif ($word_count >= 300) {
+            $score += 10;
+        } elseif ($word_count >= 150) {
+            $score += 5;
+        }
+        $internal_links = 0;
+        $external_links = 0;
+        $imgs = 0;
+        $imgs_with_alt = 0;
+        $host = parse_url(home_url(), PHP_URL_HOST);
+        if (preg_match_all('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>/i', $content, $matches)) {
+            foreach ($matches[1] as $href) {
+                if (strpos($href, 'http') === 0) {
+                    if (strpos($href, $host) !== false) {
+                        $internal_links++;
+                    } else {
+                        $external_links++;
+                    }
+                }
+            }
+        }
+        if ($internal_links > 0) {
+            $score += 5;
+        }
+        if ($external_links > 0) {
+            $score += 5;
+        }
+        $headings = 0;
+        if (preg_match_all('/<(h2|h3)[^>]*>/i', $content, $hm)) {
+            $headings = count($hm[0]);
+        }
+        if ($headings >= 3) {
+            $score += 10;
+        } elseif ($headings >= 1) {
+            $score += 5;
+        }
+        if (preg_match_all('/<img[^>]*>/i', $content, $im)) {
+            $imgs = count($im[0]);
+            foreach ($im[0] as $tag) {
+                if (preg_match('/\balt=["\'][^"\']+["\']/i', $tag)) {
+                    $imgs_with_alt++;
+                }
+            }
+        }
+        if ($imgs > 0) {
+            if ($imgs_with_alt === $imgs) {
+                $score += 10;
+            } elseif ($imgs_with_alt > 0) {
+                $score += 5;
+            }
+        }
+        if ($noindex) {
+            $score -= 20;
+        }
+        if ($score < 0) {
+            $score = 0;
+        }
+        if ($score > 100) {
+            $score = 100;
+        }
+        $grade = 'Needs Work';
+        $color = '#d63638';
+        if ($score >= 80) {
+            $grade = 'Excellent';
+            $color = '#00a32a';
+        } elseif ($score >= 60) {
+            $grade = 'Good';
+            $color = '#2271b1';
+        } elseif ($score >= 40) {
+            $grade = 'Fair';
+            $color = '#ff922b';
+        }
+        ?>
+        <div style="margin-top: 16px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background: #fff;">
+            <div style="font-weight:600; margin-bottom:8px;">SEO Score</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:72px; height:72px; border-radius:50%; background: #f0f0f1; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color: <?php echo esc_attr($color); ?>;"><?php echo esc_html($score); ?></div>
+                <div>
+                    <div style="font-weight:600; color: <?php echo esc_attr($color); ?>;"><?php echo esc_html($grade); ?></div>
+                    <div style="font-size:12px; color:#666;">Title <?php echo esc_html($title_len); ?> chars, Description <?php echo esc_html($desc_len); ?> chars, Words <?php echo esc_html($word_count); ?>, Internal links <?php echo esc_html($internal_links); ?>, External links <?php echo esc_html($external_links); ?>, Headings <?php echo esc_html($headings); ?>, Images alt <?php echo esc_html($imgs_with_alt); ?>/<?php echo esc_html($imgs); ?></div>
+                </div>
+            </div>
+        </div>
+
         <script>
             jQuery(document).ready(function($) {
                 // Character counters
@@ -599,7 +807,7 @@ class Sweetaddons_SEO
                 delete_post_meta($post_id, $meta_key);
             }
         }
-        delete_transient($this->get_sitemap_cache_key());
+        $this->clear_sitemap_caches();
     }
 
     public function custom_title($title, $sep)
@@ -620,18 +828,52 @@ class Sweetaddons_SEO
     public function handle_sitemap_request()
     {
         $qv = get_query_var('sweetaddons_sitemap');
-        if ((isset($_GET['sweetaddons_sitemap']) && $_GET['sweetaddons_sitemap'] === 'xml') || ($qv === 'xml')) {
-            $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
-            if ($enabled === '1') {
-                $this->generate_xml_sitemap();
-                exit;
-            }
+        $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
+        if ($enabled !== '1') {
+            return;
+        }
+        if ($qv === 'index') {
+            $this->generate_xml_sitemap_index();
+            exit;
+        } elseif (in_array($qv, array('posts', 'pages', 'categories', 'tags'), true)) {
+            $this->generate_xml_sitemap_type($qv);
+            exit;
         }
     }
 
-    private function generate_xml_sitemap()
+    private function generate_xml_sitemap_index()
     {
-        $cache = get_transient($this->get_sitemap_cache_key());
+        $last_modified = $this->get_latest_modified_timestamp();
+        $xml = '';
+        $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $types = array(
+            'posts' => home_url('/sitemap-posts.xml'),
+            'pages' => home_url('/sitemap-pages.xml'),
+            'categories' => home_url('/sitemap-categories.xml'),
+            'tags' => home_url('/sitemap-tags.xml')
+        );
+        foreach ($types as $loc) {
+            $xml .= '<sitemap>' . "\n";
+            $xml .= '<loc>' . esc_url($loc) . '</loc>' . "\n";
+            $xml .= '<lastmod>' . date('c', $last_modified ?: time()) . '</lastmod>' . "\n";
+            $xml .= '</sitemap>' . "\n";
+        }
+        $xml .= '</sitemapindex>';
+        set_transient($this->get_sitemap_cache_key('index'), array(
+            'xml' => $xml,
+            'last_modified' => $last_modified ?: time()
+        ), 12 * HOUR_IN_SECONDS);
+        header('Content-Type: application/xml; charset=utf-8');
+        header('Cache-Control: public, max-age=43200');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', ($last_modified ?: time())) . ' GMT');
+        $this->maybe_output_304($last_modified ?: time());
+        echo $xml;
+    }
+
+    private function generate_xml_sitemap_type($type)
+    {
+        $cache = get_transient($this->get_sitemap_cache_key($type));
         if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {
             header('Content-Type: application/xml; charset=utf-8');
             header('Cache-Control: public, max-age=43200');
@@ -646,43 +888,51 @@ class Sweetaddons_SEO
         $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
-        // Homepage
-        $xml .= '<url>' . "\n";
-        $xml .= '<loc>' . esc_url(home_url('/')) . '</loc>' . "\n";
-        $xml .= '<lastmod>' . date('c', $last_modified ?: time()) . '</lastmod>' . "\n";
-        $xml .= '<changefreq>daily</changefreq>' . "\n";
-        $xml .= '<priority>1.0</priority>' . "\n";
-        $xml .= '</url>' . "\n";
-
-        // Posts and pages (lightweight IDs only)
-        $ids = get_posts(array(
-            'post_type' => array('post', 'page'),
-            'post_status' => 'publish',
-            'posts_per_page' => -1,
-            'fields' => 'ids',
-            'no_found_rows' => true
-        ));
-
-        foreach ($ids as $id) {
-            $noindex = get_post_meta($id, '_sweetaddons_seo_noindex', true);
-            if ($noindex) {
-                continue;
+        if ($type === 'posts' || $type === 'pages') {
+            $ids = get_posts(array(
+                'post_type' => $type,
+                'post_status' => 'publish',
+                'posts_per_page' => -1,
+                'fields' => 'ids',
+                'no_found_rows' => true
+            ));
+            foreach ($ids as $id) {
+                $noindex = get_post_meta($id, '_sweetaddons_seo_noindex', true);
+                if ($noindex) {
+                    continue;
+                }
+                $permalink = get_permalink($id);
+                $modified = get_post_field('post_modified', $id);
+                $xml .= '<url>' . "\n";
+                $xml .= '<loc>' . esc_url($permalink) . '</loc>' . "\n";
+                $xml .= '<lastmod>' . date('c', strtotime($modified)) . '</lastmod>' . "\n";
+                $xml .= '<changefreq>monthly</changefreq>' . "\n";
+                $xml .= ($type === 'posts' ? '<priority>0.8</priority>' : '<priority>0.6</priority>') . "\n";
+                $xml .= '</url>' . "\n";
             }
-            $permalink = get_permalink($id);
-            $modified = get_post_field('post_modified', $id);
-            $type = get_post_type($id);
-
-            $xml .= '<url>' . "\n";
-            $xml .= '<loc>' . esc_url($permalink) . '</loc>' . "\n";
-            $xml .= '<lastmod>' . date('c', strtotime($modified)) . '</lastmod>' . "\n";
-            $xml .= '<changefreq>monthly</changefreq>' . "\n";
-            $xml .= ($type === 'post' ? '<priority>0.8</priority>' : '<priority>0.6</priority>') . "\n";
-            $xml .= '</url>' . "\n";
+        } elseif ($type === 'categories') {
+            $terms = get_terms(array('taxonomy' => 'category', 'hide_empty' => true));
+            foreach ($terms as $term) {
+                $xml .= '<url>' . "\n";
+                $xml .= '<loc>' . esc_url(get_term_link($term)) . '</loc>' . "\n";
+                $xml .= '<changefreq>weekly</changefreq>' . "\n";
+                $xml .= '<priority>0.5</priority>' . "\n";
+                $xml .= '</url>' . "\n";
+            }
+        } elseif ($type === 'tags') {
+            $terms = get_terms(array('taxonomy' => 'post_tag', 'hide_empty' => true));
+            foreach ($terms as $term) {
+                $xml .= '<url>' . "\n";
+                $xml .= '<loc>' . esc_url(get_term_link($term)) . '</loc>' . "\n";
+                $xml .= '<changefreq>weekly</changefreq>' . "\n";
+                $xml .= '<priority>0.4</priority>' . "\n";
+                $xml .= '</url>' . "\n";
+            }
         }
 
         $xml .= '</urlset>';
 
-        set_transient($this->get_sitemap_cache_key(), array(
+        set_transient($this->get_sitemap_cache_key($type), array(
             'xml' => $xml,
             'last_modified' => $last_modified ?: time()
         ), 12 * HOUR_IN_SECONDS);
@@ -713,9 +963,9 @@ class Sweetaddons_SEO
         return time();
     }
 
-    private function get_sitemap_cache_key()
+    private function get_sitemap_cache_key($suffix = 'index')
     {
-        return 'sweetaddons_sitemap_xml_cache';
+        return 'sweetaddons_sitemap_xml_cache_' . $suffix;
     }
 
     private function maybe_output_304($last_modified_ts)
@@ -729,7 +979,11 @@ class Sweetaddons_SEO
 
     public function register_sitemap_rewrite()
     {
-        add_rewrite_rule('^sitemap\.xml/?$', 'index.php?sweetaddons_sitemap=xml', 'top');
+        add_rewrite_rule('^sitemap\.xml/?$', 'index.php?sweetaddons_sitemap=index', 'top');
+        add_rewrite_rule('^sitemap-posts\.xml/?$', 'index.php?sweetaddons_sitemap=posts', 'top');
+        add_rewrite_rule('^sitemap-pages\.xml/?$', 'index.php?sweetaddons_sitemap=pages', 'top');
+        add_rewrite_rule('^sitemap-categories\.xml/?$', 'index.php?sweetaddons_sitemap=categories', 'top');
+        add_rewrite_rule('^sitemap-tags\.xml/?$', 'index.php?sweetaddons_sitemap=tags', 'top');
         $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
         $initialized = get_option('sweetaddons_sitemap_rules_initialized');
         if ($enabled === '1' && $initialized !== '2') {
@@ -750,11 +1004,30 @@ class Sweetaddons_SEO
         if ($enabled !== '1') {
             return;
         }
-        $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-        $path = strtok($request_uri, '?');
-        if (rtrim($path, '/') === '/sitemap.xml') {
-            $this->generate_xml_sitemap();
+        $qv = get_query_var('sweetaddons_sitemap');
+        if ($qv === 'index') {
+            $cache = get_transient($this->get_sitemap_cache_key('index'));
+            if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {
+                header('Content-Type: application/xml; charset=utf-8');
+                header('Cache-Control: public, max-age=43200');
+                header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $cache['last_modified']) . ' GMT');
+                $this->maybe_output_304($cache['last_modified']);
+                echo $cache['xml'];
+                exit;
+            }
+            $this->generate_xml_sitemap_index();
             exit;
+        } elseif (in_array($qv, array('posts', 'pages', 'categories', 'tags'), true)) {
+            $this->generate_xml_sitemap_type($qv);
+            exit;
+        }
+    }
+
+    private function clear_sitemap_caches()
+    {
+        delete_transient($this->get_sitemap_cache_key('index'));
+        foreach (array('posts', 'pages', 'categories', 'tags') as $t) {
+            delete_transient($this->get_sitemap_cache_key($t));
         }
     }
 }
