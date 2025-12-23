@@ -1420,203 +1420,203 @@ class Custom_Admin_Option_Page
         $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
         $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
 
+        // Calculate statuses for summary cards
+        $status_color = ($aktif && $sitekey && $secretkey) ? '#00a32a' : '#d63638';
+        $status_text = ($aktif && $sitekey && $secretkey) ? 'Active' : 'Inactive';
+        
+        $protected_count = 0;
+        if ($login) $protected_count++;
+        if ($comment) $protected_count++;
+        if ($register) $protected_count++;
+        
+        $keys_status = ($sitekey && $secretkey) ? '<span style="color:#00a32a">Configured</span>' : '<span style="color:#d63638">Missing</span>';
+
     ?>
-        <div class="wrap vd-ons">
-            <h1>🛡️ Pengaturan Google reCaptcha</h1>
-            <p>Lindungi website Anda dari spam dan bot dengan Google reCaptcha v2.</p>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">🛡️ Pengaturan Google reCaptcha</h1>
+
+            <!-- Status Summary Cards -->
+            <div class="sad-grid" style="margin-bottom: 20px;">
+                <div class="sad-card sad-stat" onclick="document.getElementById('recaptcha-general-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Status</div>
+                    <div class="sad-card-value">
+                        <span style="color: <?php echo $status_color; ?>"><?php echo $status_text; ?></span>
+                    </div>
+                    <div class="sad-subtext">System Protection</div>
+                </div>
+
+                <div class="sad-card sad-stat" onclick="document.getElementById('recaptcha-protection-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Protected Areas</div>
+                    <div class="sad-card-value"><?php echo $protected_count; ?>/3</div>
+                    <div class="sad-subtext">Forms Secured</div>
+                </div>
+
+                <div class="sad-card sad-stat" onclick="document.getElementById('recaptcha-general-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">API Keys</div>
+                    <div class="sad-card-value"><?php echo $keys_status; ?></div>
+                    <div class="sad-subtext">Google Integration</div>
+                </div>
+            </div>
 
             <form method="post" action="">
                 <?php wp_nonce_field('sweetaddons_recaptcha_settings'); ?>
 
-                <!-- reCaptcha Configuration -->
-                <div class="recaptcha-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">⚙️ Konfigurasi reCaptcha</h2>
-
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">Aktifkan reCaptcha</th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
-                                    Aktifkan Google reCaptcha v2
-                                </label>
-                                <p class="description">Aktifkan perlindungan reCaptcha di seluruh website Anda.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="captcha_sitekey">Site Key</label>
-                            </th>
-                            <td>
-                                <input type="text" id="captcha_sitekey" name="captcha_sitekey" value="<?php echo esc_attr($sitekey); ?>" class="large-text" />
-                                <p class="description">Site Key reCaptcha Anda dari konsol admin Google reCaptcha.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="captcha_secretkey">Kunci Rahasia</label>
-                            </th>
-                            <td>
-                                <input type="password" id="captcha_secretkey" name="captcha_secretkey" value="<?php echo esc_attr($secretkey); ?>" class="large-text" />
-                                <p class="description">Secret Key reCaptcha Anda dari konsol admin Google reCaptcha.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <!-- Protection Areas -->
-                <div class="recaptcha-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">🔒 Area Perlindungan</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Pilih di mana menampilkan perlindungan reCaptcha.</p>
-
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">Form Login</th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="captcha_login" value="1" <?php checked($login, '1'); ?> />
-                                    Tambahkan reCaptcha ke form login WordPress
-                                </label>
-                                <p class="description">Lindungi wp-login.php dari serangan brute force.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Form Registrasi</th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="captcha_register" value="1" <?php checked($register, '1'); ?> />
-                                    Tambahkan reCaptcha ke form registrasi pengguna
-                                </label>
-                                <p class="description">Cegah registrasi pengguna otomatis.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Komentar</th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="captcha_comment" value="1" <?php checked($comment, '1'); ?> />
-                                    Add reCaptcha to comment forms
-                                </label>
-                                <p class="description">Reduce comment spam on your posts.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
-                <!-- Setup Instructions -->
-                <div class="recaptcha-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📋 Setup Instructions</h2>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">1. Get reCaptcha Keys</h4>
-                            <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Visit <a href="https://www.google.com/recaptcha/admin" target="_blank">Google reCaptcha Admin</a></li>
-                                <li>Click "+" to create a new site</li>
-                                <li>Choose "reCaptcha v2" → "I'm not a robot"</li>
-                                <li>Add your domain name</li>
-                                <li>Salin Site Key dan Secret Key</li>
-                            </ol>
+                <div class="sad-top">
+                    <!-- Left Column -->
+                    <div class="sad-top-left">
+                        
+                        <!-- reCaptcha Configuration -->
+                        <div class="sad-card" id="recaptcha-general-settings">
+                            <div class="sad-card-title">⚙️ Konfigurasi Utama</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">Status Fitur</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
+                                            Aktifkan Google reCaptcha v2
+                                        </label>
+                                        <p class="description">Aktifkan perlindungan reCaptcha di seluruh website Anda.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="captcha_sitekey">Site Key</label></th>
+                                    <td>
+                                        <input type="text" id="captcha_sitekey" name="captcha_sitekey" value="<?php echo esc_attr($sitekey); ?>" class="large-text" />
+                                        <p class="description">Site Key reCaptcha Anda dari konsol admin Google reCaptcha.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="captcha_secretkey">Secret Key</label></th>
+                                    <td>
+                                        <input type="password" id="captcha_secretkey" name="captcha_secretkey" value="<?php echo esc_attr($secretkey); ?>" class="large-text" />
+                                        <p class="description">Secret Key reCaptcha Anda dari konsol admin Google reCaptcha.</p>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
 
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">2. Konfigurasi Pengaturan</h4>
-                            <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Tempel Site Key dan Secret Key di atas</li>
-                                <li>Enable reCaptcha protection</li>
-                                <li>Select protection areas</li>
-                                <li>Save settings</li>
-                                <li>Test reCaptcha on your forms</li>
-                            </ol>
+                        <!-- Protection Areas -->
+                        <div class="sad-card" id="recaptcha-protection-settings">
+                            <div class="sad-card-title">🔒 Area Perlindungan</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">Form Login</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="captcha_login" value="1" <?php checked($login, '1'); ?> />
+                                            Lindungi halaman login (wp-login.php)
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Form Registrasi</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="captcha_register" value="1" <?php checked($register, '1'); ?> />
+                                            Lindungi form registrasi user baru
+                                        </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Form Komentar</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="captcha_comment" value="1" <?php checked($comment, '1'); ?> />
+                                            Lindungi kolom komentar postingan
+                                        </label>
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
 
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">3. Contact Form 7</h4>
-                            <p style="margin: 0; line-height: 1.6;">
-                                To use reCaptcha in Contact Form 7, add this shortcode to your form:
-                            </p>
-                            <code style="display: block; background: #f1f1f1; padding: 10px; margin: 10px 0; border-radius: 4px;">
-                                [recaptcha]
-                            </code>
-                            <p style="margin: 0; font-size: 13px; color: #666;">
-                                The reCaptcha will automatically appear when keys are configured.
-                            </p>
+                        <!-- Current Status Details -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">📊 Detail Status</div>
+                            <table class="widefat striped" style="border:none; box-shadow:none;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f1;">
+                                        <th>Fitur</th>
+                                        <th>Status</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Integrasi API</strong></td>
+                                        <td>
+                                            <?php if ($aktif && $sitekey && $secretkey): ?>
+                                                <span style="color: #00a32a; font-weight:bold;">Terkoneksi</span>
+                                            <?php else: ?>
+                                                <span style="color: #d63638; font-weight:bold;">Terputus</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>Koneksi ke server Google</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Proteksi Login</strong></td>
+                                        <td>
+                                            <?php if ($login && $aktif): ?>
+                                                <span style="color: #00a32a; font-weight:bold;">Aktif</span>
+                                            <?php else: ?>
+                                                <span style="color: #999;">Nonaktif</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>Brute force protection</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Proteksi Komentar</strong></td>
+                                        <td>
+                                            <?php if ($comment && $aktif): ?>
+                                                <span style="color: #00a32a; font-weight:bold;">Aktif</span>
+                                            <?php else: ?>
+                                                <span style="color: #999;">Nonaktif</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>Spam comment protection</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">4. Testing</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Visit login page to test login protection</li>
-                                <li>Try posting a comment to test comment protection</li>
-                                <li>Check registration form if enabled</li>
-                                <li>Verify reCaptcha challenge appears</li>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="sad-top-right">
+                        
+                        <!-- Save Button Card -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">💾 Simpan Perubahan</div>
+                            <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan keys atau area proteksi.</div>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
+                        </div>
+
+                        <!-- Setup Instructions -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">📋 Panduan Setup</div>
+                            
+                            <h4 style="margin: 10px 0 5px; color: #23282d;">1. Dapatkan API Keys</h4>
+                            <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px; margin-bottom: 15px;">
+                                <li>Buka <a href="https://www.google.com/recaptcha/admin" target="_blank">Google reCaptcha Admin</a></li>
+                                <li>Buat site baru (pilih v2 "I'm not a robot")</li>
+                                <li>Masukkan domain website Anda</li>
+                                <li>Copy Site Key & Secret Key</li>
+                            </ul>
+
+                            <h4 style="margin: 10px 0 5px; color: #23282d;">2. Contact Form 7</h4>
+                            <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Gunakan shortcode ini:</p>
+                            <code style="display: block; background: #f0f0f1; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px;">[recaptcha]</code>
+
+                            <h4 style="margin: 10px 0 5px; color: #23282d;">3. Testing</h4>
+                            <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px;">
+                                <li>Logout untuk tes form login</li>
+                                <li>Buka postingan untuk tes komentar</li>
+                                <li>Pastikan checkbox "I'm not a robot" muncul</li>
                             </ul>
                         </div>
+
                     </div>
                 </div>
-
-                <!-- Current Status -->
-                <div class="recaptcha-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📊 Current Status</h2>
-
-                    <table class="widefat striped">
-                        <thead>
-                            <tr>
-                                <th>Feature</th>
-                                <th>Status</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>reCaptcha Service</strong></td>
-                                <td>
-                                    <?php if ($aktif && $sitekey && $secretkey): ?>
-                                        <span style="color: #00a32a;">✅ Active</span>
-                                    <?php else: ?>
-                                        <span style="color: #d63638;">❌ Inactive</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>Google reCaptcha v2 integration status</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Login Protection</strong></td>
-                                <td>
-                                    <?php if ($login && $aktif): ?>
-                                        <span style="color: #00a32a;">✅ Protected</span>
-                                    <?php else: ?>
-                                        <span style="color: #999;">⚪ Disabled</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>WordPress login form protection</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Comment Protection</strong></td>
-                                <td>
-                                    <?php if ($comment && $aktif): ?>
-                                        <span style="color: #00a32a;">✅ Protected</span>
-                                    <?php else: ?>
-                                        <span style="color: #999;">⚪ Disabled</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>Comment form spam protection</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Registration Protection</strong></td>
-                                <td>
-                                    <?php if ($register && $aktif): ?>
-                                        <span style="color: #00a32a;">✅ Protected</span>
-                                    <?php else: ?>
-                                        <span style="color: #999;">⚪ Disabled</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>User registration form protection</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <?php submit_button('Save reCaptcha Settings', 'primary', 'submit', false); ?>
             </form>
         </div>
     <?php
@@ -1664,191 +1664,237 @@ class Custom_Admin_Option_Page
         // Get current plugin data for reference
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
 
+        // Status calculations for summary cards
+        $is_whitelabel_active = ($plugin_name !== 'Sweet Addons' || $author !== 'WebsweetStudio');
+        $active_status_text = $is_whitelabel_active ? 'Active' : 'Default';
+        $active_status_color = $is_whitelabel_active ? '#28a745' : '#666';
+        
+        $fields_customized = 0;
+        if ($plugin_name !== 'Sweet Addons') $fields_customized++;
+        if ($author !== 'WebsweetStudio') $fields_customized++;
+        if ($menu_title !== 'Sweet Addons') $fields_customized++;
+        if ($hide_original === '1') $fields_customized++;
     ?>
-        <div class="wrap vd-ons">
-            <h1>🏷️ Pengaturan White Label</h1>
+        <div class="wrap sweetaddons-dashboard">
+            <h1 class="wp-heading-inline">🏷️ Pengaturan White Label</h1>
             <p>Kustomisasi branding plugin dan informasi yang ditampilkan kepada pengguna.</p>
+
+            <!-- Summary Cards -->
+            <div class="sad-grid" style="margin-bottom: 20px;">
+                <div class="sad-card sad-stat" onclick="document.getElementById('whitelabel-plugin-info').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Status Branding</div>
+                    <div class="sad-card-value">
+                        <span style="color: <?php echo $active_status_color; ?>"><?php echo $active_status_text; ?></span>
+                    </div>
+                    <div class="sad-subtext"><?php echo $is_whitelabel_active ? 'Custom Branding Applied' : 'Default Branding'; ?></div>
+                </div>
+
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Customized Fields</div>
+                    <div class="sad-card-value"><?php echo $fields_customized; ?>/4</div>
+                    <div class="sad-subtext">Key Branding Elements</div>
+                </div>
+
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Original Version</div>
+                    <div class="sad-card-value"><?php echo esc_html($plugin_data['Version']); ?></div>
+                    <div class="sad-subtext">System Version</div>
+                </div>
+            </div>
 
             <form method="post" action="">
                 <?php wp_nonce_field('sweetaddons_whitelabel_settings'); ?>
+                
+                <div class="sad-top">
+                    <!-- Left Column -->
+                    <div class="sad-top-left">
+                        <!-- Plugin Information -->
+                        <div id="whitelabel-plugin-info" class="sad-card">
+                            <div class="sad-card-title">📋 Informasi Plugin</div>
+                            <p style="margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
 
-                <!-- Plugin Information -->
-                <div class="whitelabel-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📋 Informasi Plugin</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_plugin_name">Nama Plugin</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_plugin_name" name="sweetaddons_whitelabel_plugin_name" value="<?php echo esc_attr($plugin_name); ?>" class="large-text" />
+                                        <p class="description">Nama yang muncul di daftar plugin dan menu admin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_description">Deskripsi Plugin</label>
+                                    </th>
+                                    <td>
+                                        <textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea>
+                                        <p class="description">Deskripsi yang ditampilkan di daftar plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_version">Versi</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_version" name="sweetaddons_whitelabel_version" value="<?php echo esc_attr($version); ?>" class="regular-text" />
+                                        <p class="description">Nomor versi plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label>
+                                    </th>
+                                    <td>
+                                        <input type="url" id="sweetaddons_whitelabel_plugin_uri" name="sweetaddons_whitelabel_plugin_uri" value="<?php echo esc_url($plugin_uri); ?>" class="large-text" />
+                                        <p class="description">URL yang akan dikunjungi pengguna ketika mengklik nama plugin.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_plugin_name">Nama Plugin</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_whitelabel_plugin_name" name="sweetaddons_whitelabel_plugin_name" value="<?php echo esc_attr($plugin_name); ?>" class="large-text" />
-                                <p class="description">Nama yang muncul di daftar plugin dan menu admin.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_description">Deskripsi Plugin</label>
-                            </th>
-                            <td>
-                                <textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea>
-                                <p class="description">Deskripsi yang ditampilkan di daftar plugin.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_version">Versi</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_whitelabel_version" name="sweetaddons_whitelabel_version" value="<?php echo esc_attr($version); ?>" class="regular-text" />
-                                <p class="description">Nomor versi plugin.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label>
-                            </th>
-                            <td>
-                                <input type="url" id="sweetaddons_whitelabel_plugin_uri" name="sweetaddons_whitelabel_plugin_uri" value="<?php echo esc_url($plugin_uri); ?>" class="large-text" />
-                                <p class="description">URL yang akan dikunjungi pengguna ketika mengklik nama plugin.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                        <!-- Author Information -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">👤 Informasi Penulis</div>
+                            <p style="margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
 
-                <!-- Author Information -->
-                <div class="whitelabel-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">👤 Informasi Penulis</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_author">Nama Penulis</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_author" name="sweetaddons_whitelabel_author" value="<?php echo esc_attr($author); ?>" class="large-text" />
+                                        <p class="description">Nama penulis yang ditampilkan di detail plugin.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_author_uri">URI Penulis</label>
+                                    </th>
+                                    <td>
+                                        <input type="url" id="sweetaddons_whitelabel_author_uri" name="sweetaddons_whitelabel_author_uri" value="<?php echo esc_url($author_uri); ?>" class="large-text" />
+                                        <p class="description">The URL users will visit when clicking the author name.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_author">Nama Penulis</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_whitelabel_author" name="sweetaddons_whitelabel_author" value="<?php echo esc_attr($author); ?>" class="large-text" />
-                                <p class="description">Nama penulis yang ditampilkan di detail plugin.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_author_uri">URI Penulis</label>
-                            </th>
-                            <td>
-                                <input type="url" id="sweetaddons_whitelabel_author_uri" name="sweetaddons_whitelabel_author_uri" value="<?php echo esc_url($author_uri); ?>" class="large-text" />
-                                <p class="description">The URL users will visit when clicking the author name.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                        <!-- Admin Customization -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">⚙️ Admin Customization</div>
+                            <p style="margin-bottom: 20px;">Customize the admin interface appearance.</p>
 
-                <!-- Admin Customization -->
-                <div class="whitelabel-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">⚙️ Admin Customization</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Customize the admin interface appearance.</p>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whitelabel_menu_title">Judul Menu Admin</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whitelabel_menu_title" name="sweetaddons_whitelabel_menu_title" value="<?php echo esc_attr($menu_title); ?>" class="large-text" />
+                                        <p class="description">The title shown in the WordPress admin menu.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Sembunyikan Branding Asli</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="sweetaddons_whitelabel_hide_original" value="1" <?php checked($hide_original, '1'); ?> />
+                                            Hide references to WebsweetStudio in admin interface
+                                        </label>
+                                        <p class="description">Remove WebsweetStudio branding from admin pages and footers.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <!-- Current vs New Comparison -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">📊 Before vs After Comparison</div>
 
-                    <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="sweetaddons_whitelabel_menu_title">Judul Menu Admin</label>
-                            </th>
-                            <td>
-                                <input type="text" id="sweetaddons_whitelabel_menu_title" name="sweetaddons_whitelabel_menu_title" value="<?php echo esc_attr($menu_title); ?>" class="large-text" />
-                                <p class="description">The title shown in the WordPress admin menu.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Sembunyikan Branding Asli</th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="sweetaddons_whitelabel_hide_original" value="1" <?php checked($hide_original, '1'); ?> />
-                                    Hide references to WebsweetStudio in admin interface
-                                </label>
-                                <p class="description">Remove WebsweetStudio branding from admin pages and footers.</p>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div>
+                                    <h4 style="color: #d63638; margin-bottom: 15px;">🔴 Current (Original)</h4>
+                                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                                        <p><strong>Plugin Name:</strong> <?php echo esc_html($plugin_data['Name']); ?></p>
+                                        <p><strong>Description:</strong> <?php echo esc_html($plugin_data['Description']); ?></p>
+                                        <p><strong>Version:</strong> <?php echo esc_html($plugin_data['Version']); ?></p>
+                                        <p><strong>Author:</strong> <?php echo esc_html($plugin_data['Author']); ?></p>
+                                        <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_data['PluginURI']); ?></p>
+                                    </div>
+                                </div>
 
-                <!-- Current vs New Comparison -->
-                <div class="whitelabel-section" style="background: #f9f9f9; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📊 Before vs After Comparison</h2>
+                                <div>
+                                    <h4 style="color: #00a32a; margin-bottom: 15px;">🟢 New (White Labeled)</h4>
+                                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                                        <p><strong>Plugin Name:</strong> <?php echo esc_html($plugin_name); ?></p>
+                                        <p><strong>Description:</strong> <?php echo esc_html($description); ?></p>
+                                        <p><strong>Version:</strong> <?php echo esc_html($version); ?></p>
+                                        <p><strong>Author:</strong> <?php echo esc_html($author); ?></p>
+                                        <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_uri); ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <h4 style="color: #d63638; margin-bottom: 15px;">🔴 Current (Original)</h4>
-                            <div style="background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
-                                <p><strong>Plugin Name:</strong> <?php echo esc_html($plugin_data['Name']); ?></p>
-                                <p><strong>Description:</strong> <?php echo esc_html($plugin_data['Description']); ?></p>
-                                <p><strong>Version:</strong> <?php echo esc_html($plugin_data['Version']); ?></p>
-                                <p><strong>Author:</strong> <?php echo esc_html($plugin_data['Author']); ?></p>
-                                <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_data['PluginURI']); ?></p>
+                    <!-- Right Column -->
+                    <div class="sad-top-right">
+                        <!-- Save Actions -->
+                        <div class="sad-card" style="position: sticky; top: 20px;">
+                            <div class="sad-card-title">Simpan Perubahan</div>
+                            <div class="sad-subtext" style="margin-bottom: 15px;">
+                                Klik tombol di bawah untuk menyimpan pengaturan White Label.
+                            </div>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%; margin-bottom: 10px;')); ?>
+                            <div class="sad-subtext" style="font-size: 12px; color: #888; text-align: center; margin-top: 10px;">
+                                Perubahan akan langsung diterapkan.
                             </div>
                         </div>
 
-                        <div>
-                            <h4 style="color: #00a32a; margin-bottom: 15px;">🟢 New (White Labeled)</h4>
-                            <div style="background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
-                                <p><strong>Plugin Name:</strong> <?php echo esc_html($plugin_name); ?></p>
-                                <p><strong>Description:</strong> <?php echo esc_html($description); ?></p>
-                                <p><strong>Version:</strong> <?php echo esc_html($version); ?></p>
-                                <p><strong>Author:</strong> <?php echo esc_html($author); ?></p>
-                                <p><strong>Plugin URI:</strong> <?php echo esc_html($plugin_uri); ?></p>
+                        <!-- Benefits Card -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">✨ White Label Benefits</div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">🏢 Professional Branding</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Display your company name</li>
+                                    <li>Use your website URL</li>
+                                    <li>Custom plugin description</li>
+                                    <li>Professional appearance</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">👥 Client Relations</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Hide third-party references</li>
+                                    <li>Consistent brand experience</li>
+                                    <li>Professional credibility</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">⚙️ Easy Management</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>One-click customization</li>
+                                    <li>Instant preview</li>
+                                    <li>No code modifications</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">🔄 Full Control</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Custom version numbers</li>
+                                    <li>Your support links</li>
+                                    <li>Branded admin interface</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- White Label Benefits -->
-                <div class="whitelabel-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">✨ White Label Benefits</h2>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">🏢 Professional Branding</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Display your company name</li>
-                                <li>Use your website URL</li>
-                                <li>Custom plugin description</li>
-                                <li>Professional appearance</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">👥 Client Relations</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Hide third-party references</li>
-                                <li>Consistent brand experience</li>
-                                <li>Professional credibility</li>
-                                <li>Custom support channels</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">⚙️ Easy Management</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>One-click customization</li>
-                                <li>Instant preview</li>
-                                <li>No code modifications</li>
-                                <li>Reversible changes</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">🔄 Full Control</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Custom version numbers</li>
-                                <li>Your support links</li>
-                                <li>Branded admin interface</li>
-                                <li>Complete customization</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <?php submit_button('Save White Label Settings', 'primary', 'submit', false); ?>
             </form>
         </div>
     <?php
@@ -1905,19 +1951,52 @@ class Custom_Admin_Option_Page
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
 
+        // Summary calculations
+        $is_active = ($enable === '1');
+        $status_text = $is_active ? 'Active' : 'Inactive';
+        $status_color = $is_active ? '#28a745' : '#d63638';
+        
+        $display_phone = !empty($phone) ? $phone : 'Not Configured';
+        $display_position = ucwords(str_replace('-', ' ', $position));
     ?>
-        <div class="wrap vd-ons">
-            <h1>💬 Pengaturan Chat WhatsApp</h1>
+        <div class="wrap sweetaddons-dashboard">
+            <h1 class="wp-heading-inline">💬 Pengaturan Chat WhatsApp</h1>
             <p>Tambahkan tombol chat WhatsApp mengambang ke website Anda untuk komunikasi pelanggan yang lebih baik.</p>
+
+            <!-- Summary Cards -->
+            <div class="sad-grid" style="margin-bottom: 20px;">
+                <div class="sad-card sad-stat" onclick="document.getElementById('whatsapp-general-settings').scrollIntoView({behavior: 'smooth', block: 'center'});" style="cursor: pointer;">
+                    <div class="sad-card-title">Status Widget</div>
+                    <div class="sad-card-value">
+                        <span style="color: <?php echo $status_color; ?>"><?php echo $status_text; ?></span>
+                    </div>
+                    <div class="sad-subtext"><?php echo $is_active ? 'Widget is visible' : 'Widget is hidden'; ?></div>
+                </div>
+
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Target Number</div>
+                    <div class="sad-card-value" style="font-size: 18px; line-height: 36px;"><?php echo esc_html($display_phone); ?></div>
+                    <div class="sad-subtext">WhatsApp Destination</div>
+                </div>
+
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Position</div>
+                    <div class="sad-card-value" style="font-size: 20px;"><?php echo esc_html($display_position); ?></div>
+                    <div class="sad-subtext">On Screen</div>
+                </div>
+            </div>
 
             <form method="post" action="">
                 <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
-
-                <!-- Basic Settings -->
-                <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">⚙️ Pengaturan Dasar</h2>
-
-                    <table class="form-table">
+                
+                <div class="sad-top">
+                    <!-- Left Column -->
+                    <div class="sad-top-left">
+                        <!-- Basic Settings -->
+                        <div id="whatsapp-general-settings" class="sad-card">
+                            <div class="sad-card-title">⚙️ Pengaturan Dasar</div>
+                            
+                            <table class="form-table">
                         <tr>
                             <th scope="row">Aktifkan Chat WhatsApp</th>
                             <td>
@@ -1955,14 +2034,9 @@ class Custom_Admin_Option_Page
                                 <p class="description">Text shown on the button (for extended style) and tooltip.</p>
                             </td>
                         </tr>
-                    </table>
-                </div>
-
-                <!-- Appearance Settings -->
-                <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">🎨 Pengaturan Tampilan</h2>
-
-                    <table class="form-table">
+                        <!-- Appearance Section Header -->
+                        <tr><td colspan="2"><hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;"></td></tr>
+                        <tr><th colspan="2" style="padding-left: 0;"><h3 style="margin: 0;">🎨 Pengaturan Tampilan</h3></th></tr>
                         <tr>
                             <th scope="row">
                                 <label for="sweetaddons_whatsapp_bubble_style">Button Style</label>
@@ -2008,14 +2082,9 @@ class Custom_Admin_Option_Page
                                 <p class="description">Efek animasi untuk tombol chat.</p>
                             </td>
                         </tr>
-                    </table>
-                </div>
-
-                <!-- Position Settings -->
-                <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📍 Pengaturan Posisi</h2>
-
-                    <table class="form-table">
+                        <!-- Position Section Header -->
+                        <tr><td colspan="2"><hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;"></td></tr>
+                        <tr><th colspan="2" style="padding-left: 0;"><h3 style="margin: 0;">📍 Pengaturan Posisi</h3></th></tr>
                         <tr>
                             <th scope="row">
                                 <label for="sweetaddons_whatsapp_position">Posisi Tombol</label>
@@ -2044,14 +2113,9 @@ class Custom_Admin_Option_Page
                                 <p class="description">Distance from screen edges (X = horizontal, Y = vertical).</p>
                             </td>
                         </tr>
-                    </table>
-                </div>
-
-                <!-- Visibility Settings -->
-                <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">👁️ Visibility Settings</h2>
-
-                    <table class="form-table">
+                        <!-- Visibility Section Header -->
+                        <tr><td colspan="2"><hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;"></td></tr>
+                        <tr><th colspan="2" style="padding-left: 0;"><h3 style="margin: 0;">👁️ Visibility Settings</h3></th></tr>
                         <tr>
                             <th scope="row">Device Visibility</th>
                             <td>
@@ -2076,82 +2140,95 @@ class Custom_Admin_Option_Page
                                 <p class="description">Display tooltip text when hovering over the chat button.</p>
                             </td>
                         </tr>
-                    </table>
-                </div>
+                            </table>
+                        </div>
 
-                <!-- Preview Section -->
-                <div class="whatsapp-section" style="background: #f0f8ff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">👁️ Live Preview</h2>
-                    <p style="color: #666; margin-bottom: 20px;">This is how your WhatsApp chat button will look:</p>
+                        <!-- Live Preview -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">👁️ Live Preview</div>
+                            <p style="margin-bottom: 20px;">This is how your WhatsApp chat button will look:</p>
 
-                    <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
-                        <div style="position: absolute; top: 10px; left: 10px; color: #666; font-size: 12px;">Preview Area</div>
+                            <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
+                                <div style="position: absolute; top: 10px; left: 10px; color: #666; font-size: 12px;">Preview Area</div>
 
-                        <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
-                            <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
-                                <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
-                                    <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
-                                        <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                                    </svg>
-                                    <span id="whatsapp-preview-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
+                                    <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
+                                        <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                                            <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
+                                                <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                                            </svg>
+                                            <span id="whatsapp-preview-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $phone) ? 'none' : 'block'; ?>;">
+                                    <p>Aktifkan WhatsApp dan tambahkan nomor telepon untuk melihat preview</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $phone) ? 'none' : 'block'; ?>;">
-                            <p>Aktifkan WhatsApp dan tambahkan nomor telepon untuk melihat preview</p>
+                    <!-- Right Column -->
+                    <div class="sad-top-right">
+                        <!-- Save Actions -->
+                        <div class="sad-card" style="position: sticky; top: 20px;">
+                            <div class="sad-card-title">Simpan Perubahan</div>
+                            <div class="sad-subtext" style="margin-bottom: 15px;">
+                                Klik tombol di bawah untuk menyimpan pengaturan WhatsApp.
+                            </div>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%; margin-bottom: 10px;')); ?>
+                            <div class="sad-subtext" style="font-size: 12px; color: #888; text-align: center; margin-top: 10px;">
+                                Perubahan akan langsung diterapkan.
+                            </div>
+                        </div>
+
+                        <!-- Setup Instructions -->
+                        <div class="sad-card">
+                            <div class="sad-card-title">📋 Setup Instructions</div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">1. Get Your WhatsApp Number</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Use your business WhatsApp number</li>
+                                    <li>Include country code (e.g., +62)</li>
+                                    <li>Remove spaces and special characters</li>
+                                    <li>Example: +62812345678901</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">2. Konfigurasi Pengaturan</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Aktifkan chat WhatsApp</li>
+                                    <li>Masukkan nomor telepon Anda</li>
+                                    <li>Kustomisasi tampilan dan posisi</li>
+                                    <li>Atur pesan default</li>
+                                </ul>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">3. Test & Optimize</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Visit your website to test</li>
+                                    <li>Click the chat button</li>
+                                    <li>Verify WhatsApp opens correctly</li>
+                                    <li>Adjust position if needed</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 style="color: #0073aa; margin-bottom: 10px;">4. Best Practices</h4>
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
+                                    <li>Use professional greeting message</li>
+                                    <li>Posisi untuk akses mudah</li>
+                                    <li>Consider mobile users</li>
+                                    <li>Monitor chat responses</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Setup Instructions -->
-                <div class="whatsapp-section" style="background: #fff; padding: 25px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                    <h2 style="margin-top: 0; color: #23282d;">📋 Setup Instructions</h2>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">1. Get Your WhatsApp Number</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Use your business WhatsApp number</li>
-                                <li>Include country code (e.g., +62 for Indonesia)</li>
-                                <li>Remove spaces and special characters</li>
-                                <li>Example: +62812345678901</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">2. Konfigurasi Pengaturan</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Aktifkan chat WhatsApp</li>
-                                <li>Masukkan nomor telepon Anda</li>
-                                <li>Kustomisasi tampilan dan posisi</li>
-                                <li>Atur pesan default</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">3. Test & Optimize</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Visit your website to test</li>
-                                <li>Click the chat button</li>
-                                <li>Verify WhatsApp opens correctly</li>
-                                <li>Adjust position if needed</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 style="color: #0073aa; margin-bottom: 10px;">4. Best Practices</h4>
-                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
-                                <li>Use professional greeting message</li>
-                                <li>Posisi untuk akses mudah</li>
-                                <li>Consider mobile users</li>
-                                <li>Monitor chat responses</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <?php submit_button('Save WhatsApp Settings', 'primary', 'submit', false); ?>
             </form>
         </div>
 
