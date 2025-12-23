@@ -9,8 +9,11 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   min-height: 160px;
 }
+.fl-builder-settings .ace_editor {
+  min-height: 160px;
+}
 .sap-token-toolbar {
-  margin-top: 8px;
+  margin-bottom: 8px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;

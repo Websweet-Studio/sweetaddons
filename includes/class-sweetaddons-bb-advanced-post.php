@@ -34,34 +34,18 @@ add_action('init', function () {
             $show_meta = !empty($s->show_meta);
             $show_read_more = !empty($s->show_read_more);
             $pagination = isset($s->pagination) ? $s->pagination : 'none';
-            $include_cat = isset($s->include_categories) ? trim($s->include_categories) : '';
-            $exclude_cat = isset($s->exclude_categories) ? trim($s->exclude_categories) : '';
             $paged = max(1, get_query_var('paged') ? (int)get_query_var('paged') : (isset($_GET['paged']) ? (int)$_GET['paged'] : 1));
+            $taxonomy = isset($s->taxonomy) ? trim($s->taxonomy) : '';
+            $term = isset($s->term) ? (int)$s->term : 0;
 
             $tax_query = array();
-            if ($post_type === 'post') {
-                if ($include_cat !== '') {
-                    $ids = array_map('intval', array_filter(array_map('trim', explode(',', $include_cat))));
-                    if (!empty($ids)) {
-                        $tax_query[] = array(
-                            'taxonomy' => 'category',
-                            'field' => 'term_id',
-                            'terms' => $ids,
-                            'operator' => 'IN',
-                        );
-                    }
-                }
-                if ($exclude_cat !== '') {
-                    $ids = array_map('intval', array_filter(array_map('trim', explode(',', $exclude_cat))));
-                    if (!empty($ids)) {
-                        $tax_query[] = array(
-                            'taxonomy' => 'category',
-                            'field' => 'term_id',
-                            'terms' => $ids,
-                            'operator' => 'NOT IN',
-                        );
-                    }
-                }
+            if ($taxonomy !== '' && $term > 0) {
+                $tax_query[] = array(
+                    'taxonomy' => $taxonomy,
+                    'field' => 'term_id',
+                    'terms' => array($term),
+                    'operator' => 'IN',
+                );
             }
 
             $args = array(
@@ -142,6 +126,21 @@ add_action('init', function () {
         }
     }
 
+    $taxonomy_options = array();
+    $taxes = get_taxonomies(array('public' => true), 'objects');
+    if (is_array($taxes)) {
+        foreach ($taxes as $slug => $tax) {
+            $taxonomy_options[$slug] = isset($tax->labels->name) ? $tax->labels->name : $slug;
+        }
+    }
+    $default_terms = array();
+    $terms = get_terms(array('taxonomy' => 'category', 'hide_empty' => false));
+    if (!is_wp_error($terms) && is_array($terms)) {
+        foreach ($terms as $t) {
+            $default_terms[$t->term_id] = $t->name;
+        }
+    }
+
     FLBuilder::register_module('Sweetaddons_BB_Advanced_Post', array(
         'General' => array(
             'title' => 'General',
@@ -156,6 +155,14 @@ add_action('init', function () {
                             'options' => array(
                                 'grid' => 'Grid',
                                 'list' => 'List'
+                            ),
+                            'toggle' => array(
+                                'grid' => array(
+                                    'fields' => array('columns', 'columns_mobile', 'columns_tablet')
+                                ),
+                                'list' => array(
+                                    'fields' => array()
+                                )
                             )
                         ),
                         'columns' => array(
@@ -171,40 +178,31 @@ add_action('init', function () {
                                 '6' => '6'
                             )
                         ),
-                    )
-                ),
-                'display' => array(
-                    'title' => 'Display',
-                    'fields' => array(
-                        'show_image' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Featured Image',
-                            'default' => '1'
+                        'columns_mobile' => array(
+                            'type' => 'select',
+                            'label' => 'Columns (Mobile)',
+                            'default' => '1',
+                            'options' => array(
+                                '1' => '1',
+                                '2' => '2',
+                                '3' => '3',
+                                '4' => '4',
+                                '5' => '5',
+                                '6' => '6'
+                            )
                         ),
-                        'show_title' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Title',
-                            'default' => '1'
-                        ),
-                        'show_excerpt' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Excerpt',
-                            'default' => '1'
-                        ),
-                        'excerpt_length' => array(
-                            'type' => 'text',
-                            'label' => 'Excerpt Length (words)',
-                            'default' => '20'
-                        ),
-                        'show_meta' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Meta',
-                            'default' => '1'
-                        ),
-                        'show_read_more' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Read More',
-                            'default' => '1'
+                        'columns_tablet' => array(
+                            'type' => 'select',
+                            'label' => 'Columns (Tablet)',
+                            'default' => '2',
+                            'options' => array(
+                                '1' => '1',
+                                '2' => '2',
+                                '3' => '3',
+                                '4' => '4',
+                                '5' => '5',
+                                '6' => '6'
+                            )
                         ),
                     )
                 ),
@@ -212,11 +210,20 @@ add_action('init', function () {
                     'title' => 'Custom HTML',
                     'fields' => array(
                         'custom_layout_html' => array(
-                            'type' => 'textarea',
-                            'rows' => '8',
+                            'type' => 'code',
+                            'editor' => 'html',
+                            'rows' => '18',
                             'label' => 'Custom Item HTML',
-                            'description' => 'Placeholders: {link}, {image}, {image_url}, {title}, {excerpt}, {date}, {author}, {read_more}, {meta}',
-                            'default' => ''
+                            'description' => 'Placeholders: [link], [image], [image_url], [title], [excerpt], [date], [author], [read_more], [meta]. Tanggal bisa diformat: [date:Y-m-d], [date:F j, Y], dll.',
+                            'default' => '<article class="sap-card card h-100">' . "\n"
+                                . '[image]' . "\n"
+                                . '<div class="sap-body card-body">' . "\n"
+                                . '<h3 class="card-title"><a href="[link]" class="stretched-link text-decoration-none">[title]</a></h3>' . "\n"
+                                . '[meta]' . "\n"
+                                . '<p class="card-text">[excerpt]</p>' . "\n"
+                                . '[read_more]' . "\n"
+                                . '</div>' . "\n"
+                                . '</article>'
                         )
                     )
                 )
@@ -263,16 +270,18 @@ add_action('init', function () {
                                 'ASC' => 'ASC'
                             )
                         ),
-                        'include_categories' => array(
-                            'type' => 'text',
-                            'label' => 'Include Categories (IDs, comma separated)',
-                            'default' => ''
+                        'taxonomy' => array(
+                            'type' => 'select',
+                            'label' => 'Taxonomy',
+                            'default' => 'category',
+                            'options' => $taxonomy_options
                         ),
-                        'exclude_categories' => array(
-                            'type' => 'text',
-                            'label' => 'Exclude Categories (IDs, comma separated)',
-                            'default' => ''
-                        )
+                        'term' => array(
+                            'type' => 'select',
+                            'label' => 'Term',
+                            'default' => '0',
+                            'options' => array('all' => 'All', '0' => '— Select —') + $default_terms
+                        ),
                     )
                 )
             )
@@ -297,4 +306,22 @@ add_action('init', function () {
             )
         )
     ));
+
+    add_action('wp_enqueue_scripts', function () {
+        if (class_exists('FLBuilderModel') && FLBuilderModel::is_builder_active()) {
+            wp_enqueue_style(
+                'sap-bb-adv-post-settings',
+                plugin_dir_url(__FILE__) . 'bb-advanced-post/includes/settings.css',
+                array(),
+                defined('SWEETADDONS_VERSION') ? SWEETADDONS_VERSION : '1.0.0'
+            );
+            wp_enqueue_script(
+                'sap-bb-adv-post-settings',
+                plugin_dir_url(__FILE__) . 'bb-advanced-post/includes/settings.js',
+                array('jquery'),
+                defined('SWEETADDONS_VERSION') ? SWEETADDONS_VERSION : '1.0.0',
+                true
+            );
+        }
+    });
 });
