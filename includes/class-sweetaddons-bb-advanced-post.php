@@ -13,8 +13,8 @@ add_action('init', function () {
                 'name' => 'Advanced Posts',
                 'description' => 'Advanced post grid/list',
                 'category' => 'Sweetaddons',
-                'dir' => plugin_dir_path(__FILE__),
-                'url' => plugin_dir_url(__FILE__),
+                'dir' => plugin_dir_path(__FILE__) . 'bb-advanced-post/',
+                'url' => plugin_dir_url(__FILE__) . 'bb-advanced-post/',
             ));
         }
 
@@ -143,7 +143,87 @@ add_action('init', function () {
     }
 
     FLBuilder::register_module('Sweetaddons_BB_Advanced_Post', array(
-        'Konten' => array(
+        'General' => array(
+            'title' => 'General',
+            'sections' => array(
+                'layout' => array(
+                    'title' => 'Layout',
+                    'fields' => array(
+                        'layout' => array(
+                            'type' => 'select',
+                            'label' => 'Layout',
+                            'default' => 'grid',
+                            'options' => array(
+                                'grid' => 'Grid',
+                                'list' => 'List'
+                            )
+                        ),
+                        'columns' => array(
+                            'type' => 'select',
+                            'label' => 'Columns',
+                            'default' => '3',
+                            'options' => array(
+                                '1' => '1',
+                                '2' => '2',
+                                '3' => '3',
+                                '4' => '4',
+                                '5' => '5',
+                                '6' => '6'
+                            )
+                        ),
+                    )
+                ),
+                'display' => array(
+                    'title' => 'Display',
+                    'fields' => array(
+                        'show_image' => array(
+                            'type' => 'checkbox',
+                            'label' => 'Show Featured Image',
+                            'default' => '1'
+                        ),
+                        'show_title' => array(
+                            'type' => 'checkbox',
+                            'label' => 'Show Title',
+                            'default' => '1'
+                        ),
+                        'show_excerpt' => array(
+                            'type' => 'checkbox',
+                            'label' => 'Show Excerpt',
+                            'default' => '1'
+                        ),
+                        'excerpt_length' => array(
+                            'type' => 'text',
+                            'label' => 'Excerpt Length (words)',
+                            'default' => '20'
+                        ),
+                        'show_meta' => array(
+                            'type' => 'checkbox',
+                            'label' => 'Show Meta',
+                            'default' => '1'
+                        ),
+                        'show_read_more' => array(
+                            'type' => 'checkbox',
+                            'label' => 'Show Read More',
+                            'default' => '1'
+                        ),
+                    )
+                ),
+                'custom' => array(
+                    'title' => 'Custom HTML',
+                    'fields' => array(
+                        'custom_layout_html' => array(
+                            'type' => 'textarea',
+                            'rows' => '8',
+                            'label' => 'Custom Item HTML',
+                            'description' => 'Placeholders: {link}, {image}, {image_url}, {title}, {excerpt}, {date}, {author}, {read_more}, {meta}',
+                            'default' => ''
+                        )
+                    )
+                )
+            )
+        ),
+        'Query' => array(
+            'title' => 'Query',
             'sections' => array(
                 'query' => array(
                     'title' => 'Query',
@@ -192,7 +272,17 @@ add_action('init', function () {
                             'type' => 'text',
                             'label' => 'Exclude Categories (IDs, comma separated)',
                             'default' => ''
-                        ),
+                        )
+                    )
+                )
+            )
+        ),
+        'Pagination' => array(
+            'title' => 'Pagination',
+            'sections' => array(
+                'pagination' => array(
+                    'title' => 'Pagination',
+                    'fields' => array(
                         'pagination' => array(
                             'type' => 'select',
                             'label' => 'Pagination',
@@ -201,68 +291,10 @@ add_action('init', function () {
                                 'none' => 'None',
                                 'numbers' => 'Numbers'
                             )
-                        ),
-                    )
-                ),
-                'layout' => array(
-                    'title' => 'Layout',
-                    'fields' => array(
-                        'layout' => array(
-                            'type' => 'select',
-                            'label' => 'Layout',
-                            'default' => 'grid',
-                            'options' => array(
-                                'grid' => 'Grid',
-                                'list' => 'List'
-                            )
-                        ),
-                        'columns' => array(
-                            'type' => 'select',
-                            'label' => 'Columns',
-                            'default' => '3',
-                            'options' => array(
-                                '1' => '1',
-                                '2' => '2',
-                                '3' => '3',
-                                '4' => '4',
-                                '5' => '5',
-                                '6' => '6'
-                            )
-                        ),
-                        'show_image' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Featured Image',
-                            'default' => '1'
-                        ),
-                        'show_title' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Title',
-                            'default' => '1'
-                        ),
-                        'show_excerpt' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Excerpt',
-                            'default' => '1'
-                        ),
-                        'excerpt_length' => array(
-                            'type' => 'text',
-                            'label' => 'Excerpt Length (words)',
-                            'default' => '20'
-                        ),
-                        'show_meta' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Meta',
-                            'default' => '1'
-                        ),
-                        'show_read_more' => array(
-                            'type' => 'checkbox',
-                            'label' => 'Show Read More',
-                            'default' => '1'
-                        ),
+                        )
                     )
                 )
             )
         )
     ));
 });
-

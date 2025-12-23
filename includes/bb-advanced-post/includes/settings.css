@@ -1,0 +1,21 @@
+.fl-builder-settings .fl-builder-settings-tabs li a {
+  color: #1f2937 !important;
+}
+.fl-builder-settings .fl-builder-settings-tabs li.fl-active a {
+  color: #111827 !important;
+  font-weight: 600;
+}
+.fl-builder-settings textarea[name="custom_layout_html"] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  min-height: 160px;
+}
+.sap-token-toolbar {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sap-token-toolbar .button {
+  font-size: 12px;
+  padding: 4px 8px;
+}
