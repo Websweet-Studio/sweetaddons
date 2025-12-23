@@ -294,11 +294,28 @@ class Custom_Admin_Option_Page
                 </div>
                 <div class="sad-card">
                     <div class="sad-card-title">Ringkasan</div>
-                    <div class="sad-status">
-                        <div><span>Batasi Percobaan Login</span><span><?php echo get_option('limit_login_attempts') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Nonaktifkan XML-RPC</span><span><?php echo get_option('disable_xmlrpc') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Nonaktifkan REST API</span><span><?php echo get_option('disable_rest_api') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                    </div>
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
+                        <thead>
+                            <tr style="background-color: #f0f0f1;">
+                                <th>Fitur</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Batasi Percobaan Login</td>
+                                <td><?php echo get_option('limit_login_attempts') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Nonaktifkan XML-RPC</td>
+                                <td><?php echo get_option('disable_xmlrpc') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Nonaktifkan REST API</td>
+                                <td><?php echo get_option('disable_rest_api') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -360,29 +377,84 @@ class Custom_Admin_Option_Page
                     </div>
                     <div class="sad-card">
                         <div class="sad-card-title">Informasi Situs</div>
-                        <div class="sad-table">
-                            <div><span>Nama</span><span><?php echo esc_html($site_name); ?></span></div>
-                            <div><span>URL</span><span><a href="<?php echo esc_url($site_url); ?>" target="_blank"><?php echo esc_url($site_url); ?></a></span></div>
-                            <div><span>Email Admin</span><span><?php echo esc_html($admin_email); ?></span></div>
-                            <div><span>WordPress</span><span><?php echo esc_html($wp_version); ?></span></div>
-                        </div>
-                    </div>
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
+                        <thead>
+                            <tr style="background-color: #f0f0f1;">
+                                <th>Parameter</th>
+                                <th>Nilai</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nama</td>
+                                <td><?php echo esc_html($site_name); ?></td>
+                            </tr>
+                            <tr>
+                                <td>URL</td>
+                                <td><a href="<?php echo esc_url($site_url); ?>" target="_blank"><?php echo esc_url($site_url); ?></a></td>
+                            </tr>
+                            <tr>
+                                <td>Email Admin</td>
+                                <td><?php echo esc_html($admin_email); ?></td>
+                            </tr>
+                            <tr>
+                                <td>WordPress</td>
+                                <td><?php echo esc_html($wp_version); ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 </div>
             </div>
             <div class="sad-grid">
                 <div class="sad-card">
                     <div class="sad-card-title">Status Fitur</div>
-                    <div class="sad-status">
-                        <div><span>Disable Comments</span><span><?php echo get_option('fully_disable_comment') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Hide Admin Notice</span><span><?php echo get_option('hide_admin_notice') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Maintenance Mode</span><span><?php echo get_option('maintenance_mode') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Limit Login</span><span><?php echo get_option('limit_login_attempts') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Block wp-login</span><span><?php echo get_option('block_wp_login') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Disable XML-RPC</span><span><?php echo get_option('disable_xmlrpc') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Disable REST API</span><span><?php echo get_option('disable_rest_api') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>Disable Gutenberg</span><span><?php echo get_option('disable_gutenberg') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                        <div><span>reCaptcha</span><span><?php echo get_option('captcha_Sweetaddons') ? 'Aktif' : 'Nonaktif'; ?></span></div>
-                    </div>
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
+                        <thead>
+                            <tr style="background-color: #f0f0f1;">
+                                <th>Fitur</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Disable Comments</td>
+                                <td><?php echo get_option('fully_disable_comment') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Hide Admin Notice</td>
+                                <td><?php echo get_option('hide_admin_notice') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Maintenance Mode</td>
+                                <td><?php echo get_option('maintenance_mode') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Limit Login</td>
+                                <td><?php echo get_option('limit_login_attempts') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Block wp-login</td>
+                                <td><?php echo get_option('block_wp_login') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Disable XML-RPC</td>
+                                <td><?php echo get_option('disable_xmlrpc') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Disable REST API</td>
+                                <td><?php echo get_option('disable_rest_api') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Disable Gutenberg</td>
+                                <td><?php echo get_option('disable_gutenberg') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>reCaptcha</td>
+                                <td><?php echo get_option('captcha_Sweetaddons') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="sad-card sad-actions">
                     <div class="sad-card-title">Aksi Cepat</div>
@@ -696,13 +768,14 @@ class Custom_Admin_Option_Page
         $referer_stats = $stats_handler->get_referer_stats(30);
 
     ?>
-        <div class="wrap vd-ons">
-            <h1>📊 Statistik Pengunjung</h1>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">📊 Statistik Pengunjung</h1>
 
             <?php echo $rebuild_message; ?>
 
             <!-- Rebuild Stats Button -->
-            <div style="margin: 20px 0;">
+            <div class="sad-card" style="margin-bottom: 20px;">
+                <div class="sad-card-title">Maintenance</div>
                 <form method="post" style="display: inline;">
                     <?php wp_nonce_field('rebuild_stats'); ?>
                     <input type="hidden" name="rebuild_stats" value="1">
@@ -710,188 +783,68 @@ class Custom_Admin_Option_Page
                         🔄 Bangun Ulang Statistik
                     </button>
                     <span style="margin-left: 10px; color: #666; font-size: 13px;">
-                        Use this if visitor counts appear incorrect
+                        Gunakan ini jika hitungan pengunjung tampak tidak benar
                     </span>
                 </form>
             </div>
-            <div class="sad-card sad-stat">
-                <div class="sad-card-title">Bulan Ini</div>
-                <div class="sad-card-value"><?php echo number_format($summary_stats['this_month']->total_visits ?: 0); ?></div>
-                <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($summary_stats['this_month']->unique_visitors ?: 0); ?></div>
-            </div>
+
             <!-- Summary Cards -->
-            <div class="stats-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+            <div class="sad-grid stats-summary" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
 
-                <div class="stat-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Hari Ini</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;"><?php echo $summary_stats['today']->unique_visitors ?: 0; ?></div>
-                    <div style="color: #666; font-size: 14px;">Pengunjung Unik</div>
-                    <div style="color: #999; font-size: 12px;"><?php echo $summary_stats['today']->total_visits ?: 0; ?> total visits</div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Hari Ini</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['today']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['today']->total_visits ?: 0; ?></div>
                 </div>
 
-                <div class="stat-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Minggu Ini</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;"><?php echo $summary_stats['this_week']->unique_visitors ?: 0; ?></div>
-                    <div style="color: #666; font-size: 14px;">Pengunjung Unik</div>
-                    <div style="color: #999; font-size: 12px;"><?php echo $summary_stats['this_week']->total_visits ?: 0; ?> total visits</div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Minggu Ini</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['this_week']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['this_week']->total_visits ?: 0; ?></div>
                 </div>
 
-                <div class="stat-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Bulan Ini</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;"><?php echo $summary_stats['this_month']->unique_visitors ?: 0; ?></div>
-                    <div style="color: #666; font-size: 14px;">Pengunjung Unik</div>
-                    <div style="color: #999; font-size: 12px;"><?php echo $summary_stats['this_month']->total_visits ?: 0; ?> total visits</div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Bulan Ini</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['this_month']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['this_month']->total_visits ?: 0; ?></div>
                 </div>
 
-                <div class="stat-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">All Time</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;"><?php echo $summary_stats['all_time']->unique_visitors ?: 0; ?></div>
-                    <div style="color: #666; font-size: 14px;">Pengunjung Unik</div>
-                    <div style="color: #999; font-size: 12px;"><?php echo $summary_stats['all_time']->total_visits ?: 0; ?> total visits</div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">All Time</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['all_time']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['all_time']->total_visits ?: 0; ?></div>
                 </div>
             </div>
 
             <!-- Charts Section -->
-            <div class="charts-section" style="display: grid; grid-template-columns: 7fr 3fr; gap: 20px; margin: 20px 0;">
+            <div class="sad-grid charts-section" style="grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
 
                 <!-- Daily Visits Chart -->
-                <div class="chart-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; color: #23282d;">📈 Daily Visits (Last 30 Days)</h3>
-                    <canvas id="dailyVisitsChart" width="400" height="200"></canvas>
+                <div class="sad-card">
+                    <div class="sad-card-title">📈 Daily Visits (Last 30 Days)</div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="dailyVisitsChart"></canvas>
+                    </div>
                 </div>
 
                 <!-- Top Pages Chart -->
-                <div class="chart-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; color: #23282d;">📄 Halaman Teratas</h3>
-                    <canvas id="topPagesChart" width="400" height="200"></canvas>
-                </div>
-            </div>
-
-            <!-- Shortcode Usage Section -->
-            <div class="shortcode-section" style="background: #fff; padding: 30px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 20px 0;">
-                <h3 style="margin-top: 0; color: #23282d;">📋 Shortcode Usage - [statistic]</h3>
-                <p style="color: #666; margin-bottom: 25px;">Tampilkan statistik visitor di halaman, post, atau widget dengan shortcode yang fleksibel.</p>
-
-                <div class="shortcode-examples" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-
-                    <!-- Basic Examples -->
-                    <div class="shortcode-group">
-                        <h4 style="color: #23282d; margin-bottom: 15px;">🎯 Basic Usage</h4>
-
-                        <div class="shortcode-item" style="margin-bottom: 20px;">
-                            <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
-                                <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic]')">[statistic]</span>
-                                <button onclick="copyToClipboard('[statistic]')" style="float: right; background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                            </div>
-                            <div class="shortcode-desc" style="font-size: 13px; color: #666;">Tampilkan semua statistik dengan layout default</div>
-                        </div>
-
-                        <div class="shortcode-item" style="margin-bottom: 20px;">
-                            <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
-                                <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic show=&quot;today&quot;]')">[statistic show="today"]</span>
-                                <button onclick="copyToClipboard('[statistic show=&quot;today&quot;]')" style="float: right; background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                            </div>
-                            <div class="shortcode-desc" style="font-size: 13px; color: #666;">Hanya statistik hari ini</div>
-                        </div>
-
-                        <div class="shortcode-item" style="margin-bottom: 20px;">
-                            <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
-                                <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic show=&quot;total&quot;]')">[statistic show="total"]</span>
-                                <button onclick="copyToClipboard('[statistic show=&quot;total&quot;]')" style="float: right; background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                            </div>
-                            <div class="shortcode-desc" style="font-size: 13px; color: #666;">Hanya total statistik</div>
-                        </div>
+                <div class="sad-card">
+                    <div class="sad-card-title">📄 Halaman Teratas</div>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="topPagesChart"></canvas>
                     </div>
-
-                    <!-- Advanced Examples -->
-                    <div class="shortcode-group">
-                        <h4 style="color: #23282d; margin-bottom: 15px;">⚙️ Advanced Usage</h4>
-
-                        <div class="shortcode-item" style="margin-bottom: 20px;">
-                            <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
-                                <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic style=&quot;cards&quot; columns=&quot;2&quot;]')">[statistic style="cards" columns="2"]</span>
-                                <button onclick="copyToClipboard('[statistic style=&quot;cards&quot; columns=&quot;2&quot;]')" style="float: right; background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                            </div>
-                            <div class="shortcode-desc" style="font-size: 13px; color: #666;">Style card dengan 2 kolom</div>
-                        </div>
-
-                        <div class="shortcode-item" style="margin-bottom: 20px;">
-                            <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
-                                <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic style=&quot;minimal&quot; columns=&quot;1&quot;]')">[statistic style="minimal" columns="1"]</span>
-                                <button onclick="copyToClipboard('[statistic style=&quot;minimal&quot; columns=&quot;1&quot;]')" style="float: right; background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                            </div>
-                            <div class="shortcode-desc" style="font-size: 13px; color: #666;">Style minimal untuk sidebar</div>
-                        </div>
-
-                        <div class="shortcode-item" style="margin-bottom: 20px;">
-                            <div class="shortcode-code" style="background: #f1f1f1; padding: 12px; border-radius: 6px; font-family: monospace; margin-bottom: 10px;">
-                                <span style="color: #0073aa; cursor: pointer;" onclick="copyToClipboard('[statistic show=&quot;today&quot; style=&quot;cards&quot; columns=&quot;2&quot;]')">[statistic show="today" style="cards" columns="2"]</span>
-                                <button onclick="copyToClipboard('[statistic show=&quot;today&quot; style=&quot;cards&quot; columns=&quot;2&quot;]')" style="float: right; background: #0073aa; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Copy</button>
-                            </div>
-                            <div class="shortcode-desc" style="font-size: 13px; color: #666;">Kombinasi: hari ini, style card, 2 kolom</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Parameters Reference -->
-                <div class="parameters-reference" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <h4 style="color: #23282d; margin-bottom: 15px;">📚 Parameter Reference</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-
-                        <div class="param-group">
-                            <strong style="color: #0073aa;">show</strong>
-                            <div style="font-size: 13px; color: #666; margin-top: 5px;">
-                                • <code>all</code> - Semua data (default)<br>
-                                • <code>today</code> - Hanya hari ini<br>
-                                • <code>total</code> - Hanya total
-                            </div>
-                        </div>
-
-                        <div class="param-group">
-                            <strong style="color: #0073aa;">style</strong>
-                            <div style="font-size: 13px; color: #666; margin-top: 5px;">
-                                • <code>default</code> - Card dengan background<br>
-                                • <code>minimal</code> - Style bersih<br>
-                                • <code>cards</code> - Card dengan shadow
-                            </div>
-                        </div>
-
-                        <div class="param-group">
-                            <strong style="color: #0073aa;">columns</strong>
-                            <div style="font-size: 13px; color: #666; margin-top: 5px;">
-                                • <code>1</code> - Vertikal<br>
-                                • <code>2</code> - Dua kolom<br>
-                                • <code>3</code> - Tiga kolom<br>
-                                • <code>4</code> - Empat kolom (default)
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Preview -->
-                <div class="live-preview" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-                    <h4 style="color: #23282d; margin-bottom: 15px;">👁️ Live Preview</h4>
-                    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-                        <?php
-                        $stats_handler_preview = new Sweetaddons_Visitor_Stats();
-                        echo $stats_handler_preview->statistics_shortcode(array('style' => 'cards', 'columns' => '4'));
-                        ?>
-                    </div>
-                    <p style="font-size: 12px; color: #999; margin-top: 10px; text-align: center;">
-                        Preview menggunakan: <code>[statistic style="cards" columns="4"]</code>
-                    </p>
                 </div>
             </div>
 
             <!-- Data Tables Section -->
-            <div class="tables-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+            <div class="sad-grid tables-section" style="grid-template-columns: 1fr 1fr; gap: 20px;">
 
                 <!-- Top Pages Table -->
-                <div class="table-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; color: #23282d;">🏆 Halaman Teratas (30 Hari Terakhir)</h3>
-                    <table class="widefat striped" style="margin-top: 15px;">
+                <div class="sad-card">
+                    <div class="sad-card-title">🏆 Halaman Teratas (30 Hari Terakhir)</div>
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
                         <thead>
-                            <tr>
+                            <tr style="background-color: #f0f0f1;">
                                 <th>Page URL</th>
                                 <th>Pengunjung Unik</th>
                                 <th>Total Tampilan</th>
@@ -916,11 +869,11 @@ class Custom_Admin_Option_Page
                 </div>
 
                 <!-- Top Referrers Table -->
-                <div class="table-container" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; color: #23282d;">🔗 Rujukan Teratas (30 Hari Terakhir)</h3>
-                    <table class="widefat striped" style="margin-top: 15px;">
+                <div class="sad-card">
+                    <div class="sad-card-title">🔗 Rujukan Teratas (30 Hari Terakhir)</div>
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
                         <thead>
-                            <tr>
+                            <tr style="background-color: #f0f0f1;">
                                 <th>Referrer</th>
                                 <th>Visits</th>
                             </tr>

@@ -45,9 +45,12 @@
    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .sad-card-title {
-   font-size: 14px;
-   color: #6b7280;
-   margin-bottom: 10px;
+   font-size: 18px;
+   font-weight: 600;
+   color: #2d3748;
+   padding-bottom: 10px;
+   border-bottom: 1px solid #e2e8f0;
+   margin-bottom: 15px;
 }
 .sad-card-value {
    font-size: 28px;
