@@ -847,17 +847,30 @@ class Sweetaddons_SEO
         $xml = '';
         $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-        $types = array(
-            'posts' => home_url('/sitemap-posts.xml'),
-            'pages' => home_url('/sitemap-pages.xml'),
-            'categories' => home_url('/sitemap-categories.xml'),
-            'tags' => home_url('/sitemap-tags.xml')
+        $per_page = 2000;
+        $totals = array(
+            'posts' => (int) wp_count_posts('post')->publish,
+            'pages' => (int) wp_count_posts('page')->publish,
+            'categories' => (int) wp_count_terms(array('taxonomy' => 'category', 'hide_empty' => true)),
+            'tags' => (int) wp_count_terms(array('taxonomy' => 'post_tag', 'hide_empty' => true)),
         );
-        foreach ($types as $loc) {
-            $xml .= '<sitemap>' . "\n";
-            $xml .= '<loc>' . esc_url($loc) . '</loc>' . "\n";
-            $xml .= '<lastmod>' . date('c', $last_modified ?: time()) . '</lastmod>' . "\n";
-            $xml .= '</sitemap>' . "\n";
+        foreach ($totals as $type => $total) {
+            $pages = max(1, (int) ceil($total / $per_page));
+            if ($pages === 1) {
+                $loc = home_url('/sitemap-' . $type . '.xml');
+                $xml .= '<sitemap>' . "\n";
+                $xml .= '<loc>' . esc_url($loc) . '</loc>' . "\n";
+                $xml .= '<lastmod>' . date('c', $last_modified ?: time()) . '</lastmod>' . "\n";
+                $xml .= '</sitemap>' . "\n";
+            } else {
+                for ($i = 1; $i <= $pages; $i++) {
+                    $loc = home_url('/sitemap-' . $type . '-' . $i . '.xml');
+                    $xml .= '<sitemap>' . "\n";
+                    $xml .= '<loc>' . esc_url($loc) . '</loc>' . "\n";
+                    $xml .= '<lastmod>' . date('c', $last_modified ?: time()) . '</lastmod>' . "\n";
+                    $xml .= '</sitemap>' . "\n";
+                }
+            }
         }
         $xml .= '</sitemapindex>';
         set_transient($this->get_sitemap_cache_key('index'), array(
@@ -873,7 +886,12 @@ class Sweetaddons_SEO
 
     private function generate_xml_sitemap_type($type)
     {
-        $cache = get_transient($this->get_sitemap_cache_key($type));
+        $page = (int) get_query_var('sweetaddons_sitemap_page');
+        if ($page < 1) {
+            $page = 1;
+        }
+        $suffix = $type . '-' . $page;
+        $cache = get_transient($this->get_sitemap_cache_key($suffix));
         if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {
             header('Content-Type: application/xml; charset=utf-8');
             header('Cache-Control: public, max-age=43200');
@@ -888,11 +906,15 @@ class Sweetaddons_SEO
         $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
+        $per_page = 2000;
+
         if ($type === 'posts' || $type === 'pages') {
+            $post_type = $type === 'posts' ? 'post' : 'page';
             $ids = get_posts(array(
-                'post_type' => $type,
+                'post_type' => $post_type,
                 'post_status' => 'publish',
-                'posts_per_page' => -1,
+                'posts_per_page' => $per_page,
+                'offset' => ($page - 1) * $per_page,
                 'fields' => 'ids',
                 'no_found_rows' => true
             ));
@@ -911,7 +933,7 @@ class Sweetaddons_SEO
                 $xml .= '</url>' . "\n";
             }
         } elseif ($type === 'categories') {
-            $terms = get_terms(array('taxonomy' => 'category', 'hide_empty' => true));
+            $terms = get_terms(array('taxonomy' => 'category', 'hide_empty' => true, 'number' => $per_page, 'offset' => ($page - 1) * $per_page));
             foreach ($terms as $term) {
                 $xml .= '<url>' . "\n";
                 $xml .= '<loc>' . esc_url(get_term_link($term)) . '</loc>' . "\n";
@@ -920,7 +942,7 @@ class Sweetaddons_SEO
                 $xml .= '</url>' . "\n";
             }
         } elseif ($type === 'tags') {
-            $terms = get_terms(array('taxonomy' => 'post_tag', 'hide_empty' => true));
+            $terms = get_terms(array('taxonomy' => 'post_tag', 'hide_empty' => true, 'number' => $per_page, 'offset' => ($page - 1) * $per_page));
             foreach ($terms as $term) {
                 $xml .= '<url>' . "\n";
                 $xml .= '<loc>' . esc_url(get_term_link($term)) . '</loc>' . "\n";
@@ -932,7 +954,7 @@ class Sweetaddons_SEO
 
         $xml .= '</urlset>';
 
-        set_transient($this->get_sitemap_cache_key($type), array(
+        set_transient($this->get_sitemap_cache_key($suffix), array(
             'xml' => $xml,
             'last_modified' => $last_modified ?: time()
         ), 12 * HOUR_IN_SECONDS);
@@ -984,6 +1006,10 @@ class Sweetaddons_SEO
         add_rewrite_rule('^sitemap-pages\.xml/?$', 'index.php?sweetaddons_sitemap=pages', 'top');
         add_rewrite_rule('^sitemap-categories\.xml/?$', 'index.php?sweetaddons_sitemap=categories', 'top');
         add_rewrite_rule('^sitemap-tags\.xml/?$', 'index.php?sweetaddons_sitemap=tags', 'top');
+        add_rewrite_rule('^sitemap-posts-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=posts&sweetaddons_sitemap_page=$matches[1]', 'top');
+        add_rewrite_rule('^sitemap-pages-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=pages&sweetaddons_sitemap_page=$matches[1]', 'top');
+        add_rewrite_rule('^sitemap-categories-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=categories&sweetaddons_sitemap_page=$matches[1]', 'top');
+        add_rewrite_rule('^sitemap-tags-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=tags&sweetaddons_sitemap_page=$matches[1]', 'top');
         $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
         $initialized = get_option('sweetaddons_sitemap_rules_initialized');
         if ($enabled === '1' && $initialized !== '2') {
@@ -995,6 +1021,7 @@ class Sweetaddons_SEO
     public function add_query_vars($vars)
     {
         $vars[] = 'sweetaddons_sitemap';
+        $vars[] = 'sweetaddons_sitemap_page';
         return $vars;
     }
 
