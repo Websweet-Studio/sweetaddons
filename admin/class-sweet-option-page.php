@@ -110,6 +110,26 @@ class Custom_Admin_Option_Page
             'Sweetaddons_whatsapp',    // Menu slug
             array($this, 'whatsapp_page_callback') // Callback function
         );
+
+        // Add Login Customizer submenu
+        add_submenu_page(
+            'custom_admin_options',     // Parent slug
+            'Login Customizer',         // Page title
+            'Login Page',               // Menu title
+            'manage_options',           // Capability
+            'Sweetaddons_login_customizer', // Menu slug
+            array($this, 'login_customizer_page_callback') // Callback function
+        );
+
+        // Add Database Cleaner submenu
+        add_submenu_page(
+            'custom_admin_options',     // Parent slug
+            'Database Cleaner',         // Page title
+            'DB Cleaner',               // Menu title
+            'manage_options',           // Capability
+            'Sweetaddons_db_cleaner',   // Menu slug
+            array($this, 'db_cleaner_page_callback') // Callback function
+        );
     }
 
 
@@ -1494,12 +1514,37 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Tingkat Kesulitan</th>
                                     <td>
-                                        <select name="captcha_difficulty">
+                                        <select name="captcha_difficulty" id="captcha_difficulty">
                                             <option value="easy" <?php selected($difficulty, 'easy'); ?>>Mudah (4 Angka)</option>
                                             <option value="medium" <?php selected($difficulty, 'medium'); ?>>Sedang (5 Karakter)</option>
                                             <option value="hard" <?php selected($difficulty, 'hard'); ?>>Sulit (6 Karakter + Noise)</option>
                                         </select>
                                         <p class="description">Atur kompleksitas kode dan visual CAPTCHA.</p>
+
+                                        <div id="captcha-preview-container" style="margin-top: 15px;">
+                                            <strong>Preview:</strong><br>
+                                            <img id="captcha-preview-img" src="<?php echo add_query_arg(array('sweetaddons_captcha' => 'preview', 'difficulty' => $difficulty), home_url('/')); ?>" alt="Captcha Preview" style="border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px; margin-top: 5px;">
+                                            <p><a href="#" id="refresh-captcha-preview" class="button button-small">Refresh Preview</a></p>
+                                        </div>
+
+                                        <script>
+                                            jQuery(document).ready(function($) {
+                                                function updateCaptchaPreview() {
+                                                    var difficulty = $('#captcha_difficulty').val();
+                                                    var src = '<?php echo home_url('/'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
+                                                    $('#captcha-preview-img').attr('src', src);
+                                                }
+
+                                                $('#captcha_difficulty').on('change', function() {
+                                                    updateCaptchaPreview();
+                                                });
+
+                                                $('#refresh-captcha-preview').on('click', function(e) {
+                                                    e.preventDefault();
+                                                    updateCaptchaPreview();
+                                                });
+                                            });
+                                        </script>
                                     </td>
                                 </tr>
                             </table>
@@ -1864,6 +1909,216 @@ class Custom_Admin_Option_Page
                 </div>
         </div>
         </form>
+        </div>
+    <?php
+    }
+
+    public function login_customizer_page_callback()
+    {
+        // Handle settings save
+        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
+            $login_data = array();
+
+            if (isset($_POST['login_logo_url'])) {
+                $login_data['logo_url'] = sanitize_text_field($_POST['login_logo_url']);
+            }
+            if (isset($_POST['login_bg_color'])) {
+                $login_data['bg_color'] = sanitize_text_field($_POST['login_bg_color']);
+            }
+            if (isset($_POST['login_bg_image'])) {
+                $login_data['bg_image'] = sanitize_text_field($_POST['login_bg_image']);
+            }
+            if (isset($_POST['login_btn_color'])) {
+                $login_data['btn_color'] = sanitize_text_field($_POST['login_btn_color']);
+            }
+            if (isset($_POST['login_btn_text_color'])) {
+                $login_data['btn_text_color'] = sanitize_text_field($_POST['login_btn_text_color']);
+            }
+
+            update_option('sweetaddons_login_customizer', $login_data);
+            echo '<div class="notice notice-success"><p>✅ Pengaturan Login Page Customizer berhasil disimpan!</p></div>';
+        }
+
+        // Get current settings
+        $login_settings = get_option('sweetaddons_login_customizer', array());
+        $logo_url = isset($login_settings['logo_url']) ? $login_settings['logo_url'] : '';
+        $bg_color = isset($login_settings['bg_color']) ? $login_settings['bg_color'] : '#f1f1f1';
+        $bg_image = isset($login_settings['bg_image']) ? $login_settings['bg_image'] : '';
+        $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
+        $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
+    ?>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">🎨 Login Page Customizer</h1>
+
+            <form method="post" action="">
+                <?php wp_nonce_field('sweetaddons_login_customizer_settings'); ?>
+
+                <div class="sad-top">
+                    <div class="sad-top-left">
+                        <div class="sad-card">
+                            <div class="sad-card-title">⚙️ Konfigurasi Tampilan</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">Logo URL</th>
+                                    <td>
+                                        <input type="text" name="login_logo_url" id="login_logo_url" value="<?php echo esc_attr($logo_url); ?>" class="regular-text" />
+                                        <button type="button" class="button button-secondary" id="upload_logo_button">Upload Logo</button>
+                                        <p class="description">Upload atau masukkan URL logo untuk halaman login.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Warna Background</th>
+                                    <td>
+                                        <input type="color" name="login_bg_color" value="<?php echo esc_attr($bg_color); ?>" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Gambar Background</th>
+                                    <td>
+                                        <input type="text" name="login_bg_image" id="login_bg_image" value="<?php echo esc_attr($bg_image); ?>" class="regular-text" />
+                                        <button type="button" class="button button-secondary" id="upload_bg_button">Upload Background</button>
+                                        <p class="description">Upload atau masukkan URL gambar background.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Warna Tombol</th>
+                                    <td>
+                                        <input type="color" name="login_btn_color" value="<?php echo esc_attr($btn_color); ?>" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Warna Teks Tombol</th>
+                                    <td>
+                                        <input type="color" name="login_btn_text_color" value="<?php echo esc_attr($btn_text_color); ?>" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="sad-top-right">
+                        <div class="sad-card">
+                            <div class="sad-card-title">💾 Simpan Perubahan</div>
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <script>
+                jQuery(document).ready(function($) {
+                    var mediaUploader;
+
+                    $('#upload_logo_button').click(function(e) {
+                        e.preventDefault();
+                        if (mediaUploader) {
+                            mediaUploader.open();
+                            return;
+                        }
+                        mediaUploader = wp.media.frames.file_frame = wp.media({
+                            title: 'Pilih Logo',
+                            button: {
+                                text: 'Pilih Logo'
+                            },
+                            multiple: false
+                        });
+                        mediaUploader.on('select', function() {
+                            var attachment = mediaUploader.state().get('selection').first().toJSON();
+                            $('#login_logo_url').val(attachment.url);
+                        });
+                        mediaUploader.open();
+                    });
+
+                    var bgUploader;
+                    $('#upload_bg_button').click(function(e) {
+                        e.preventDefault();
+                        if (bgUploader) {
+                            bgUploader.open();
+                            return;
+                        }
+                        bgUploader = wp.media.frames.file_frame = wp.media({
+                            title: 'Pilih Background',
+                            button: {
+                                text: 'Pilih Background'
+                            },
+                            multiple: false
+                        });
+                        bgUploader.on('select', function() {
+                            var attachment = bgUploader.state().get('selection').first().toJSON();
+                            $('#login_bg_image').val(attachment.url);
+                        });
+                        bgUploader.open();
+                    });
+                });
+            </script>
+        </div>
+    <?php
+    }
+
+    public function db_cleaner_page_callback()
+    {
+        // Handle cleanup
+        if (isset($_POST['submit']) && check_admin_referer('sweetaddons_db_cleaner_action', 'sweetaddons_db_cleaner_nonce')) {
+            $items = isset($_POST['items']) ? $_POST['items'] : array();
+
+            if (!empty($items)) {
+                $cleaner = new Sweetaddons_Database_Cleaner();
+                $cleaned_items = $cleaner->clean_items($items);
+
+                $message = '✅ Berhasil membersihkan: ' . implode(', ', $cleaned_items);
+                echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
+            } else {
+                echo '<div class="notice notice-warning"><p>⚠️ Tidak ada item yang dipilih untuk dibersihkan.</p></div>';
+            }
+        }
+
+        $cleaner = new Sweetaddons_Database_Cleaner();
+        $stats = $cleaner->get_stats();
+    ?>
+        <div class="wrap vd-ons sweetaddons-dashboard">
+            <h1 class="sad-title">🧹 Database Cleaner</h1>
+
+            <form method="post" action="">
+                <?php wp_nonce_field('sweetaddons_db_cleaner_action', 'sweetaddons_db_cleaner_nonce'); ?>
+
+                <div class="sad-top">
+                    <div class="sad-top-left">
+                        <div class="sad-card">
+                            <div class="sad-card-title">🗑️ Item yang Dapat Diberishkan</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><input type="checkbox" name="items[]" value="revisions" checked> Post Revisions</th>
+                                    <td><span class="sad-badge sad-badge-warning"><?php echo $stats['revisions']; ?> items</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><input type="checkbox" name="items[]" value="auto_drafts" checked> Auto Drafts</th>
+                                    <td><span class="sad-badge sad-badge-warning"><?php echo $stats['auto_drafts']; ?> items</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><input type="checkbox" name="items[]" value="spam_comments" checked> Spam Comments</th>
+                                    <td><span class="sad-badge sad-badge-danger"><?php echo $stats['spam_comments']; ?> items</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><input type="checkbox" name="items[]" value="trashed_comments" checked> Trashed Comments</th>
+                                    <td><span class="sad-badge sad-badge-danger"><?php echo $stats['trashed_comments']; ?> items</span></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><input type="checkbox" name="items[]" value="expired_transients" checked> Expired Transients</th>
+                                    <td><span class="sad-badge sad-badge-info"><?php echo $stats['expired_transients']; ?> items</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="sad-top-right">
+                        <div class="sad-card">
+                            <div class="sad-card-title">🚀 Aksi Pembersihan</div>
+                            <p>Klik tombol di bawah untuk membersihkan item yang dipilih dari database. Pastikan Anda telah melakukan backup database sebelum melakukan pembersihan.</p>
+                            <?php submit_button('Bersihkan Database Sekarang', 'primary', 'submit', false, array('style' => 'width: 100%;', 'onclick' => "return confirm('Apakah Anda yakin ingin membersihkan database? Tindakan ini tidak dapat dibatalkan.');")); ?>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     <?php
     }

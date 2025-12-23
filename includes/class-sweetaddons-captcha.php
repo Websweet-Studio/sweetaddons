@@ -57,6 +57,21 @@ class Sweetaddons_Captcha
     {
         $qv = get_query_var('sweetaddons_captcha');
         $token = get_query_var('token');
+
+        // Handle preview mode
+        if ($qv === 'preview') {
+            if (!current_user_can('manage_options')) {
+                die('Access denied');
+            }
+
+            $difficulty = isset($_GET['difficulty']) ? sanitize_text_field($_GET['difficulty']) : 'medium';
+            $this->difficulty = $difficulty;
+
+            $code = $this->generate_code();
+            $this->render_image($code);
+            exit;
+        }
+
         if ($qv === 'image' && $token) {
             $code = get_transient('sweetaddons_captcha_' . $token);
             if (!$code) {

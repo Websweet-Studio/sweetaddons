@@ -204,6 +204,16 @@ class Sweetaddons
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-breadcrumb.php';
 
         /**
+         * Berisi Class untuk Login Customizer functionality
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-login-customizer.php';
+
+        /**
+         * Berisi Class untuk Database Cleaner functionality
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-database-cleaner.php';
+
+        /**
          * The class responsible for defining all actions that occur in the admin area.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweetaddons-admin.php';
@@ -289,6 +299,12 @@ class Sweetaddons
 
         // Initialize Breadcrumb functionality
         new Sweetaddons_Breadcrumb();
+
+        // Initialize Login Customizer
+        new Sweetaddons_Login_Customizer();
+
+        // Initialize Database Cleaner
+        new Sweetaddons_Database_Cleaner();
     }
 
     /**
