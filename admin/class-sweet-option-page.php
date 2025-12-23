@@ -1449,6 +1449,9 @@ class Custom_Admin_Option_Page
             if (isset($_POST['captcha_register'])) {
                 $captcha_data['register'] = sanitize_text_field($_POST['captcha_register']);
             }
+            if (isset($_POST['captcha_difficulty'])) {
+                $captcha_data['difficulty'] = sanitize_text_field($_POST['captcha_difficulty']);
+            }
 
             update_option('captcha_Sweetaddons', $captcha_data);
             echo '<div class="notice notice-success"><p>✅ Pengaturan reCaptcha berhasil disimpan!</p></div>';
@@ -1461,6 +1464,7 @@ class Custom_Admin_Option_Page
         $login = isset($captcha_settings['login']) ? $captcha_settings['login'] : '';
         $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
         $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
+        $difficulty = isset($captcha_settings['difficulty']) ? $captcha_settings['difficulty'] : 'medium';
 
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
@@ -1485,6 +1489,17 @@ class Custom_Admin_Option_Page
                                             Aktifkan CAPTCHA Tulisan di Gambar
                                         </label>
                                         <p class="description">Aktifkan perlindungan CAPTCHA berbasis gambar tanpa API eksternal.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Tingkat Kesulitan</th>
+                                    <td>
+                                        <select name="captcha_difficulty">
+                                            <option value="easy" <?php selected($difficulty, 'easy'); ?>>Mudah (4 Angka)</option>
+                                            <option value="medium" <?php selected($difficulty, 'medium'); ?>>Sedang (5 Karakter)</option>
+                                            <option value="hard" <?php selected($difficulty, 'hard'); ?>>Sulit (6 Karakter + Noise)</option>
+                                        </select>
+                                        <p class="description">Atur kompleksitas kode dan visual CAPTCHA.</p>
                                     </td>
                                 </tr>
                             </table>
