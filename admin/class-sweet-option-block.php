@@ -144,58 +144,62 @@ class Sweet_Option_Block
         <div class="wrap vd-ons sweetaddons-dashboard">
             <h1 class="sad-title">🔒 Pengaturan Blokir Login</h1>
 
-            <!-- Status Summary Cards -->
-            <div class="sad-grid" style="margin-bottom: 20px;">
-                <div class="sad-card" style="text-align: center; border-bottom: 4px solid #0073aa;">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">Status Blokir</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
-                        <?php echo $block_active ? '<span style="color:#00a32a">AKTIF</span>' : '<span style="color:#d63638">NONAKTIF</span>'; ?>
-                    </div>
-                    <div style="color: #666; font-size: 14px;">Proteksi wp-login.php</div>
+            <div class="sad-grid">
+                <div class="sad-card">
+                    <div class="sad-card-title">Pengaturan Utama</div>
+                    <form method="post" action="options.php" class="sad-form">
+                        <?php settings_fields('Sweetaddons_block_group'); ?>
+                        <?php do_settings_sections('Sweetaddons_block_group'); ?>
+
+                        <table class="form-table">
+                            <?php
+                            foreach ($block_fields as $data) :
+                                echo '<tr>';
+                                echo '<th scope="row">' . $data['title'] . '</th>';
+                                echo '<td>';
+                                $this->field($data);
+                                echo '</td>';
+                                echo '</tr>';
+                            endforeach;
+                            ?>
+                        </table>
+
+                        <div class="sad-actions-row" style="justify-content: flex-end;">
+                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="sad-card" style="text-align: center; border-bottom: 4px solid #0073aa;">
-                    <h3 style="margin: 0 0 10px 0; color: #0073aa;">IP Whitelist</h3>
-                    <div style="font-size: 24px; font-weight: bold; color: #23282d;">
-                        <?php echo $whitelist_count; ?>
-                    </div>
-                    <div style="color: #666; font-size: 14px;">IP Terdaftar</div>
+                <div class="sad-card">
+                    <div class="sad-card-title">Ringkasan</div>
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
+                        <thead>
+                            <tr style="background-color: #f0f0f1;">
+                                <th>Fitur</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Status Blokir</td>
+                                <td><?php echo $block_active ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>IP Whitelist</td>
+                                <td><?php echo $whitelist_count > 0 ? $whitelist_count . ' IP' : '-'; ?></td>
+                            </tr>
+                            <tr>
+                                <td>Negara Diizinkan</td>
+                                <td><?php echo esc_html(get_option('whitelist_country', 'ID')); ?></td>
+                            </tr>
+                            <tr>
+                                <td>Redirect URL</td>
+                                <td><a href="<?php echo esc_url(get_option('redirect_to', 'http://127.0.0.1')); ?>" target="_blank">Cek Link</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            <form method="post" action="options.php">
-                <?php settings_fields('Sweetaddons_block_group'); ?>
-
-                <div class="sad-top">
-                    <!-- Left Column -->
-                    <div class="sad-top-left">
-                        <div class="sad-card">
-                            <div class="sad-card-title">⚙️ Konfigurasi Utama</div>
-                            <table class="form-table">
-                                <?php
-                                foreach ($block_fields as $data) :
-                                    echo '<tr>';
-                                    echo '<th scope="row">' . $data['title'] . '</th>';
-                                    echo '<td>';
-                                    $this->field($data);
-                                    echo '</td>';
-                                    echo '</tr>';
-                                endforeach;
-                                ?>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Right Column -->
-                    <div class="sad-top-right">
-                        <div class="sad-card" style="text-align: center; background: #f0f8ff; border-color: #0073aa;">
-                            <h3 style="margin-top: 0;">💾 Simpan Perubahan</h3>
-                            <p style="margin-bottom: 15px; color: #666;">Jangan lupa simpan pengaturan Anda.</p>
-                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
-                        </div>
-                    </div>
-                </div>
-            </form>
         </div>
 <?php
     }
