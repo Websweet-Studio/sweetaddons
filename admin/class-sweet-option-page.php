@@ -1464,7 +1464,7 @@ class Custom_Admin_Option_Page
 
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
-            <h1 class="sad-title">🛡️ Pengaturan Google reCaptcha</h1>
+            <h1 class="sad-title">🛡️ Pengaturan CAPTCHA Tulisan (Image)</h1>
 
             <form method="post" action="">
                 <?php wp_nonce_field('sweetaddons_recaptcha_settings'); ?>
@@ -1482,23 +1482,9 @@ class Custom_Admin_Option_Page
                                     <td>
                                         <label>
                                             <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
-                                            Aktifkan Google reCaptcha v2
+                                            Aktifkan CAPTCHA Tulisan di Gambar
                                         </label>
-                                        <p class="description">Aktifkan perlindungan reCaptcha di seluruh website Anda.</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><label for="captcha_sitekey">Site Key</label></th>
-                                    <td>
-                                        <input type="text" id="captcha_sitekey" name="captcha_sitekey" value="<?php echo esc_attr($sitekey); ?>" class="large-text" />
-                                        <p class="description">Site Key reCaptcha Anda dari konsol admin Google reCaptcha.</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row"><label for="captcha_secretkey">Secret Key</label></th>
-                                    <td>
-                                        <input type="password" id="captcha_secretkey" name="captcha_secretkey" value="<?php echo esc_attr($secretkey); ?>" class="large-text" />
-                                        <p class="description">Secret Key reCaptcha Anda dari konsol admin Google reCaptcha.</p>
+                                        <p class="description">Aktifkan perlindungan CAPTCHA berbasis gambar tanpa API eksternal.</p>
                                     </td>
                                 </tr>
                             </table>
@@ -1551,15 +1537,15 @@ class Custom_Admin_Option_Page
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><strong>Integrasi API</strong></td>
+                                        <td><strong>Generator Lokal</strong></td>
                                         <td>
-                                            <?php if ($aktif && $sitekey && $secretkey): ?>
-                                                <span style="color: #00a32a; font-weight:bold;">Terkoneksi</span>
+                                            <?php if ($aktif): ?>
+                                                <span style="color: #00a32a; font-weight:bold;">Tersedia</span>
                                             <?php else: ?>
-                                                <span style="color: #d63638; font-weight:bold;">Terputus</span>
+                                                <span style="color: #999;">Nonaktif</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td>Koneksi ke server Google</td>
+                                        <td>Pembuatan gambar CAPTCHA di server</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Proteksi Login</strong></td>
@@ -1602,24 +1588,21 @@ class Custom_Admin_Option_Page
                         <!-- Setup Instructions -->
                         <div class="sad-card">
                             <div class="sad-card-title">📋 Panduan Setup</div>
-
-                            <h4 style="margin: 10px 0 5px; color: #23282d;">1. Dapatkan API Keys</h4>
+                            <h4 style="margin: 10px 0 5px; color: #23282d;">1. Aktivasi</h4>
                             <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px; margin-bottom: 15px;">
-                                <li>Buka <a href="https://www.google.com/recaptcha/admin" target="_blank">Google reCaptcha Admin</a></li>
-                                <li>Buat site baru (pilih v2 "I'm not a robot")</li>
-                                <li>Masukkan domain website Anda</li>
-                                <li>Copy Site Key & Secret Key</li>
+                                <li>Nyalakan status fitur CAPTCHA</li>
+                                <li>Pilih area proteksi: Login, Registrasi, Komentar</li>
+                                <li>Tidak memerlukan API key</li>
                             </ul>
-
                             <h4 style="margin: 10px 0 5px; color: #23282d;">2. Contact Form 7</h4>
-                            <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Gunakan shortcode ini:</p>
-                            <code style="display: block; background: #f0f0f1; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px;">[recaptcha]</code>
-
+                            <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Gunakan tag berikut:</p>
+                            <code style="display: block; background: #f0f0f1; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px;">[sweetcaptcha]</code>
+                            <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Tag <code>[recaptcha]</code> juga otomatis menampilkan CAPTCHA gambar.</p>
                             <h4 style="margin: 10px 0 5px; color: #23282d;">3. Testing</h4>
                             <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px;">
                                 <li>Logout untuk tes form login</li>
                                 <li>Buka postingan untuk tes komentar</li>
-                                <li>Pastikan checkbox "I'm not a robot" muncul</li>
+                                <li>Pastikan gambar CAPTCHA muncul dan input teks bekerja</li>
                             </ul>
                         </div>
 

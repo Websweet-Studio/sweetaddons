@@ -1,38 +1,65 @@
 # Sweet Addons Plugin
 
-Plugin ini adalah kumpulan fungsi tambahan dan shortcode yang berguna dalam mengelola dan menyesuaikan situs WordPress Anda.
+Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan UI untuk membantu mengelola serta menyesuaikan situs WordPress Anda.
 
-## Fungsi yang Tersedia
+## Fitur Utama
 
-### Pengaturan Admin
+- Keamanan & Anti-Spam
 
-Plugin ini memungkinkan Anda untuk mengkonfigurasi berbagai pengaturan di dasbor admin:
+  - Batasi percobaan login per IP (limit login attempts)
+  - Blokir akses `wp-login.php` berdasarkan whitelist IP/negara dan redirect
+  - CAPTCHA gambar teks: login, komentar, lostpassword, register, integrasi Contact Form 7
+  - Nonaktifkan XML-RPC
+  - Nonaktifkan REST API (dengan pengecualian endpoint widget)
 
-- `fully_disable_comment`: Menonaktifkan komentar di seluruh situs.
-- `hide_admin_notice`: Menyembunyikan pemberitahuan admin yang muncul di dasbor.
-- `limit_login_attempts`: Memperingan upaya login dengan membatasi jumlah percobaan.
-- `maintenance_mode`: Mengaktifkan mode pemeliharaan untuk penghentian akses sementara.
-- `disable_xmlrpc`: Menonaktifkan fitur XML-RPC WordPress.
-- `disable_rest_api`: Menonaktifkan REST API WordPress.
-- `disable_gutenberg`: Menonaktifkan editor blok Gutenberg.
-- `block_wp_login`: Memblokir akses masuk ke situs WordPress.
-- `whitelist_country`: Memberikan akses berdasarkan negara yang diizinkan.
-- `redirect_to`: Mengarahkan pengguna setelah login atau logout.
-- `classic_widget`: Menambahkan widget klasik ke editor blok.
+- Maintenance
 
-### Shortcode
+  - Maintenance Mode (halaman 503 custom untuk pengunjung non-admin)
+  - Pemeriksaan cepat: permalink, site icon, reCaptcha, pengaturan SEO, domain, auto-update plugin
 
-Plugin ini juga menyediakan beberapa shortcode yang umum digunakan:
+- SEO
 
-- `[shortcode1]`: Deskripsi singkat tentang shortcode 1.
-- `[shortcode2]`: Deskripsi singkat tentang shortcode 2.
-- ...
+  - Meta tags: description, keywords, robots, canonical
+  - Open Graph & Twitter Card
+  - Schema.org: Article & WebSite
+  - Meta box SEO di editor konten
+  - Sitemap XML di `/sitemap.xml` dengan cache dan dukungan 304
+
+- Statistik Pengunjung
+
+  - Logging kunjungan, agregasi harian/bulanan
+  - Statistik halaman dan referrer
+  - Halaman admin dengan grafik dan tabel, tombol “Bangun Ulang Statistik”
+
+- UI/UX
+
+  - Widget WhatsApp mengambang: posisi, warna, ukuran, tooltip, gaya bubble
+  - Breadcrumb shortcode dengan beberapa gaya tampilan
+
+- Utilitas
+  - Sembunyikan Admin Notices
+  - Nonaktifkan komentar
+  - Nonaktifkan Gutenberg dan aktifkan Classic Widgets
+  - Hapus slug `category` dari permalink posting
+
+## Shortcode
+
+- `[statistic]` — menampilkan statistik pengunjung.
+- `[breadcrumb]` — menampilkan breadcrumb navigasi (opsi: `separator`, `home_text`, `show_home`, `show_current`, `style`).
+- `[sweet_recaptcha]` — menampilkan reCaptcha v2 sebagai shortcode.
+- `[sweet_captcha]` — menampilkan CAPTCHA gambar teks sebagai shortcode.
+- Contact Form 7: tag `sweetcaptcha` (tag `recaptcha` juga otomatis menampilkan CAPTCHA gambar).
+
+## Pengaturan Admin
+
+- Dashboard Sweet Addons: status fitur, ringkasan konten/server, dan quick actions.
+- Submenu: Umum, Maintenance Mode, Blokir Login, Proteksi Spam, Statistik, SEO, reCaptcha, White Label, WhatsApp.
 
 ## Pemasangan
 
-1. Unduh plugin dari repositori ini.
-2. Unggah direktori plugin ke direktori `wp-content/plugins/` di situs WordPress Anda.
-3. Aktifkan plugin melalui menu "Plugins" di dasbor WordPress.
+- Unduh plugin dari repositori ini.
+- Unggah direktori plugin ke `wp-content/plugins/` di situs WordPress Anda.
+- Aktifkan plugin melalui menu “Plugins” di dasbor WordPress.
 
 ## Rekomendasi Plugin
 

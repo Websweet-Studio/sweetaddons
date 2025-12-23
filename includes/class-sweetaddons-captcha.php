@@ -1,259 +1,198 @@
 <?php
-
-/**
- * Register all actions and filters for the plugin
- *
- * @link       https://websweetstudio.com
- * @since      1.0.0
- *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
- */
-
-/**
- * Register all actions and filters for the plugin.
- *
- * Maintain a list of all hooks that are registered throughout
- * the plugin, and register them with the WordPress API. Call the
- * run function to execute the list of actions and filters.
- *
- * @package    Sweetaddons
- * @subpackage Sweetaddons/includes
- * @author     WebsweetStudio <websweetstudio@gmail.com>
- */
-
 class Sweetaddons_Captcha
 {
-
-    /**
-     * Sitekey reCaptcha v2
-     */
-    private $sitekey;
-
-    /**
-     * Secretkey reCaptcha v2
-     */
-    private $secretkey;
-
-    /**
-     * data-size reCaptcha v2
-     * compact, normal
-     */
-    private $size;
-
     private $active = false;
+    private $areas = array(
+        'login' => '1',
+        'comment' => '1',
+        'register' => '1'
+    );
 
     public function __construct()
     {
-        $captcha_Sweetaddons   = get_option('captcha_Sweetaddons', []);
-        $captcha_aktif      = isset($captcha_Sweetaddons['aktif']) ? $captcha_Sweetaddons['aktif'] : '';
-        $this->sitekey      = isset($captcha_Sweetaddons['sitekey']) ? $captcha_Sweetaddons['sitekey'] : '';
-        $this->secretkey    = isset($captcha_Sweetaddons['secretkey']) ? $captcha_Sweetaddons['secretkey'] : '';
-        $this->size         = wp_is_mobile() ? 'compact' : 'normal';
+        $opt = get_option('captcha_Sweetaddons', array());
+        $this->active = !empty($opt['aktif']);
+        if (isset($opt['login'])) $this->areas['login'] = $opt['login'];
+        if (isset($opt['comment'])) $this->areas['comment'] = $opt['comment'];
+        if (isset($opt['register'])) $this->areas['register'] = $opt['register'];
 
-        if ($captcha_aktif && $this->sitekey && $this->secretkey) {
-
-            $this->active = true;
-
-            // Tambahkan action captcha ke login_form
-            add_action('login_form', array($this, 'display'));
-            add_action('login_form_middle', array($this, 'display_login_form'));
-
-            // Tambahkan Filter Auth untuk captcha
-            add_filter('wp_authenticate_user', array($this, 'verify_login_form'), 10, 3);
-
-            // Panggil fungsi untuk menambahkan reCaptcha ke kolom komentar
-            add_action('comment_form_after_fields', array($this, 'display'));
-            // Panggil fungsi untuk memvalidasi reCaptcha saat proses submit komentar
-            add_action('pre_comment_on_post', array($this, 'verify_comment_form'), 10, 1);
-
-            // Panggil fungsi untuk menambahkan reCaptcha ke kolom lostpassword
+        if ($this->active) {
+            if ($this->areas['login'] === '1') {
+                add_action('login_form', array($this, 'display'));
+                add_action('login_form_middle', array($this, 'display'));
+                add_filter('wp_authenticate_user', array($this, 'verify_login_form'), 10, 2);
+            }
+            if ($this->areas['comment'] === '1') {
+                add_action('comment_form_after_fields', array($this, 'display'));
+                add_action('pre_comment_on_post', array($this, 'verify_comment_form'), 10, 1);
+            }
+            if ($this->areas['register'] === '1') {
+                add_action('register_form', array($this, 'display'));
+                add_filter('registration_errors', array($this, 'verify_register_form'), 10, 3);
+            }
             add_action('lostpassword_form', array($this, 'display'));
             add_action('lostpassword_post', array($this, 'lostpassword_post'));
 
-            // Panggil fungsi untuk menambahkan reCaptcha ke kolom register
-            add_action('register_form', array($this, 'display'));
-            add_action('signup_extra_fields', array($this, 'display'));
-            add_filter('registration_errors', array($this, 'verify_register_form'), 10, 3);
+            add_filter('query_vars', array($this, 'add_query_vars'));
+            add_action('template_redirect', array($this, 'maybe_render_image'));
 
             if (class_exists('WPCF7')) {
                 add_action('wpcf7_init', array($this, 'wpcf7_form_captcha'));
             }
 
-            add_shortcode('sweet_recaptcha', array($this, 'display_login_form'));
+            add_shortcode('sweet_captcha', array($this, 'shortcode'));
+            add_shortcode('sweet_recaptcha', array($this, 'shortcode'));
         }
     }
 
-    public function wpcf7_form_captcha()
+    public function add_query_vars($vars)
     {
-        wpcf7_add_form_tag('recaptcha', array($this, 'wpcf7_display_captcha'));
-    }
-    public function wpcf7_display_captcha()
-    {
-        ob_start();
-        echo $this->display();
-        return ob_get_clean();
+        $vars[] = 'sweetaddons_captcha';
+        $vars[] = 'token';
+        return $vars;
     }
 
-    public function isActive()
+    public function maybe_render_image()
     {
-        return $this->active;
+        $qv = get_query_var('sweetaddons_captcha');
+        $token = get_query_var('token');
+        if ($qv === 'image' && $token) {
+            $code = get_transient('sweetaddons_captcha_' . $token);
+            if (!$code) {
+                status_header(410);
+                exit;
+            }
+            $this->render_image($code);
+            exit;
+        }
+    }
+
+    private function render_image($code)
+    {
+        $w = 160;
+        $h = 50;
+        $img = imagecreatetruecolor($w, $h);
+        $bg = imagecolorallocate($img, 245, 246, 250);
+        $fg = imagecolorallocate($img, 30, 30, 30);
+        $noise1 = imagecolorallocate($img, 200, 200, 200);
+        $noise2 = imagecolorallocate($img, 180, 180, 180);
+        imagefilledrectangle($img, 0, 0, $w, $h, $bg);
+        for ($i = 0; $i < 25; $i++) {
+            imageline($img, mt_rand(0, $w), mt_rand(0, $h), mt_rand(0, $w), mt_rand(0, $h), $noise1);
+        }
+        for ($i = 0; $i < 100; $i++) {
+            imagesetpixel($img, mt_rand(0, $w), mt_rand(0, $h), $noise2);
+        }
+        $x = 15;
+        for ($i = 0; $i < strlen($code); $i++) {
+            $y = mt_rand(20, 35);
+            imagestring($img, mt_rand(3, 5), $x, $y - 15, $code[$i], $fg);
+            $x += mt_rand(20, 28);
+        }
+        header('Content-Type: image/png');
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        imagepng($img);
+        imagedestroy($img);
+    }
+
+    private function generate_code($len = 5)
+    {
+        $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $code = '';
+        for ($i = 0; $i < $len; $i++) {
+            $code .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+        return $code;
+    }
+
+    private function make_block()
+    {
+        $token = wp_generate_password(16, false, false);
+        $code = $this->generate_code();
+        set_transient('sweetaddons_captcha_' . $token, $code, 15 * MINUTE_IN_SECONDS);
+        $src = add_query_arg(array('sweetaddons_captcha' => 'image', 'token' => $token, 'v' => time()), home_url('/'));
+        $html = '<div class="sweetaddons-captcha" style="margin:10px 0; display:flex; align-items:center; gap:10px;">';
+        $html .= '<img src="' . esc_url($src) . '" alt="Captcha" style="border:1px solid #ddd; height:50px; width:160px; background:#f5f6fa;" />';
+        $html .= '<input type="text" name="sweetaddons_captcha_input" placeholder="Masukkan teks di gambar" required style="padding:6px 8px; width:180px;" />';
+        $html .= '<input type="hidden" name="sweetaddons_captcha_token" value="' . esc_attr($token) . '" />';
+        $html .= '</div>';
+        return $html;
     }
 
     public function display()
     {
-        if ($this->active) {
-            $node = 'rr' . uniqid();
-            echo '<div class="' . $node . '">';
-            echo '<div id="g' . $node . '" data-size="' . $this->size . '" style="transform: scale(0.9);transform-origin: 0 0;"></div>';
-?>
-            <script type="text/javascript">
-                function onloadCallback<?php echo $node; ?>() {
-                    grecaptcha.render('g<?php echo $node; ?>', {
-                        'sitekey': '<?php echo $this->sitekey; ?>',
-                        'callback': callback<?php echo $node; ?>,
-                        'expired-callback': expired<?php echo $node; ?>
-                    });
-                };
-
-                function callback<?php echo $node; ?>() {
-                    (function($) {
-                        var form = $('.<?php echo $node; ?>').parent().closest('form');
-                        form.find('input[type="submit"]').attr('disabled', false);
-                        form.find('button[type="submit"]').attr('disabled', false);
-                    })(jQuery);
-                };
-                (function($) {
-                    $(document).ready(function() {
-                        var form = $('.<?php echo $node; ?>').parent().closest('form');
-                        form.find('input[type="submit"]').attr('disabled', 'disabled');
-                        form.find('button[type="submit"]').attr('disabled', 'disabled');
-                    });
-                })(jQuery);
-
-                function expired<?php echo $node; ?>() {
-                    alert('Captcha Kadaluarsa, silahkan refresh halaman');
-                };
-            </script>
-<?php
-            echo '<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback' . $node . '&render=explicit" async defer></script>';
-            echo '</div>';
-        }
+        echo $this->make_block();
     }
 
-    public function verify($gresponse = null)
+    public function shortcode()
     {
+        return $this->make_block();
+    }
 
-        if ($this->active) {
-
-            $gresponse = $gresponse ? $gresponse : '0';
-            if (empty($gresponse) && isset($_POST['g-recaptcha-response'])) {
-                $gresponse = $_POST['g-recaptcha-response'];
-            }
-
-            $result = [
-                'success' => false,
-                'message' => 'Harap validasi captcha yang ada',
-            ];
-
-            if ($gresponse) {
-                $response = wp_remote_get('https://www.google.com/recaptcha/api/siteverify?secret=' . $this->secretkey . '&response=' . $gresponse);
-                $response = json_decode($response['body'], true);
-
-                if (true == $response['success']) {
-                    $result = [
-                        'success' => true,
-                        'message' => 'Validasi captcha berhasil',
-                    ];
-                } else {
-                    $result = [
-                        'success' => false,
-                        'message' => 'Captcha salah',
-                    ];
-                }
-            }
-        } else {
-
-            $result = [
-                'success' => true,
-                'message' => 'Validasi captcha tidak aktif',
-            ];
+    private function verify_pair()
+    {
+        $token = isset($_POST['sweetaddons_captcha_token']) ? sanitize_text_field($_POST['sweetaddons_captcha_token']) : '';
+        $input = isset($_POST['sweetaddons_captcha_input']) ? sanitize_text_field($_POST['sweetaddons_captcha_input']) : '';
+        if (!$token || !$input) {
+            return array('success' => false, 'message' => 'Harap masukkan teks pada gambar');
         }
-
-        return $result;
+        $code = get_transient('sweetaddons_captcha_' . $token);
+        if (!$code) {
+            return array('success' => false, 'message' => 'Captcha kadaluarsa, muat ulang halaman');
+        }
+        delete_transient('sweetaddons_captcha_' . $token);
+        if (strcasecmp($code, $input) === 0) {
+            return array('success' => true, 'message' => 'Captcha valid');
+        }
+        return array('success' => false, 'message' => 'Captcha salah');
     }
 
     public function verify_login_form($user, $password)
     {
-
-        // Periksa apakah reCaptcha valid saat proses login
-        $respon = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '0';
-        $verify = $this->verify($respon);
-
-        if (!$verify['success']) {
-            // Jika reCaptcha tidak valid, hentikan proses login
-            remove_action('authenticate', 'wp_authenticate_username_password', 20);
-            // wp_die('reCaptcha verification failed. Please try again.');
-            return new WP_Error('Captcha Invalid', __($verify['message']));
-        } else {
-            return $user;
+        $v = $this->verify_pair();
+        if (!$v['success']) {
+            return new WP_Error('captcha_invalid', __($v['message']));
         }
+        return $user;
     }
 
     public function verify_comment_form($comment_data)
     {
-        // Periksa apakah reCaptcha valid saat proses submit komentar
-        $verify = $this->verify($_POST['g-recaptcha-response']);
-
-        if (!$verify['success']) {
-            // Jika reCaptcha tidak valid, hentikan proses submit komentar
-            wp_die($verify['message']);
+        $v = $this->verify_pair();
+        if (!$v['success']) {
+            wp_die($v['message']);
         }
-
         return $comment_data;
     }
 
     public function lostpassword_post()
     {
-
-        //jika user belum login
         if (!is_user_logged_in()) {
-            // Periksa apakah reCaptcha valid saat proses submit lostpassword
-            $verify = $this->verify($_POST['g-recaptcha-response']);
-
-            if (!$verify['success']) {
-                // Jika reCaptcha tidak valid, hentikan proses submit
-                wp_die($verify['message']);
+            $v = $this->verify_pair();
+            if (!$v['success']) {
+                wp_die($v['message']);
             }
         }
     }
 
     public function verify_register_form($errors, $sanitized_user_login, $user_email)
     {
-
-        if (isset($_POST['register']) && !empty($_POST['g-recaptcha-response'])) {
-            $verify = $this->verify($_POST['g-recaptcha-response']);
-            if (!$verify['success']) {
-                $errors->add('recaptcha_error', __($verify['message']));
-            }
+        $v = $this->verify_pair();
+        if (!$v['success']) {
+            $errors->add('captcha_error', __($v['message']));
         }
-
         return $errors;
     }
 
-    public function display_login_form()
+    public function wpcf7_form_captcha()
     {
-        if ($this->active) {
-            $html = '<div>';
-            $html .= '<div class="g-recaptcha" data-sitekey="' . $this->sitekey . '"></div>';
-            $html .= '<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
-            $html .= '</div>';
+        wpcf7_add_form_tag('sweetcaptcha', array($this, 'wpcf7_display_captcha'));
+        wpcf7_add_form_tag('recaptcha', array($this, 'wpcf7_display_captcha'));
+    }
 
-            return $html;
-        } else {
-            return '';
-        }
+    public function wpcf7_display_captcha()
+    {
+        return $this->make_block();
     }
 }
-
 $captcha_handler = new Sweetaddons_Captcha();
