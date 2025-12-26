@@ -4,9 +4,14 @@ const path = require("path");
 const glob = require("glob");
 const packageJson = require("../package.json");
 
+// Read sweetaddons.php to get the version
+const phpFilePath = path.join(__dirname, "../sweetaddons.php");
+const phpContent = fs.readFileSync(phpFilePath, "utf8");
+const versionMatch = phpContent.match(/Version:\s+([0-9.]+)/);
+
 // Nama folder dan file zip yang akan dibuat
 const pluginName = packageJson.name;
-const pluginVersion = packageJson.version;
+const pluginVersion = versionMatch ? versionMatch[1] : packageJson.version;
 const outputFolder = path.join(__dirname, "../dist");
 const tempFolder = path.join(outputFolder, pluginName);
 const outputFileName = `${pluginName}-${pluginVersion}.zip`;

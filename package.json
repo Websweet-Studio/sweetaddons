@@ -1,6 +1,6 @@
 {
   "name": "sweetaddons",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Addon plugin for WebsweetStudio Client",
   "main": "index.js",
   "scripts": {
