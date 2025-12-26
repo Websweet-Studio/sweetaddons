@@ -41,9 +41,12 @@ class Custom_Admin_Option_Page
 
     public function add_options_page()
     {
+        $plugin_name = class_exists('Sweetaddons_WhiteLabel') ? Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name') : 'Sweet Addons';
+        $menu_title = class_exists('Sweetaddons_WhiteLabel') ? Sweetaddons_WhiteLabel::get_white_labeled_info('menu_title') : 'Sweet Addons';
+
         add_menu_page(
-            'Sweet Addons',       // Judul halaman
-            'Sweet Addons',       // Judul menu
+            $plugin_name,       // Judul halaman
+            $menu_title,       // Judul menu
             'manage_options',           // Hak akses yang dibutuhkan
             'custom_admin_options',     // Slug menu
             array($this, 'options_page_callback'), // Callback untuk halaman pengaturan
@@ -346,7 +349,7 @@ class Custom_Admin_Option_Page
     {
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
-            <h1 class="sad-title">Dashboard Sweet Addons</h1>
+            <h1 class="sad-title">Dashboard <?php echo class_exists('Sweetaddons_WhiteLabel') ? esc_html(Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name')) : 'Sweet Addons'; ?></h1>
             <div class="sad-top">
                 <?php
                 global $wpdb;
@@ -700,7 +703,7 @@ class Custom_Admin_Option_Page
 
             <!-- Sweet Addons Status -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">⚙️ Sweet Addons Status</h3>
+                <h3 style="margin-top: 0; color: #23282d;">⚙️ <?php echo class_exists('Sweetaddons_WhiteLabel') ? esc_html(Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name')) : 'Sweet Addons'; ?> Status</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Disable Comments:</strong></td>
