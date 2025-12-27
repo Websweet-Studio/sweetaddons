@@ -169,7 +169,7 @@ class Sweetaddons_WhiteLabel
         $white_label_data = array(
             'plugin_name' => get_option('sweetaddons_whitelabel_plugin_name', 'Sweet Addons'),
             'plugin_uri' => get_option('sweetaddons_whitelabel_plugin_uri', 'https://websweetstudio.com'),
-            'description' => get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client'),
+            'description' => get_option('sweetaddons_whitelabel_description', 'Plugin pendukung tema.'),
             'author' => get_option('sweetaddons_whitelabel_author', 'WebsweetStudio'),
             'author_uri' => get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com'),
             'version' => get_option('sweetaddons_whitelabel_version', '2.2.2'),
