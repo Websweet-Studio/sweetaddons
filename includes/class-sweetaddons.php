@@ -237,6 +237,15 @@ class sweetaddons
     }
 
     /**
+     * Load REST API controllers and other new architecture components
+     */
+    private function load_rest_controllers()
+    {
+        require_once plugin_dir_path(dirname(__FILE__)) . 'src/Api/SEO_Controller.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'src/Api/Spam_Controller.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'src/Api/Umum_Controller.php';
+    }
+    /**
      * Define the locale for this plugin for internationalization.
      *
      * Uses the Sweetaddons_i18n class in order to set the domain and to register the hook
@@ -289,6 +298,11 @@ class sweetaddons
 
         // Initialize SEO functionality
         new Sweetaddons_SEO();
+        // Initialize REST API controllers
+        $this->load_rest_controllers();
+        new Sweetaddons_SEO_Controller();
+        new Sweetaddons_Spam_Controller();
+        new Sweetaddons_Umum_Controller();
 
         // Initialize White Label functionality (only in admin)
         if (is_admin()) {

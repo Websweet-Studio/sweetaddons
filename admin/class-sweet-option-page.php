@@ -36,6 +36,7 @@ class Custom_Admin_Option_Page
             wp_enqueue_media();
             wp_enqueue_script('jquery');
             wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
+            wp_enqueue_script('alpinejs', 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), null);
         }
     }
 

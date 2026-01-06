@@ -1,7 +1,7 @@
 <div class="wrap vd-ons sweetaddons-dashboard">
     <h1 class="sad-title">🔍 Pengaturan SEO</h1>
 
-    <form method="post" action="" class="sad-form">
+    <form method="post" action="" class="sad-form" x-data="seoForm" @submit.prevent="save">
         <?php wp_nonce_field('sweetaddons_seo_settings'); ?>
 
         <div class="sad-top">
@@ -192,6 +192,50 @@
 </div>
 
 <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('seoForm', () => ({
+            saving: false,
+            nonce: '<?php echo wp_create_nonce('wp_rest'); ?>',
+            async save() {
+                this.saving = true;
+                try {
+                    const payload = {
+                        sweetaddons_seo_home_title: document.getElementById('sweetaddons_seo_home_title').value,
+                        sweetaddons_seo_home_description: document.getElementById('sweetaddons_seo_home_description').value,
+                        sweetaddons_seo_default_og_image: document.getElementById('sweetaddons_seo_default_og_image').value,
+                        sweetaddons_seo_twitter_site: document.getElementById('sweetaddons_seo_twitter_site').value,
+                        sweetaddons_seo_google_search_console: document.getElementById('sweetaddons_seo_google_search_console').value,
+                        sweetaddons_seo_template_single_title: document.getElementById('sweetaddons_seo_template_single_title').value,
+                        sweetaddons_seo_template_single_description: document.getElementById('sweetaddons_seo_template_single_description').value,
+                        sweetaddons_seo_template_page_title: document.getElementById('sweetaddons_seo_template_page_title').value,
+                        sweetaddons_seo_template_page_description: document.getElementById('sweetaddons_seo_template_page_description').value,
+                        sweetaddons_seo_template_category_title: document.getElementById('sweetaddons_seo_template_category_title').value,
+                        sweetaddons_seo_template_category_description: document.getElementById('sweetaddons_seo_template_category_description').value,
+                        sweetaddons_seo_template_tag_title: document.getElementById('sweetaddons_seo_template_tag_title').value,
+                        sweetaddons_seo_template_tag_description: document.getElementById('sweetaddons_seo_template_tag_description').value,
+                        sweetaddons_seo_enable_sitemap: document.querySelector('input[name="sweetaddons_seo_enable_sitemap"]').checked ? '1' : '0'
+                    };
+                    const res = await fetch('<?php echo esc_url_raw(get_rest_url(null, '/sweetaddons/v1/seo/options')); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': this.nonce
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        throw new Error(errText || 'Gagal menyimpan pengaturan.');
+                    }
+                    alert('✅ Pengaturan SEO berhasil disimpan via REST API!');
+                } catch (e) {
+                    alert('❌ ' + e.message);
+                } finally {
+                    this.saving = false;
+                }
+            }
+        }));
+    });
     jQuery(document).ready(function($) {
         // Character counters
         function updateCounter(input, counter, recommended) {

@@ -3,9 +3,7 @@
     <div class="sad-grid">
         <div class="sad-card">
             <div class="sad-card-title">Pengaturan Utama</div>
-            <form method="post" action="options.php" class="sad-form">
-                <?php settings_fields('custom_admin_options_group'); ?>
-                <?php do_settings_sections('custom_admin_options_group'); ?>
+            <form method="post" action="" class="sad-form" x-data="spamForm" @submit.prevent="save">
                 <table class="form-table">
                     <?php
                     foreach ($spam_fields as $data) :
@@ -52,3 +50,39 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('spamForm', () => ({
+            saving: false,
+            nonce: '<?php echo wp_create_nonce('wp_rest'); ?>',
+            async save() {
+                this.saving = true;
+                try {
+                    const payload = {
+                        limit_login_attempts: document.getElementById('limit_login_attempts').checked ? '1' : '0',
+                        disable_xmlrpc: document.getElementById('disable_xmlrpc').checked ? '1' : '0',
+                        disable_rest_api: document.getElementById('disable_rest_api').checked ? '1' : '0'
+                    };
+                    const res = await fetch('<?php echo esc_url_raw(get_rest_url(null, '/sweetaddons/v1/spam/options')); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': this.nonce
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        throw new Error(errText || 'Gagal menyimpan pengaturan.');
+                    }
+                    alert('✅ Pengaturan Proteksi Spam berhasil disimpan via REST API!');
+                } catch (e) {
+                    alert('❌ ' + e.message);
+                } finally {
+                    this.saving = false;
+                }
+            }
+        }));
+    });
+</script>
