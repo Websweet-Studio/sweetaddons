@@ -1,7 +1,208 @@
-/**
- * All of the CSS for your admin-specific functionality should be
- * included in this file.
-*/
+:root {
+  --sad-primary: #2563eb; /* blue-600 */
+  --sad-primary-hover: #1d4ed8; /* blue-700 */
+  --sad-bg: #f3f4f6; /* gray-100 */
+  --sad-card-bg: #ffffff;
+  --sad-text-main: #111827; /* gray-900 */
+  --sad-text-muted: #6b7280; /* gray-500 */
+  --sad-border: #e5e7eb; /* gray-200 */
+  --sad-success: #10b981; /* emerald-500 */
+  --sad-success-bg: #ecfdf5; /* emerald-50 */
+  --sad-danger: #ef4444; /* red-500 */
+  --sad-danger-bg: #fef2f2; /* red-50 */
+}
+
+.sweetaddons-dashboard {
+  margin-top: 20px;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--sad-text-main);
+}
+
+.sad-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--sad-text-main);
+  margin-bottom: 24px;
+}
+
+.sad-top, .sad-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.sad-top {
+  grid-template-columns: 2fr 1fr;
+}
+
+.sad-top-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .sad-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sad-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-top: 24px;
+}
+
+.sad-card {
+  background: var(--sad-card-bg);
+  border: 1px solid var(--sad-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.sad-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sad-text-main);
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--sad-border);
+}
+
+/* Stats */
+.sad-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .sad-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sad-stat {
+  border-left: 4px solid var(--sad-success);
+  padding: 20px;
+}
+
+.sad-card-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--sad-text-main);
+  margin-bottom: 4px;
+}
+
+.sad-subtext {
+  font-size: 13px;
+  color: var(--sad-text-muted);
+}
+
+/* Tables */
+.sad-card table.widefat {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.sad-card table.widefat thead th {
+  background-color: var(--sad-bg);
+  color: var(--sad-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--sad-border);
+}
+
+.sad-card table.widefat tbody td {
+  padding: 12px 16px;
+  color: var(--sad-text-main);
+  border-bottom: 1px solid var(--sad-border);
+  font-size: 14px;
+}
+
+.sad-card table.widefat tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Chips */
+.sad-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sad-chip {
+  background: var(--sad-bg);
+  color: var(--sad-text-main);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Actions */
+.sad-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sad-actions .button {
+  border-radius: 6px;
+  padding: 8px 16px;
+  height: auto;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.sad-actions .button-primary {
+  background-color: var(--sad-primary) !important;
+  border-color: var(--sad-primary) !important;
+  color: white !important;
+  text-shadow: none !important;
+}
+
+.sad-actions .button-primary:hover {
+  background-color: var(--sad-primary-hover) !important;
+  border-color: var(--sad-primary-hover) !important;
+  color: white !important;
+}
+
+.sad-actions .button-secondary {
+  background-color: white !important;
+  border-color: var(--sad-border) !important;
+  color: var(--sad-text-main) !important;
+}
+
+.sad-actions .button-secondary:hover {
+  background-color: var(--sad-bg) !important;
+  border-color: #d1d5db !important;
+  color: var(--sad-text-main) !important;
+}
+
+/* Hide WP Notices on Dashboard */
+body.toplevel_page_custom_admin_options .notice,
+body.toplevel_page_custom_admin_options .notice-warning,
+body.toplevel_page_custom_admin_options .notice-alt,
+body.toplevel_page_custom_admin_options .update-nag {
+  display: none !important;
+}
+
+.sad-card canvas {
+  width: 100% !important;
+  height: 300px !important;
+}
 
 .vdaddons-notice {
   background-color: #fff4bd;
@@ -11,131 +212,11 @@
   margin: 0.25rem 0;
 }
 
-.sweetaddons-dashboard {
-  margin-top: 10px;
-}
-.sad-title {
-  margin: 0 0 16px 0;
-}
-.sad-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-.sad-top {
-  display: grid;
-  grid-template-columns: 7fr 3fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-.sad-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 16px;
-}
-.sad-top-right .sad-card + .sad-card,
-.sad-top-left .sad-card + .sad-card {
-  margin-top: 16px;
-}
-.sad-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-.sad-card-title {
-  font-size: 18px;
+.sad-status-active {
+  color: var(--sad-success);
   font-weight: 600;
-  color: #2d3748;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e2e8f0;
-  margin-bottom: 15px;
-}
-.sad-card-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #065f46;
-  margin-bottom: 6px;
-}
-.sad-subtext {
-  font-size: 12px;
-  color: #6b7280;
-}
-.sad-stat {
-  border-left: 6px solid #10b981;
-}
-.sad-table {
-  display: grid;
-  gap: 8px;
-}
-.sad-table div {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  font-size: 13px;
-}
-.sad-table div span:first-child {
-  color: #6b7280;
-}
-.sad-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.sad-chip {
-  background: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-.sad-status {
-  display: grid;
-  gap: 8px;
-}
-.sad-status div {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-}
-.sad-actions-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.sad-actions .button-primary {
-  background: #10b981;
-  border-color: #10b981;
-}
-.sad-actions .button-primary:hover {
-  background: #059669;
-  border-color: #059669;
 }
 
-body.toplevel_page_custom_admin_options .notice,
-body.toplevel_page_custom_admin_options .notice-warning,
-body.toplevel_page_custom_admin_options .notice-alt,
-body.toplevel_page_custom_admin_options .update-nag {
-  display: none !important;
-}
-
-.sad-card canvas {
-  height: 220px !important;
-}
-
-@media (max-width: 1024px) {
-  .sad-top {
-    grid-template-columns: 1fr;
-  }
-}
-
-.sad-form .form-table th {
-  width: 40%;
-  vertical-align: top;
-}
-.sad-form .form-table td {
-  width: 60%;
+.sad-status-inactive {
+  color: var(--sad-text-muted);
 }

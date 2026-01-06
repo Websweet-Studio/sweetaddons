@@ -2,6 +2,7 @@
 class Sweetaddons_Captcha
 {
     private $active = false;
+    private $difficulty = 'medium';
     private $areas = array(
         'login' => '1',
         'comment' => '1',
