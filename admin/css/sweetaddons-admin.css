@@ -220,3 +220,33 @@ body.toplevel_page_custom_admin_options .update-nag {
 .sad-status-inactive {
   color: var(--sad-text-muted);
 }
+
+/* Badges */
+.sad-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.sad-badge-warning {
+  background-color: #fffbeb; /* yellow-50 */
+  color: #b45309; /* yellow-700 */
+}
+
+.sad-badge-danger {
+  background-color: var(--sad-danger-bg);
+  color: var(--sad-danger);
+}
+
+.sad-badge-info {
+  background-color: #eff6ff; /* blue-50 */
+  color: #1d4ed8; /* blue-700 */
+}
+
+.sad-badge-success {
+  background-color: var(--sad-success-bg);
+  color: var(--sad-success);
+}

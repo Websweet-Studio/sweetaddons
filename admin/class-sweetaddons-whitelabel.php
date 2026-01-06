@@ -7,7 +7,7 @@
  * @since      1.0.0
  *
  * @package    sweetaddons
- * @subpackage sweetaddons/includes
+ * @subpackage sweetaddons/admin
  */
 
 class Sweetaddons_WhiteLabel

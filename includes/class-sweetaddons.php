@@ -191,7 +191,7 @@ class sweetaddons
         /**
          * Berisi Class untuk White Label functionality
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-whitelabel.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweetaddons-whitelabel.php';
 
         /**
          * Berisi Class untuk WhatsApp functionality
