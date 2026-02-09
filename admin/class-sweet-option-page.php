@@ -196,6 +196,9 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_animation');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_bubble_style');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_tooltip');
+        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_link_type');
+        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_custom_url');
+        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_custom_image');
     }
 
     public function field($data)
@@ -2337,6 +2340,9 @@ class Custom_Admin_Option_Page
 
     public function whatsapp_page_callback()
     {
+        // Enqueue media uploader
+        wp_enqueue_media();
+
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
             $fields = array(
@@ -2353,7 +2359,10 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whatsapp_show_desktop',
                 'sweetaddons_whatsapp_animation',
                 'sweetaddons_whatsapp_bubble_style',
-                'sweetaddons_whatsapp_show_tooltip'
+                'sweetaddons_whatsapp_show_tooltip',
+                'sweetaddons_whatsapp_link_type',
+                'sweetaddons_whatsapp_custom_url',
+                'sweetaddons_whatsapp_custom_image'
             );
 
             foreach ($fields as $field) {
@@ -2385,6 +2394,9 @@ class Custom_Admin_Option_Page
         $animation = get_option('sweetaddons_whatsapp_animation', 'pulse');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
+        $link_type = get_option('sweetaddons_whatsapp_link_type', 'phone');
+        $custom_url = get_option('sweetaddons_whatsapp_custom_url', '');
+        $custom_image = get_option('sweetaddons_whatsapp_custom_image', '');
 
         // Summary calculations
         $is_active = ($enable === '1');
@@ -2415,6 +2427,20 @@ class Custom_Admin_Option_Page
                                     </td>
                                 </tr>
                                 <tr>
+                                    <th scope="row">Link Destination</th>
+                                    <td>
+                                        <label style="margin-right: 15px;">
+                                            <input type="radio" name="sweetaddons_whatsapp_link_type" value="phone" <?php checked($link_type, 'phone'); ?> class="sweetaddons-link-type-selector">
+                                            WhatsApp Number
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="sweetaddons_whatsapp_link_type" value="custom" <?php checked($link_type, 'custom'); ?> class="sweetaddons-link-type-selector">
+                                            Custom URL
+                                        </label>
+                                        <p class="description">Choose whether to link to a WhatsApp number or a custom URL.</p>
+                                    </td>
+                                </tr>
+                                <tr class="sweetaddons-phone-field">
                                     <th scope="row">
                                         <label for="sweetaddons_whatsapp_phone">WhatsApp Number</label>
                                     </th>
@@ -2423,13 +2449,22 @@ class Custom_Admin_Option_Page
                                         <p class="description">Your WhatsApp number with country code (e.g., +62812345678901).</p>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr class="sweetaddons-phone-field">
                                     <th scope="row">
                                         <label for="sweetaddons_whatsapp_message">Pesan Default</label>
                                     </th>
                                     <td>
                                         <textarea id="sweetaddons_whatsapp_message" name="sweetaddons_whatsapp_message" rows="3" class="large-text"><?php echo esc_textarea($message); ?></textarea>
                                         <p class="description">Default message that will be pre-filled when users click the chat button.</p>
+                                    </td>
+                                </tr>
+                                <tr class="sweetaddons-custom-url-field" style="display: none;">
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_custom_url">Custom URL</label>
+                                    </th>
+                                    <td>
+                                        <input type="url" id="sweetaddons_whatsapp_custom_url" name="sweetaddons_whatsapp_custom_url" value="<?php echo esc_url($custom_url); ?>" class="large-text" placeholder="https://example.com/contact" />
+                                        <p class="description">Enter the full URL where the button should link to.</p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -2462,6 +2497,22 @@ class Custom_Admin_Option_Page
                                             <option value="extended" <?php selected($bubble_style, 'extended'); ?>>Extended (Icon + Text)</option>
                                         </select>
                                         <p class="description">Choose between circle icon or extended button with text.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_custom_image">Custom Icon/Image</label>
+                                    </th>
+                                    <td>
+                                        <div class="sweetaddons-image-upload-wrapper">
+                                            <input type="hidden" id="sweetaddons_whatsapp_custom_image" name="sweetaddons_whatsapp_custom_image" value="<?php echo esc_attr($custom_image); ?>">
+                                            <div id="sweetaddons-whatsapp-image-preview" style="margin-bottom: 10px; <?php echo empty($custom_image) ? 'display:none;' : ''; ?>">
+                                                <img src="<?php echo esc_url($custom_image); ?>">
+                                            </div>
+                                            <button type="button" class="button" id="sweetaddons-whatsapp-upload-btn">Select Image</button>
+                                            <button type="button" class="button" id="sweetaddons-whatsapp-remove-btn" style="<?php echo empty($custom_image) ? 'display:none;' : ''; ?>">Remove</button>
+                                        </div>
+                                        <p class="description">Upload a custom image/icon to replace the default WhatsApp SVG icon. Best size: 60x60px.</p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -2644,6 +2695,53 @@ class Custom_Admin_Option_Page
 
         <script>
             jQuery(document).ready(function($) {
+                // Media Uploader
+                var frame;
+                $('#sweetaddons-whatsapp-upload-btn').on('click', function(e) {
+                    e.preventDefault();
+                    if (frame) {
+                        frame.open();
+                        return;
+                    }
+                    frame = wp.media({
+                        title: 'Select Custom Image/Icon',
+                        button: {
+                            text: 'Use this image'
+                        },
+                        multiple: false
+                    });
+                    frame.on('select', function() {
+                        var attachment = frame.state().get('selection').first().toJSON();
+                        $('#sweetaddons_whatsapp_custom_image').val(attachment.url);
+                        $('#sweetaddons-whatsapp-image-preview img').attr('src', attachment.url);
+                        $('#sweetaddons-whatsapp-image-preview').show();
+                        $('#sweetaddons-whatsapp-remove-btn').show();
+                        updateWhatsAppPreview();
+                    });
+                    frame.open();
+                });
+
+                $('#sweetaddons-whatsapp-remove-btn').on('click', function() {
+                    $('#sweetaddons_whatsapp_custom_image').val('');
+                    $('#sweetaddons-whatsapp-image-preview').hide();
+                    $(this).hide();
+                    updateWhatsAppPreview();
+                });
+
+                // Toggle Link Type fields
+                function toggleLinkFields() {
+                    var linkType = $('input[name="sweetaddons_whatsapp_link_type"]:checked').val();
+                    if (linkType === 'custom') {
+                        $('.sweetaddons-phone-field').hide();
+                        $('.sweetaddons-custom-url-field').show();
+                    } else {
+                        $('.sweetaddons-phone-field').show();
+                        $('.sweetaddons-custom-url-field').hide();
+                    }
+                }
+                $('.sweetaddons-link-type-selector').on('change', toggleLinkFields);
+                toggleLinkFields(); // Init
+
                 // Color picker sync
                 $('#sweetaddons_whatsapp_color').on('change', function() {
                     $(this).next('input[type="text"]').val($(this).val());
@@ -2653,7 +2751,9 @@ class Custom_Admin_Option_Page
                 // Real-time preview update function
                 function updateWhatsAppPreview() {
                     const enable = $('#sweetaddons_whatsapp_enable').is(':checked');
+                    const linkType = $('input[name="sweetaddons_whatsapp_link_type"]:checked').val();
                     const phone = $('#sweetaddons_whatsapp_phone').val().trim();
+                    const customUrl = $('#sweetaddons_whatsapp_custom_url').val().trim();
                     const button_text = $('#sweetaddons_whatsapp_button_text').val().trim() || 'Chat dengan kami';
                     const position = $('#sweetaddons_whatsapp_position').val();
                     const color = $('#sweetaddons_whatsapp_color').val();
@@ -2661,15 +2761,25 @@ class Custom_Admin_Option_Page
                     const offset_x = $('#sweetaddons_whatsapp_offset_x').val() || '20';
                     const offset_y = $('#sweetaddons_whatsapp_offset_y').val() || '20';
                     const bubble_style = $('#sweetaddons_whatsapp_bubble_style').val();
+                    const customImage = $('#sweetaddons_whatsapp_custom_image').val();
 
                     const $container = $('#whatsapp-preview-container');
                     const $placeholder = $('#whatsapp-preview-placeholder');
                     const $bubble = $('#whatsapp-preview-bubble');
                     const $inner = $('#whatsapp-preview-inner');
                     const $text = $('#whatsapp-preview-text');
+                    const $icon = $bubble.find('.sweetaddons-wa-icon');
+
+                    // Check if configured
+                    let configured = false;
+                    if (linkType === 'custom') {
+                        configured = !!customUrl;
+                    } else {
+                        configured = !!phone;
+                    }
 
                     // Show/hide preview
-                    if (enable && phone) {
+                    if (enable && configured) {
                         $container.show();
                         $placeholder.hide();
 
@@ -2697,16 +2807,62 @@ class Custom_Admin_Option_Page
                         }
                         $bubble.attr('style', 'position: absolute; ' + positionStyle);
 
+                        // Update Icon/Image
+                        if (customImage) {
+                            // Replace SVG with Image
+                            $icon.html(`<img src="${customImage}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`);
+                            // Remove SVG specific styles if any, or adjust
+                        } else {
+                            // Restore SVG
+                            $icon.html(`<svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="#ffffff"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-8.683-2.031-9.676-.272-.994-.47-.149-.646-.149-.174 0-.372 0-.57.025-.198.025-.52.099-.792.397-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>`);
+                        }
+
                         // Update bubble style and content
                         let innerStyle = '';
                         if (bubble_style === 'extended') {
                             innerStyle = `display: flex; align-items: center; padding: 12px 20px; background: ${color}; border-radius: 25px; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
                             $text.show().text(button_text);
-                            $bubble.find('svg').css('margin-right', '8px');
+                            $bubble.find('.sweetaddons-wa-icon').css('margin-right', '8px');
+                            if (customImage) {
+                                $bubble.find('.sweetaddons-wa-icon').css({
+                                    width: '24px',
+                                    height: '24px'
+                                });
+                            } else {
+                                $bubble.find('.sweetaddons-wa-icon').css({
+                                    width: 'auto',
+                                    height: 'auto'
+                                });
+                                $bubble.find('svg').css({
+                                    width: '24px',
+                                    height: '24px'
+                                });
+                            }
+
                         } else {
                             innerStyle = `width: ${size}px; height: ${size}px; display: flex; align-items: center; justify-content: center; background: ${color}; border-radius: 50%; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
                             $text.hide();
-                            $bubble.find('svg').css('margin-right', '0');
+                            $bubble.find('.sweetaddons-wa-icon').css('margin-right', '0');
+
+                            if (customImage) {
+                                // Full size image for circle mode
+                                $bubble.find('.sweetaddons-wa-icon').css({
+                                    width: '100%',
+                                    height: '100%',
+                                    padding: '0',
+                                    overflow: 'hidden',
+                                    borderRadius: '50%'
+                                });
+                            } else {
+                                $bubble.find('.sweetaddons-wa-icon').css({
+                                    width: 'auto',
+                                    height: 'auto'
+                                });
+                                $bubble.find('svg').css({
+                                    width: '35px',
+                                    height: '35px'
+                                });
+                            }
                         }
                         $inner.attr('style', innerStyle);
 
@@ -2718,7 +2874,9 @@ class Custom_Admin_Option_Page
 
                 // Event listeners for all WhatsApp fields
                 $('#sweetaddons_whatsapp_enable').on('change', updateWhatsAppPreview);
+                $('input[name="sweetaddons_whatsapp_link_type"]').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_phone').on('input', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_custom_url').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_button_text').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
