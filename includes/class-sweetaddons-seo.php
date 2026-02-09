@@ -18,25 +18,13 @@ class Sweetaddons_SEO
         add_action('wp_head', array($this, 'output_og_tags'), 2);
         add_action('add_meta_boxes', array($this, 'add_seo_meta_boxes'));
         add_action('save_post', array($this, 'save_seo_meta_data'));
-        // add_action('init', array($this, 'handle_sitemap_request')); // Removed: incorrect hook usage
+        add_action('init', array($this, 'handle_sitemap_request'));
         add_action('init', array($this, 'register_sitemap_rewrite'));
         add_filter('query_vars', array($this, 'add_query_vars'));
         add_action('template_redirect', array($this, 'template_redirect_sitemap'));
         add_filter('wp_title', array($this, 'custom_title'), 10, 2);
         add_filter('document_title_parts', array($this, 'custom_document_title_parts'));
-        add_filter('redirect_canonical', array($this, 'disable_trailing_slash_redirect'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
-        
-        // Disable WP Core sitemap if enabled
-        add_filter('wp_sitemaps_enabled', array($this, 'disable_wp_sitemaps'));
-    }
-
-    public function disable_wp_sitemaps($enabled)
-    {
-        if (get_option('sweetaddons_seo_enable_sitemap', '1') === '1') {
-            return false;
-        }
-        return $enabled;
     }
 
     public function output_meta_tags()
@@ -822,14 +810,6 @@ class Sweetaddons_SEO
         $this->clear_sitemap_caches();
     }
 
-    public function disable_trailing_slash_redirect($redirect_url)
-    {
-        if (get_query_var('sweetaddons_sitemap')) {
-            return false;
-        }
-        return $redirect_url;
-    }
-
     public function custom_title($title, $sep)
     {
         if (is_feed()) {
@@ -866,7 +846,6 @@ class Sweetaddons_SEO
         $last_modified = $this->get_latest_modified_timestamp();
         $xml = '';
         $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<?xml-stylesheet type="text/xsl" href="' . home_url('/sitemap.xsl') . '"?>' . "\n";
         $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         $per_page = 2000;
         $totals = array(
@@ -925,7 +904,6 @@ class Sweetaddons_SEO
         $last_modified = $this->get_latest_modified_timestamp();
         $xml = '';
         $xml .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $xml .= '<?xml-stylesheet type="text/xsl" href="' . home_url('/sitemap.xsl') . '"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
         $per_page = 2000;
@@ -988,138 +966,6 @@ class Sweetaddons_SEO
         echo $xml;
     }
 
-    private function generate_xsl_stylesheet()
-    {
-        header('Content-Type: text/xml; charset=utf-8');
-        header('Cache-Control: public, max-age=43200');
-        
-        echo '<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" 
-                xmlns:html="http://www.w3.org/TR/REC-html40"
-                xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
-    <xsl:template match="/">
-        <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-                <title>XML Sitemap</title>
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-                <style type="text/css">
-                    body {
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-                        color: #333;
-                        max-width: 75rem;
-                        margin: 0 auto;
-                        padding: 2rem;
-                    }
-                    a {
-                        color: #0073aa;
-                        text-decoration: none;
-                    }
-                    a:hover {
-                        text-decoration: underline;
-                    }
-                    table {
-                        border: none;
-                        border-collapse: collapse;
-                        width: 100%;
-                    }
-                    th {
-                        text-align: left;
-                        padding: 1rem .5rem;
-                        border-bottom: 1px solid #ccc;
-                    }
-                    td {
-                        padding: 1rem .5rem;
-                        border-bottom: 1px solid #eee;
-                        font-size: 14px;
-                    }
-                    .header {
-                        padding-bottom: 1.5rem;
-                        border-bottom: 1px solid #ccc;
-                        margin-bottom: 1.5rem;
-                    }
-                    h1 {
-                        margin: 0;
-                        font-size: 24px;
-                        font-weight: normal;
-                    }
-                    .desc {
-                        color: #666;
-                        margin-top: 5px;
-                        font-size: 14px;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>XML Sitemap</h1>
-                    <p class="desc">
-                        This is an XML Sitemap generated by Sweet Addons to make your content more visible for search engines.
-                    </p>
-                </div>
-                <div id="content">
-                    <xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &gt; 0">
-                        <p class="desc">This XML Sitemap Index file contains <xsl:value-of select="count(sitemap:sitemapindex/sitemap:sitemap)"/> sitemaps.</p>
-                        <table cellpadding="5">
-                            <thead>
-                            <tr style="border-bottom:1px black solid;">
-                                <th width="75%">Sitemap</th>
-                                <th width="25%">Last Modified</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">
-                                <tr>
-                                    <td>
-                                        <a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a>
-                                    </td>
-                                    <td>
-                                        <xsl:value-of select="concat(substring(sitemap:lastmod,0,11),concat(\' \', substring(sitemap:lastmod,12,5)))"/>
-                                    </td>
-                                </tr>
-                            </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:if>
-                    
-                    <xsl:if test="count(sitemap:urlset/sitemap:url) &gt; 0">
-                        <table cellpadding="5">
-                            <thead>
-                            <tr style="border-bottom:1px black solid;">
-                                <th width="60%">URL</th>
-                                <th width="15%">Priority</th>
-                                <th width="15%">Change Frequency</th>
-                                <th width="25%">Last Modified</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <xsl:for-each select="sitemap:urlset/sitemap:url">
-                                <tr>
-                                    <td>
-                                        <a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a>
-                                    </td>
-                                    <td>
-                                        <xsl:value-of select="concat(sitemap:priority*100,\'%\')"/>
-                                    </td>
-                                    <td>
-                                        <xsl:value-of select="sitemap:changefreq"/>
-                                    </td>
-                                    <td>
-                                        <xsl:value-of select="concat(substring(sitemap:lastmod,0,11),concat(\' \', substring(sitemap:lastmod,12,5)))"/>
-                                    </td>
-                                </tr>
-                            </xsl:for-each>
-                            </tbody>
-                        </table>
-                    </xsl:if>
-                </div>
-            </body>
-        </html>
-    </xsl:template>
-</xsl:stylesheet>';
-    }
-
     private function get_latest_modified_timestamp()
     {
         $q = new WP_Query(array(
@@ -1155,10 +1001,7 @@ class Sweetaddons_SEO
 
     public function register_sitemap_rewrite()
     {
-        // Note: We handle wp-sitemap.xml redirect manually in template_redirect to avoid rewrite rule overhead/conflicts
-
         add_rewrite_rule('^sitemap\.xml/?$', 'index.php?sweetaddons_sitemap=index', 'top');
-        add_rewrite_rule('^sitemap\.xsl/?$', 'index.php?sweetaddons_sitemap=xsl', 'top');
         add_rewrite_rule('^sitemap-posts\.xml/?$', 'index.php?sweetaddons_sitemap=posts', 'top');
         add_rewrite_rule('^sitemap-pages\.xml/?$', 'index.php?sweetaddons_sitemap=pages', 'top');
         add_rewrite_rule('^sitemap-categories\.xml/?$', 'index.php?sweetaddons_sitemap=categories', 'top');
@@ -1167,14 +1010,11 @@ class Sweetaddons_SEO
         add_rewrite_rule('^sitemap-pages-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=pages&sweetaddons_sitemap_page=$matches[1]', 'top');
         add_rewrite_rule('^sitemap-categories-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=categories&sweetaddons_sitemap_page=$matches[1]', 'top');
         add_rewrite_rule('^sitemap-tags-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=tags&sweetaddons_sitemap_page=$matches[1]', 'top');
-        
         $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
         $initialized = get_option('sweetaddons_sitemap_rules_initialized');
-        
-        // Bump version to 4 to ensure clean flush of old problematic rules
-        if ($enabled === '1' && $initialized != '4') {
+        if ($enabled === '1' && $initialized !== '2') {
             flush_rewrite_rules();
-            update_option('sweetaddons_sitemap_rules_initialized', '4');
+            update_option('sweetaddons_sitemap_rules_initialized', 2);
         }
     }
 
@@ -1182,7 +1022,6 @@ class Sweetaddons_SEO
     {
         $vars[] = 'sweetaddons_sitemap';
         $vars[] = 'sweetaddons_sitemap_page';
-        $vars[] = 'sweetaddons_sitemap_redirect';
         return $vars;
     }
 
@@ -1192,26 +1031,7 @@ class Sweetaddons_SEO
         if ($enabled !== '1') {
             return;
         }
-
-        // Redirect wp-sitemap.xml (Manual check)
-        // Check for direct access to wp-sitemap.xml in URL
-        $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-        if (strpos($request_uri, '/wp-sitemap.xml') !== false) {
-             wp_redirect(home_url('/sitemap.xml'), 301);
-             exit;
-        }
-
-        // Redirect wp-sitemap.xml (Fallback for query var if cached)
-        if (get_query_var('sweetaddons_sitemap_redirect')) {
-            wp_redirect(home_url('/sitemap.xml'), 301);
-            exit;
-        }
-
         $qv = get_query_var('sweetaddons_sitemap');
-        if ($qv === 'xsl') {
-            $this->generate_xsl_stylesheet();
-            exit;
-        }
         if ($qv === 'index') {
             $cache = get_transient($this->get_sitemap_cache_key('index'));
             if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {

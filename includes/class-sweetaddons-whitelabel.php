@@ -167,13 +167,13 @@ class Sweetaddons_WhiteLabel
     public static function get_white_labeled_info($key = null)
     {
         $white_label_data = array(
-            'plugin_name' => get_option('sweetaddons_whitelabel_plugin_name', 'Addons'),
+            'plugin_name' => get_option('sweetaddons_whitelabel_plugin_name', 'Sweet Addons'),
             'plugin_uri' => get_option('sweetaddons_whitelabel_plugin_uri', 'https://websweetstudio.com'),
-            'description' => get_option('sweetaddons_whitelabel_description', 'Plugin pendukung tema.'),
+            'description' => get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client'),
             'author' => get_option('sweetaddons_whitelabel_author', 'WebsweetStudio'),
             'author_uri' => get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com'),
             'version' => get_option('sweetaddons_whitelabel_version', '2.2.2'),
-            'menu_title' => get_option('sweetaddons_whitelabel_menu_title', 'Addons'),
+            'menu_title' => get_option('sweetaddons_whitelabel_menu_title', 'Sweet Addons'),
             'hide_original' => get_option('sweetaddons_whitelabel_hide_original', '')
         );
 

@@ -317,9 +317,9 @@ class Custom_Admin_Option_Page
                 </div>
                 <div class="sad-card">
                     <div class="sad-card-title">Ringkasan</div>
-                    <table class="widefat striped">
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
                         <thead>
-                            <tr>
+                            <tr style="background-color: #f0f0f1;">
                                 <th>Fitur</th>
                                 <th>Status</th>
                             </tr>
@@ -327,15 +327,15 @@ class Custom_Admin_Option_Page
                         <tbody>
                             <tr>
                                 <td>Batasi Percobaan Login</td>
-                                <td><?php echo get_option('limit_login_attempts') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('limit_login_attempts') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Nonaktifkan XML-RPC</td>
-                                <td><?php echo get_option('disable_xmlrpc') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('disable_xmlrpc') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Nonaktifkan REST API</td>
-                                <td><?php echo get_option('disable_rest_api') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('disable_rest_api') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -400,9 +400,9 @@ class Custom_Admin_Option_Page
                     </div>
                     <div class="sad-card">
                         <div class="sad-card-title">Informasi Situs</div>
-                        <table class="widefat striped">
+                        <table class="widefat striped" style="border:none; box-shadow:none;">
                             <thead>
-                                <tr>
+                                <tr style="background-color: #f0f0f1;">
                                     <th>Parameter</th>
                                     <th>Nilai</th>
                                 </tr>
@@ -432,9 +432,9 @@ class Custom_Admin_Option_Page
             <div class="sad-grid">
                 <div class="sad-card">
                     <div class="sad-card-title">Status Fitur</div>
-                    <table class="widefat striped">
+                    <table class="widefat striped" style="border:none; box-shadow:none;">
                         <thead>
-                            <tr>
+                            <tr style="background-color: #f0f0f1;">
                                 <th>Fitur</th>
                                 <th>Status</th>
                             </tr>
@@ -442,39 +442,39 @@ class Custom_Admin_Option_Page
                         <tbody>
                             <tr>
                                 <td>Disable Comments</td>
-                                <td><?php echo get_option('fully_disable_comment') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('fully_disable_comment') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Hide Admin Notice</td>
-                                <td><?php echo get_option('hide_admin_notice') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('hide_admin_notice') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Maintenance Mode</td>
-                                <td><?php echo get_option('maintenance_mode') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('maintenance_mode') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Limit Login</td>
-                                <td><?php echo get_option('limit_login_attempts') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('limit_login_attempts') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Block wp-login</td>
-                                <td><?php echo get_option('block_wp_login') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('block_wp_login') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Disable XML-RPC</td>
-                                <td><?php echo get_option('disable_xmlrpc') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('disable_xmlrpc') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Disable REST API</td>
-                                <td><?php echo get_option('disable_rest_api') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('disable_rest_api') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>Disable Gutenberg</td>
-                                <td><?php echo get_option('disable_gutenberg') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('disable_gutenberg') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                             <tr>
                                 <td>reCaptcha</td>
-                                <td><?php echo get_option('captcha_Sweetaddons') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                                <td><?php echo get_option('captcha_Sweetaddons') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -603,12 +603,12 @@ class Custom_Admin_Option_Page
         $memory_limit = ini_get('memory_limit');
 
     ?>
-        <div class="sad-grid">
+        <div class="websweet-report-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
 
             <!-- Site Information -->
-            <div class="sad-card">
-                <div class="sad-card-title">🌐 Informasi Website</div>
-                <table class="widefat striped">
+            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #23282d;">🌐 Informasi Website</h3>
+                <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Nama Website:</strong></td>
                         <td><?php echo esc_html($site_name); ?></td>
@@ -633,9 +633,9 @@ class Custom_Admin_Option_Page
             </div>
 
             <!-- Content Statistics -->
-            <div class="sad-card">
-                <div class="sad-card-title">📝 Statistik Konten</div>
-                <table class="widefat striped">
+            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #23282d;">📝 Statistik Konten</h3>
+                <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Posts Terpublikasi:</strong></td>
                         <td><?php echo esc_html($published_posts); ?></td>
@@ -656,9 +656,9 @@ class Custom_Admin_Option_Page
             </div>
 
             <!-- Theme & Plugin Information -->
-            <div class="sad-card">
-                <div class="sad-card-title">🎨 Theme & Plugin</div>
-                <table class="widefat striped">
+            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #23282d;">🎨 Theme & Plugin</h3>
+                <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Active Theme:</strong></td>
                         <td><?php echo esc_html($theme_name); ?></td>
@@ -679,9 +679,9 @@ class Custom_Admin_Option_Page
             </div>
 
             <!-- Server Information -->
-            <div class="sad-card">
-                <div class="sad-card-title">🖥️ Server Information</div>
-                <table class="widefat striped">
+            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #23282d;">🖥️ Server Information</h3>
+                <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>PHP Version:</strong></td>
                         <td><?php echo esc_html($php_version); ?></td>
@@ -702,36 +702,36 @@ class Custom_Admin_Option_Page
             </div>
 
             <!-- Sweet Addons Status -->
-            <div class="sad-card">
-                <div class="sad-card-title">⚙️ <?php echo class_exists('Sweetaddons_WhiteLabel') ? esc_html(Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name')) : 'Sweet Addons'; ?> Status</div>
-                <table class="widefat striped">
+            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #23282d;">⚙️ <?php echo class_exists('Sweetaddons_WhiteLabel') ? esc_html(Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name')) : 'Sweet Addons'; ?> Status</h3>
+                <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Disable Comments:</strong></td>
-                        <td><?php echo get_option('fully_disable_comment') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                        <td><?php echo get_option('fully_disable_comment') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Hide Admin Notice:</strong></td>
-                        <td><?php echo get_option('hide_admin_notice') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                        <td><?php echo get_option('hide_admin_notice') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Maintenance Mode:</strong></td>
-                        <td><?php echo get_option('maintenance_mode') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                        <td><?php echo get_option('maintenance_mode') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Limit Login Attempts:</strong></td>
-                        <td><?php echo get_option('limit_login_attempts') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                        <td><?php echo get_option('limit_login_attempts') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Block wp-login:</strong></td>
-                        <td><?php echo get_option('block_wp_login') ? '<span class="sad-status-active">Aktif</span>' : '<span class="sad-status-inactive">Nonaktif</span>'; ?></td>
+                        <td><?php echo get_option('block_wp_login') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
                     </tr>
                 </table>
             </div>
 
             <!-- Quick Actions -->
-            <div class="sad-card sad-actions">
-                <div class="sad-card-title">🚀 Quick Actions</div>
-                <div class="sad-actions-row">
+            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="margin-top: 0; color: #23282d;">🚀 Quick Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">📊 Visitor Statistics</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">🔍 SEO Settings</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">🛡️ reCaptcha</a>
@@ -744,7 +744,31 @@ class Custom_Admin_Option_Page
                 </div>
             </div>
         </div>
+
+        <style>
+            .report-table td {
+                padding: 8px 0;
+                border-bottom: 1px solid #f1f1f1;
+            }
+
+            .report-table td:first-child {
+                width: 50%;
+                padding-right: 10px;
+            }
+
+            .report-card h3 {
+                border-bottom: 2px solid #0073aa;
+                padding-bottom: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .websweet-report-grid {
+                    grid-template-columns: 1fr !important;
+                }
+            }
+        </style>
     <?php
+
         return ob_get_clean();
     }
 
@@ -1761,7 +1785,7 @@ class Custom_Admin_Option_Page
         // Get current settings
         $plugin_name = get_option('sweetaddons_whitelabel_plugin_name', 'Sweet Addons');
         $plugin_uri = get_option('sweetaddons_whitelabel_plugin_uri', 'https://websweetstudio.com');
-        $description = get_option('sweetaddons_whitelabel_description', 'Plugin pendukung tema.');
+        $description = get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client');
         $author = get_option('sweetaddons_whitelabel_author', 'WebsweetStudio');
         $author_uri = get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com');
         $version = get_option('sweetaddons_whitelabel_version', '2.2.1');
