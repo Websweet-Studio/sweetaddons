@@ -2412,7 +2412,7 @@ class Custom_Admin_Option_Page
                 <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
                 <div class="sad-top">
                     <div class="sad-top-left">
-                        <div class="sad-card">
+                        <div class="sad-card sad-mb-2">
                             <div class="sad-card-title">⚙️ Pengaturan Dasar</div>
 
                             <table class="form-table">
@@ -2506,7 +2506,7 @@ class Custom_Admin_Option_Page
                                     <td>
                                         <div class="sweetaddons-image-upload-wrapper">
                                             <input type="hidden" id="sweetaddons_whatsapp_custom_image" name="sweetaddons_whatsapp_custom_image" value="<?php echo esc_attr($custom_image); ?>">
-                                            <div id="sweetaddons-whatsapp-image-preview" style="margin-bottom: 10px; <?php echo empty($custom_image) ? 'display:none;' : ''; ?>">
+                                            <div id="sweetaddons-whatsapp-image-preview" class="sweetaddons-whatsapp-image-preview" style="margin-bottom: 10px; <?php echo empty($custom_image) ? 'display:none;' : ''; ?>">
                                                 <img src="<?php echo esc_url($custom_image); ?>">
                                             </div>
                                             <button type="button" class="button" id="sweetaddons-whatsapp-upload-btn">Select Image</button>

@@ -237,3 +237,6 @@ body.toplevel_page_custom_admin_options .update-nag {
 .sad-status-inactive {
   color: var(--sad-text-muted);
 }
+.sad-mb-2 {
+  margin-bottom: 24px;
+}

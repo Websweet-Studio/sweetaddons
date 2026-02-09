@@ -15,15 +15,15 @@ class Sweetaddons_WhatsApp
     public function __construct()
     {
         add_action('wp_footer', array($this, 'output_whatsapp_widget'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_whatsapp_styles'));
+        add_action('wp_head', array($this, 'print_whatsapp_styles'));
     }
 
-    public function enqueue_whatsapp_styles()
+    public function print_whatsapp_styles()
     {
         $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
 
         if ($enable_whatsapp && !is_admin()) {
-            wp_add_inline_style('wp-block-library', $this->get_whatsapp_css());
+            echo '<style>' . $this->get_whatsapp_css() . '</style>';
         }
     }
 
