@@ -171,26 +171,6 @@ class Sweet_Option_Umum
                         </div>
                     </form>
                 </div>
-
-                <div class="sad-card">
-                    <div class="sad-card-title">Ringkasan</div>
-                    <table class="widefat striped" style="border:none; box-shadow:none;">
-                        <thead>
-                            <tr style="background-color: #f0f0f1;">
-                                <th>Fitur</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($umum_fields as $field) : ?>
-                                <tr>
-                                    <td><?php echo esc_html($field['title']); ?></td>
-                                    <td><?php echo get_option($field['id']) ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
 <?php

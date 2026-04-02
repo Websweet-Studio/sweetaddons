@@ -23,7 +23,9 @@ class Sweetaddons_WhatsApp
         $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
 
         if ($enable_whatsapp && !is_admin()) {
-            wp_add_inline_style('wp-block-library', $this->get_whatsapp_css());
+            wp_register_style('sweetaddons-whatsapp-css', false);
+            wp_enqueue_style('sweetaddons-whatsapp-css');
+            wp_add_inline_style('sweetaddons-whatsapp-css', $this->get_whatsapp_css());
         }
     }
 
@@ -50,17 +52,14 @@ class Sweetaddons_WhatsApp
 
         // Clean phone number
         $clean_phone = preg_replace('/[^0-9]/', '', $phone_number);
-        if (substr($clean_phone, 0, 1) !== '+') {
-            $clean_phone = '+' . $clean_phone;
-        }
 
-        // replace 62 jika karakter pertama adalah 0
+        // handle 0 prefix to 62
         if (substr($clean_phone, 0, 1) === '0') {
             $clean_phone = '62' . substr($clean_phone, 1);
         }
 
         // Generate WhatsApp URL
-        $whatsapp_url = 'https://wa.me/' . ltrim($clean_phone, '+') . '?text=' . urlencode($message);
+        $whatsapp_url = 'https://wa.me/' . $clean_phone . '?text=' . urlencode($message);
 
         // Position classes
         $position_classes = $this->get_position_classes($position);

@@ -315,31 +315,6 @@ class Custom_Admin_Option_Page
                         </div>
                     </form>
                 </div>
-                <div class="sad-card">
-                    <div class="sad-card-title">Ringkasan</div>
-                    <table class="widefat striped" style="border:none; box-shadow:none;">
-                        <thead>
-                            <tr style="background-color: #f0f0f1;">
-                                <th>Fitur</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Batasi Percobaan Login</td>
-                                <td><?php echo get_option('limit_login_attempts') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Nonaktifkan XML-RPC</td>
-                                <td><?php echo get_option('disable_xmlrpc') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Nonaktifkan REST API</td>
-                                <td><?php echo get_option('disable_rest_api') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     <?php
@@ -430,55 +405,6 @@ class Custom_Admin_Option_Page
                 </div>
             </div>
             <div class="sad-grid">
-                <div class="sad-card">
-                    <div class="sad-card-title">Status Fitur</div>
-                    <table class="widefat striped" style="border:none; box-shadow:none;">
-                        <thead>
-                            <tr style="background-color: #f0f0f1;">
-                                <th>Fitur</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Disable Comments</td>
-                                <td><?php echo get_option('fully_disable_comment') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Hide Admin Notice</td>
-                                <td><?php echo get_option('hide_admin_notice') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Maintenance Mode</td>
-                                <td><?php echo get_option('maintenance_mode') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Limit Login</td>
-                                <td><?php echo get_option('limit_login_attempts') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Block wp-login</td>
-                                <td><?php echo get_option('block_wp_login') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Disable XML-RPC</td>
-                                <td><?php echo get_option('disable_xmlrpc') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Disable REST API</td>
-                                <td><?php echo get_option('disable_rest_api') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>Disable Gutenberg</td>
-                                <td><?php echo get_option('disable_gutenberg') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                            <tr>
-                                <td>reCaptcha</td>
-                                <td><?php echo get_option('captcha_Sweetaddons') ? '<span style="color:#00a32a; font-weight:bold;">Aktif</span>' : '<span style="color:#999;">Nonaktif</span>'; ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
                 <div class="sad-card sad-actions">
                     <div class="sad-card-title">Aksi Cepat</div>
                     <div class="sad-actions-row">
@@ -1416,18 +1342,6 @@ class Custom_Admin_Option_Page
                             <?php endif; ?>
                         </div>
 
-                        <!-- Features Info -->
-                        <div class="sad-card">
-                            <div class="sad-card-title">✨ Fitur SEO</div>
-                            <ul style="list-style-type: disc; margin-left: 20px; color: #666;">
-                                <li style="margin-bottom: 5px;">Judul & Deskripsi Meta</li>
-                                <li style="margin-bottom: 5px;">Open Graph Support</li>
-                                <li style="margin-bottom: 5px;">XML Sitemap Generator</li>
-                                <li style="margin-bottom: 5px;">Robots.txt Control</li>
-                                <li>Schema.org Data</li>
-                            </ul>
-                        </div>
-
                     </div>
                 </div>
             </form>
@@ -1662,55 +1576,6 @@ class Custom_Admin_Option_Page
                                         </label>
                                     </td>
                                 </tr>
-                            </table>
-                        </div>
-
-                        <!-- Current Status Details -->
-                        <div class="sad-card">
-                            <div class="sad-card-title">📊 Detail Status</div>
-                            <table class="widefat striped" style="border:none; box-shadow:none;">
-                                <thead>
-                                    <tr style="background-color: #f0f0f1;">
-                                        <th>Fitur</th>
-                                        <th>Status</th>
-                                        <th>Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Generator Lokal</strong></td>
-                                        <td>
-                                            <?php if ($aktif): ?>
-                                                <span style="color: #00a32a; font-weight:bold;">Tersedia</span>
-                                            <?php else: ?>
-                                                <span style="color: #999;">Nonaktif</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>Pembuatan gambar CAPTCHA di server</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Proteksi Login</strong></td>
-                                        <td>
-                                            <?php if ($login && $aktif): ?>
-                                                <span style="color: #00a32a; font-weight:bold;">Aktif</span>
-                                            <?php else: ?>
-                                                <span style="color: #999;">Nonaktif</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>Brute force protection</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Proteksi Komentar</strong></td>
-                                        <td>
-                                            <?php if ($comment && $aktif): ?>
-                                                <span style="color: #00a32a; font-weight:bold;">Aktif</span>
-                                            <?php else: ?>
-                                                <span style="color: #999;">Nonaktif</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>Spam comment protection</td>
-                                    </tr>
-                                </tbody>
                             </table>
                         </div>
 
@@ -2630,36 +2495,6 @@ class Custom_Admin_Option_Page
                             <div class="sad-actions-row" style="justify-content: flex-end;">
                                 <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
                             </div>
-                        </div>
-
-                        <div class="sad-card">
-                            <div class="sad-card-title">Ringkasan</div>
-                            <table class="widefat striped" style="border:none; box-shadow:none;">
-                                <thead>
-                                    <tr style="background-color: #f0f0f1;">
-                                        <th>Fitur</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Status Widget</td>
-                                        <td><span style="color: <?php echo $status_color; ?>; font-weight:bold;"><?php echo $status_text; ?></span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Target Number</td>
-                                        <td><?php echo esc_html($display_phone); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Position</td>
-                                        <td><?php echo esc_html($display_position); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Button Style</td>
-                                        <td><?php echo ucfirst($bubble_style); ?></td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>

@@ -75,7 +75,7 @@ class Sweetaddons_Admin
 		 * class.
 		 */
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/sweetaddons-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/admin/css/sweetaddons-admin.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -98,6 +98,6 @@ class Sweetaddons_Admin
 		 * class.
 		 */
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/sweetaddons-admin.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/admin/js/sweetaddons-admin.js', array('jquery'), $this->version, false);
 	}
 }

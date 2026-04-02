@@ -87,7 +87,7 @@ class Sweetaddons_Standar_Editor
 
     function mce_register_plugin($plugin_array)
     {
-        $plugin_array['table'] = SWEETADDONS_PLUGIN_DIR_URL . 'admin/js/tinymce-table-plugin.min.js';
+        $plugin_array['table'] = SWEETADDONS_PLUGIN_DIR_URL . 'assets/admin/js/tinymce-table-plugin.min.js';
         return $plugin_array;
     }
 }
