@@ -172,6 +172,57 @@
   width: 60%;
 }
 
+/* Consistent Input Styling */
+.sad-form input[type="date"],
+.sad-form input[type="datetime-local"],
+.sad-form input[type="datetime"],
+.sad-form input[type="email"],
+.sad-form input[type="month"],
+.sad-form input[type="number"],
+.sad-form input[type="password"],
+.sad-form input[type="search"],
+.sad-form input[type="tel"],
+.sad-form input[type="text"],
+.sad-form input[type="time"],
+.sad-form input[type="url"],
+.sad-form input[type="week"],
+.sad-form textarea,
+.sad-form select {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  color: #1f2937;
+  font-size: 14px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  min-height: 36px;
+}
+
+.sad-form input:focus,
+.sad-form textarea:focus,
+.sad-form select:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+  outline: none !important;
+}
+
+.sad-form .large-text {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.sad-form .regular-text {
+  width: 100% !important;
+  max-width: 450px !important;
+}
+
+.sad-form .small-text {
+  width: 80px !important;
+}
+
 /* Custom Sweet Addons Notice */
 .sad-notice {
   background: #fff;
