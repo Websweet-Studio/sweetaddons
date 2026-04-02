@@ -63,13 +63,13 @@ jQuery(document).ready(function ($) {
                 },
                 success: function(response) {
                     if (response && response.success) {
-                        $('#reset-message').html('<div class="notice notice-success is-dismissible"><p>' + response.data + '</p></div>');
+                        $('#reset-message').html('<div class="sad-notice sad-notice-success"><p>' + response.data + '</p></div>');
                     } else {
-                        $('#reset-message').html('<div class="notice notice-error is-dismissible"><p>Terjadi kesalahan saat mereset data.</p></div>');
+                        $('#reset-message').html('<div class="sad-notice sad-notice-error"><p>Terjadi kesalahan saat mereset data.</p></div>');
                     }
                 },
                 error: function() {
-                    $('#reset-message').html('<div class="notice notice-error is-dismissible"><p>Terjadi kesalahan saat mengirim permintaan AJAX.</p></div>');
+                    $('#reset-message').html('<div class="sad-notice sad-notice-error"><p>Terjadi kesalahan saat mengirim permintaan AJAX.</p></div>');
                 }
             });
         });

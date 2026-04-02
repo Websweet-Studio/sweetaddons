@@ -115,11 +115,43 @@
   border-color: #059669;
 }
 
-body.toplevel_page_custom_admin_options .notice,
-body.toplevel_page_custom_admin_options .notice-warning,
-body.toplevel_page_custom_admin_options .notice-alt,
-body.toplevel_page_custom_admin_options .update-nag {
-  display: none !important;
+/* Style default WordPress notices to match Sweet Addons design */
+.sweetaddons-dashboard .notice,
+.sweetaddons-dashboard .notice-success,
+.sweetaddons-dashboard .notice-warning,
+.sweetaddons-dashboard .notice-error,
+.sweetaddons-dashboard .update-nag {
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 14px !important;
+  padding: 10px 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  margin: 15px 0 25px 0 !important;
+  display: block !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.sweetaddons-dashboard .notice-success {
+  border-left: 5px solid #10b981 !important;
+}
+
+.sweetaddons-dashboard .notice-warning {
+  border-left: 5px solid #ff922b !important;
+}
+
+.sweetaddons-dashboard .notice-error {
+  border-left: 5px solid #d63638 !important;
+}
+
+.sweetaddons-dashboard .notice p {
+  margin: 0.5em 0 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.sweetaddons-dashboard .notice-success p {
+  color: #065f46 !important;
 }
 
 .sad-card canvas {
@@ -138,4 +170,41 @@ body.toplevel_page_custom_admin_options .update-nag {
 }
 .sad-form .form-table td {
   width: 60%;
+}
+
+/* Custom Sweet Addons Notice */
+.sad-notice {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: 15px 0 25px 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sad-notice p {
+  margin: 0 !important;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.sad-notice-success {
+  border-left: 5px solid #10b981;
+}
+
+.sad-notice-success p {
+  color: #065f46;
+}
+
+.sad-notice-warning {
+  border-left: 5px solid #ff922b;
+}
+
+.sad-notice-error {
+  border-left: 5px solid #d63638;
 }

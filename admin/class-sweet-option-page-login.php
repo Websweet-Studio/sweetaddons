@@ -23,7 +23,7 @@
             }
 
             update_option('sweetaddons_login_customizer', $login_data);
-            echo '<div class="notice notice-success"><p>✅ Pengaturan Login Page Customizer berhasil disimpan!</p></div>';
+            echo '<div class="sad-notice sad-notice-success"><p>✅ Pengaturan Login Page Customizer berhasil disimpan!</p></div>';
         }
 
         // Get current settings

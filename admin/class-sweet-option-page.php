@@ -708,7 +708,7 @@ class Custom_Admin_Option_Page
         if (isset($_POST['rebuild_stats']) && wp_verify_nonce($_POST['_wpnonce'], 'rebuild_stats')) {
             $daily_count = $stats_handler->rebuild_daily_stats();
             $page_count = $stats_handler->rebuild_page_stats();
-            $rebuild_message = "<div class='notice notice-success'><p>✅ Statistik berhasil dibangun ulang! Memproses {$daily_count} data harian dan {$page_count} data halaman.</p></div>";
+            $rebuild_message = "<div class='sad-notice sad-notice-success'><p>✅ Statistik berhasil dibangun ulang! Memproses {$daily_count} data harian dan {$page_count} data halaman.</p></div>";
         }
 
         $summary_stats = $stats_handler->get_summary_stats();
@@ -1146,8 +1146,6 @@ class Custom_Admin_Option_Page
                     }
                 }
             }
-
-            echo '<div class="notice notice-success"><p>✅ Pengaturan SEO berhasil disimpan!</p></div>';
         }
 
         $home_title = get_option('sweetaddons_seo_home_title', '');
@@ -1167,6 +1165,11 @@ class Custom_Admin_Option_Page
 
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
+            <?php
+            if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_seo_settings')) {
+                echo '<div class="sad-notice sad-notice-success"><p>✅ Pengaturan SEO berhasil disimpan!</p></div>';
+            }
+            ?>
             <h1 class="sad-title">🔍 Pengaturan SEO</h1>
 
             <form method="post" action="" class="sad-form">
@@ -1469,7 +1472,6 @@ class Custom_Admin_Option_Page
             }
 
             update_option('captcha_Sweetaddons', $captcha_data);
-            echo '<div class="notice notice-success"><p>✅ Pengaturan reCaptcha berhasil disimpan!</p></div>';
         }
 
         $captcha_settings = get_option('captcha_Sweetaddons', array());
@@ -1483,6 +1485,11 @@ class Custom_Admin_Option_Page
 
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
+            <?php
+            if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) {
+                echo '<div class="sad-notice sad-notice-success"><p>✅ Pengaturan reCaptcha berhasil disimpan!</p></div>';
+            }
+            ?>
             <h1 class="sad-title">🛡️ Pengaturan CAPTCHA Tulisan (Image)</h1>
 
             <form method="post" action="">
@@ -1643,8 +1650,6 @@ class Custom_Admin_Option_Page
                     }
                 }
             }
-
-            echo '<div class="notice notice-success"><p>✅ Pengaturan White Label berhasil disimpan!</p></div>';
         }
 
         // Get current settings
@@ -1662,6 +1667,11 @@ class Custom_Admin_Option_Page
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
+            <?php
+            if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whitelabel_settings')) {
+                echo '<div class="sad-notice sad-notice-success"><p>✅ Pengaturan White Label berhasil disimpan!</p></div>';
+            }
+            ?>
             <h1 class="sad-title">🏷️ Pengaturan White Label</h1>
             <p>Kustomisasi branding plugin dan informasi yang ditampilkan kepada pengguna.</p>
 
@@ -1896,7 +1906,6 @@ class Custom_Admin_Option_Page
             }
 
             update_option('sweetaddons_login_customizer', $login_data);
-            echo '<div class="notice notice-success"><p>✅ Pengaturan Login Page Customizer berhasil disimpan!</p></div>';
         }
 
         // Get current settings
@@ -1907,50 +1916,54 @@ class Custom_Admin_Option_Page
         $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
     ?>
-        <style>
-            .sad-drop-zone {
-                border: 2px dashed #b4b9be;
-                padding: 20px;
-                text-align: center;
-                background: #fff;
-                cursor: pointer;
-                position: relative;
-                transition: all 0.2s;
-                border-radius: 4px;
-            }
-
-            .sad-drop-zone:hover,
-            .sad-drop-zone.drag-over {
-                border-color: #2271b1;
-                background: #f0f6fc;
-            }
-
-            .sad-drop-zone img {
-                max-width: 100%;
-                height: auto;
-                max-height: 150px;
-                display: block;
-                margin: 0 auto 10px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-
-            .sad-drop-zone .sad-placeholder {
-                color: #646970;
-                padding: 20px 0;
-            }
-
-            .sad-drop-zone .sad-remove {
-                margin-top: 10px;
-                color: #d63638;
-                cursor: pointer;
-                display: inline-block;
-                font-size: 13px;
-                text-decoration: underline;
-            }
-        </style>
-
         <div class="wrap vd-ons sweetaddons-dashboard">
+            <?php
+            if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
+                echo '<div class="sad-notice sad-notice-success"><p>✅ Pengaturan Login Page Customizer berhasil disimpan!</p></div>';
+            }
+            ?>
             <h1 class="sad-title">🎨 Login Page Customizer</h1>
+            <style>
+                .sad-drop-zone {
+                    border: 2px dashed #b4b9be;
+                    padding: 20px;
+                    text-align: center;
+                    background: #fff;
+                    cursor: pointer;
+                    position: relative;
+                    transition: all 0.2s;
+                    border-radius: 4px;
+                }
+
+                .sad-drop-zone:hover,
+                .sad-drop-zone.drag-over {
+                    border-color: #2271b1;
+                    background: #f0f6fc;
+                }
+
+                .sad-drop-zone img {
+                    max-width: 100%;
+                    height: auto;
+                    max-height: 150px;
+                    display: block;
+                    margin: 0 auto 10px;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                }
+
+                .sad-drop-zone .sad-placeholder {
+                    color: #646970;
+                    padding: 20px 0;
+                }
+
+                .sad-drop-zone .sad-remove {
+                    margin-top: 10px;
+                    color: #d63638;
+                    cursor: pointer;
+                    display: inline-block;
+                    font-size: 13px;
+                    text-decoration: underline;
+                }
+            </style>
 
             <form method="post" action="">
                 <?php wp_nonce_field('sweetaddons_login_customizer_settings'); ?>
@@ -2167,9 +2180,9 @@ class Custom_Admin_Option_Page
                 $cleaned_items = $cleaner->clean_items($items);
 
                 $message = '✅ Berhasil membersihkan: ' . implode(', ', $cleaned_items);
-                echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
+                echo '<div class="sad-notice sad-notice-success"><p>' . esc_html($message) . '</p></div>';
             } else {
-                echo '<div class="notice notice-warning"><p>⚠️ Tidak ada item yang dipilih untuk dibersihkan.</p></div>';
+                echo '<div class="sad-notice sad-notice-warning"><p>⚠️ Tidak ada item yang dipilih untuk dibersihkan.</p></div>';
             }
         }
 
@@ -2255,8 +2268,6 @@ class Custom_Admin_Option_Page
                     }
                 }
             }
-
-            echo '<div class="notice notice-success"><p>✅ Pengaturan Chat WhatsApp berhasil disimpan!</p></div>';
         }
 
         // Get current settings
@@ -2275,15 +2286,15 @@ class Custom_Admin_Option_Page
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
 
-        // Summary calculations
-        $is_active = ($enable === '1');
-        $status_text = $is_active ? 'Active' : 'Inactive';
-        $status_color = $is_active ? '#28a745' : '#d63638';
-
         $display_phone = !empty($phone) ? $phone : 'Not Configured';
         $display_position = ucwords(str_replace('-', ' ', $position));
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
+            <?php
+            if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
+                echo '<div class="sad-notice sad-notice-success"><p>✅ Pengaturan Chat WhatsApp berhasil disimpan!</p></div>';
+            }
+            ?>
             <h1 class="sad-title">💬 Pengaturan Chat WhatsApp</h1>
             <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
