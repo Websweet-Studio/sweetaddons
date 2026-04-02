@@ -100,4 +100,14 @@ class Sweetaddons_Admin
 
 		wp_enqueue_script($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/admin/js/sweetaddons-admin.js', array('jquery'), $this->version, false);
 	}
+
+	/**
+	 * Define a global JS variable to prevent conflicts.
+	 *
+	 * @since    1.0.0
+	 */
+	public function define_global_js_variable()
+	{
+		echo '<script>var active = window.active || false;</script>';
+	}
 }
