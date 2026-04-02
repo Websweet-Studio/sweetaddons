@@ -1492,7 +1492,7 @@ class Custom_Admin_Option_Page
             ?>
             <h1 class="sad-title">🛡️ Pengaturan CAPTCHA Tulisan (Image)</h1>
 
-            <form method="post" action="">
+            <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_recaptcha_settings'); ?>
 
                 <div class="sad-top">
@@ -1965,7 +1965,7 @@ class Custom_Admin_Option_Page
                 }
             </style>
 
-            <form method="post" action="">
+            <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_login_customizer_settings'); ?>
 
                 <div class="sad-top">
@@ -2192,7 +2192,7 @@ class Custom_Admin_Option_Page
         <div class="wrap vd-ons sweetaddons-dashboard">
             <h1 class="sad-title">🧹 Database Cleaner</h1>
 
-            <form method="post" action="">
+            <form method="post" action="" class="sad-form">
                 <?php wp_nonce_field('sweetaddons_db_cleaner_action', 'sweetaddons_db_cleaner_nonce'); ?>
 
                 <div class="sad-top">
@@ -2451,11 +2451,11 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Device Visibility</th>
                                     <td>
-                                        <label>
+                                        <label class="sad-form-checkbox">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> />
                                             Tampilkan di perangkat Mobile
                                         </label><br>
-                                        <label>
+                                        <label class="sad-form-checkbox">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> />
                                             Tampilkan di perangkat Desktop
                                         </label>
@@ -2465,7 +2465,7 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Tooltip</th>
                                     <td>
-                                        <label>
+                                        <label class="sad-form-checkbox">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> />
                                             Show tooltip on hover
                                         </label>

@@ -98,8 +98,10 @@ class Sweetaddons_Public
 		 * class.
 		 */
 
-		// Enqueue GSAP
-		wp_enqueue_script('gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', array(), '3.12.5', true);
+		// Enqueue GSAP if not already present
+		if (!wp_script_is('gsap', 'registered') && !wp_script_is('gsap', 'enqueued')) {
+			wp_enqueue_script('gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', array(), '3.12.5', true);
+		}
 
 		wp_enqueue_script($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/frontend/js/sweetaddons-public.js', array('jquery', 'gsap'), $this->version, false);
 	}

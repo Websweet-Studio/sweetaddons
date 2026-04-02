@@ -15,7 +15,7 @@
   margin-top: 10px;
 }
 .sad-title {
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0 !important;
 }
 .sad-grid {
   display: grid;
@@ -223,6 +223,83 @@
   width: 80px !important;
 }
 
+/* Color Input Styling */
+.sad-form input[type="color"] {
+  width: 60px;
+  height: 48px;
+  padding: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  vertical-align: middle;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.sad-form input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.sad-form input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 5px;
+}
+
+.sad-form input[type="color"]:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+  outline: none !important;
+}
+
+/* Checkbox & Radio Styling */
+.sad-form input[type="checkbox"],
+.sad-form input[type="radio"] {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  margin-top: -3px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.sad-form input[type="radio"] {
+  border-radius: 50%;
+}
+
+.sad-form input[type="checkbox"]:checked,
+.sad-form input[type="radio"]:checked {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
+.sad-form input[type="checkbox"]:checked::before {
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>');
+  width: 14px;
+  height: 14px;
+  margin: 1px;
+}
+
+.sad-form input[type="radio"]:checked::before {
+  background-color: white;
+  width: 8px;
+  height: 8px;
+  margin: 4px;
+}
+
+.sad-form input[type="checkbox"]:focus,
+.sad-form input[type="radio"]:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+.sad-form-checkbox {
+  margin-bottom: 8px;
+}
 /* Custom Sweet Addons Notice */
 .sad-notice {
   background: #fff;
