@@ -32,7 +32,13 @@ class Custom_Admin_Option_Page
 
     public function enqueue_admin_scripts($hook)
     {
-        if (strpos($hook, 'sweetaddons') !== false || strpos($hook, 'custom_admin_options') !== false) {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        $is_sweetaddons_page = stripos($hook, 'sweetaddons') !== false
+            || stripos($hook, 'custom_admin_options') !== false
+            || stripos($page, 'sweetaddons') !== false
+            || $page === 'custom_admin_options';
+
+        if ($is_sweetaddons_page) {
             wp_enqueue_media();
             wp_enqueue_script('jquery');
             wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
@@ -716,7 +722,6 @@ class Custom_Admin_Option_Page
     public function visitor_stats_page_callback()
     {
         $stats_handler = new Sweetaddons_Visitor_Stats();
-        wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
 
         // Handle rebuild request
         $rebuild_message = '';
@@ -938,94 +943,101 @@ class Custom_Admin_Option_Page
             const uniqueVisitsData = dailyData.map(item => item.unique_visits);
             const totalVisitsData = dailyData.map(item => item.total_visits);
 
-            const dailyCtx = document.getElementById('dailyVisitsChart').getContext('2d');
-            new Chart(dailyCtx, {
-                type: 'line',
-                data: {
-                    labels: dailyLabels,
-                    datasets: [{
-                            label: 'Pengunjung Unik',
-                            data: uniqueVisitsData,
-                            borderColor: '#0066cc',
-                            backgroundColor: 'rgba(0, 102, 204, 0.14)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'Total Kunjungan',
-                            data: totalVisitsData,
-                            borderColor: '#2997ff',
-                            backgroundColor: 'rgba(41, 151, 255, 0.10)',
-                            tension: 0.4,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+            const dailyCanvas = document.getElementById('dailyVisitsChart');
+            const pageCanvas = document.getElementById('topPagesChart');
+
+            if (!window.Chart || !dailyCanvas || !pageCanvas) {
+                console.warn('Sweet Addons: Chart.js gagal dimuat atau elemen canvas tidak ditemukan.');
+            } else {
+                const dailyCtx = dailyCanvas.getContext('2d');
+                new Chart(dailyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: dailyLabels,
+                        datasets: [{
+                                label: 'Pengunjung Unik',
+                                data: uniqueVisitsData,
+                                borderColor: '#0066cc',
+                                backgroundColor: 'rgba(0, 102, 204, 0.14)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Total Kunjungan',
+                                data: totalVisitsData,
+                                borderColor: '#2997ff',
+                                backgroundColor: 'rgba(41, 151, 255, 0.10)',
+                                tension: 0.4,
+                                fill: false
+                            }
+                        ]
                     },
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    }
-                }
-            });
-
-            // Top Pages Chart
-            const pageData = <?php echo json_encode(array_map(function ($page) {
-                                    return [
-                                        'url' => $page->page_url,
-                                        'views' => (int)$page->total_views
-                                    ];
-                                }, array_slice($page_stats, 0, 8))); ?>;
-
-            const pageLabels = pageData.map(item => item.url);
-            const pageViews = pageData.map(item => item.views);
-
-            const pageCtx = document.getElementById('topPagesChart').getContext('2d');
-            new Chart(pageCtx, {
-                type: 'bar',
-                data: {
-                    labels: pageLabels,
-                    datasets: [{
-                        label: 'Page Views',
-                        data: pageViews,
-                        backgroundColor: 'rgba(0, 102, 204, 0.18)',
-                        borderColor: '#0066cc',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         },
-                        x: {
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 0,
-                                callback: function(value, index, values) {
-                                    const label = this.getLabelForValue(value);
-                                    return label.length > 20 ? label.substring(0, 20) + '...' : label;
-                                }
+                        plugins: {
+                            legend: {
+                                position: 'top'
                             }
                         }
+                    }
+                });
+
+                // Top Pages Chart
+                const pageData = <?php echo json_encode(array_map(function ($page) {
+                                        return [
+                                            'url' => $page->page_url,
+                                            'views' => (int)$page->total_views
+                                        ];
+                                    }, array_slice($page_stats, 0, 8))); ?>;
+
+                const pageLabels = pageData.map(item => item.url);
+                const pageViews = pageData.map(item => item.views);
+
+                const pageCtx = pageCanvas.getContext('2d');
+                new Chart(pageCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: pageLabels,
+                        datasets: [{
+                            label: 'Page Views',
+                            data: pageViews,
+                            backgroundColor: 'rgba(0, 102, 204, 0.18)',
+                            borderColor: '#0066cc',
+                            borderWidth: 1
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    callback: function(value, index, values) {
+                                        const label = this.getLabelForValue(value);
+                                        return label.length > 20 ? label.substring(0, 20) + '...' : label;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         </script>
         <?php Sweetaddons_Admin_Layout::close(); ?>
     <?php
@@ -2298,14 +2310,156 @@ class Custom_Admin_Option_Page
 
                     <div class="sad-card">
                         <div class="sad-card-title">Live Preview</div>
-                        <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
+                        <style>
+                            #whatsapp-preview-stage .sweetaddons-wa-widget {
+                                position: absolute;
+                                z-index: 1;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-bubble {
+                                position: relative;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-link {
+                                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                                position: relative;
+                                overflow: hidden;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-icon,
+                            #whatsapp-preview-stage .sweetaddons-wa-text {
+                                position: relative;
+                                z-index: 1;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-tooltip {
+                                position: absolute;
+                                background: #333;
+                                color: #fff;
+                                padding: 8px 12px;
+                                border-radius: 6px;
+                                font-size: 12px;
+                                white-space: nowrap;
+                                opacity: 0;
+                                visibility: hidden;
+                                transition: all 0.3s ease;
+                                pointer-events: none;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-widget:hover .sweetaddons-wa-tooltip {
+                                opacity: 1;
+                                visibility: visible;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-bottom-right .sweetaddons-wa-tooltip,
+                            #whatsapp-preview-stage .sweetaddons-wa-bottom-left .sweetaddons-wa-tooltip {
+                                bottom: calc(100% + 10px);
+                                left: 50%;
+                                transform: translateX(-50%);
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-top-right .sweetaddons-wa-tooltip,
+                            #whatsapp-preview-stage .sweetaddons-wa-top-left .sweetaddons-wa-tooltip {
+                                top: calc(100% + 10px);
+                                left: 50%;
+                                transform: translateX(-50%);
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-center-right .sweetaddons-wa-tooltip {
+                                right: calc(100% + 10px);
+                                top: 50%;
+                                transform: translateY(-50%);
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-center-left .sweetaddons-wa-tooltip {
+                                left: calc(100% + 10px);
+                                top: 50%;
+                                transform: translateY(-50%);
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='pulse'] .sweetaddons-wa-link {
+                                animation: sweetaddons-wa-pulse 2s infinite;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='bounce'] .sweetaddons-wa-link {
+                                animation: sweetaddons-wa-bounce 2s infinite;
+                            }
+
+                            #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='shake'] .sweetaddons-wa-link {
+                                animation: sweetaddons-wa-shake 3s infinite;
+                            }
+
+                            @keyframes sweetaddons-wa-pulse {
+                                0% {
+                                    transform: scale(1);
+                                }
+
+                                50% {
+                                    transform: scale(1.02);
+                                }
+
+                                100% {
+                                    transform: scale(1);
+                                }
+                            }
+
+                            @keyframes sweetaddons-wa-bounce {
+
+                                0%,
+                                20%,
+                                50%,
+                                80%,
+                                100% {
+                                    transform: translateY(0);
+                                }
+
+                                40% {
+                                    transform: translateY(-10px);
+                                }
+
+                                60% {
+                                    transform: translateY(-5px);
+                                }
+                            }
+
+                            @keyframes sweetaddons-wa-shake {
+
+                                0%,
+                                100% {
+                                    transform: translateX(0);
+                                }
+
+                                10%,
+                                30%,
+                                50%,
+                                70%,
+                                90% {
+                                    transform: translateX(-2px);
+                                }
+
+                                20%,
+                                40%,
+                                60%,
+                                80% {
+                                    transform: translateX(2px);
+                                }
+                            }
+                        </style>
+                        <div id="whatsapp-preview-stage" style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
                             <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
-                                <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
-                                    <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
-                                        <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
-                                            <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                                        </svg>
-                                        <span id="whatsapp-preview-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                <div id="whatsapp-preview-bubble" class="sweetaddons-wa-widget sweetaddons-wa-preview sweetaddons-wa-<?php echo esc_attr($position); ?>" data-animation="<?php echo esc_attr($animation); ?>" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
+                                    <div id="whatsapp-preview-shell" class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
+                                        <div id="whatsapp-preview-inner" class="sweetaddons-wa-link" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                                            <div class="sweetaddons-wa-icon">
+                                                <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
+                                                    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                                                </svg>
+                                            </div>
+                                            <span id="whatsapp-preview-text" class="sweetaddons-wa-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                        </div>
+                                        <div id="whatsapp-preview-tooltip" class="sweetaddons-wa-tooltip" style="display: <?php echo ($show_tooltip === '1') ? 'block' : 'none'; ?>;">
+                                            <?php echo esc_html($button_text); ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2343,16 +2497,21 @@ class Custom_Admin_Option_Page
                     const button_text = $('#sweetaddons_whatsapp_button_text').val().trim() || 'Chat dengan kami';
                     const position = $('#sweetaddons_whatsapp_position').val();
                     const color = $('#sweetaddons_whatsapp_color').val();
+                    const animation = $('#sweetaddons_whatsapp_animation').val();
                     const size = '60';
                     const offset_x = '20';
                     const offset_y = '20';
                     const bubble_style = $('#sweetaddons_whatsapp_bubble_style').val();
+                    const show_tooltip = $('input[name="sweetaddons_whatsapp_show_tooltip"]').is(':checked');
 
                     const $container = $('#whatsapp-preview-container');
                     const $placeholder = $('#whatsapp-preview-placeholder');
                     const $bubble = $('#whatsapp-preview-bubble');
+                    const $shell = $('#whatsapp-preview-shell');
                     const $inner = $('#whatsapp-preview-inner');
                     const $text = $('#whatsapp-preview-text');
+                    const $tooltip = $('#whatsapp-preview-tooltip');
+                    const $icon = $bubble.find('.sweetaddons-wa-icon svg');
 
                     // Show/hide preview
                     if (enable && phone) {
@@ -2382,19 +2541,25 @@ class Custom_Admin_Option_Page
                                 break;
                         }
                         $bubble.attr('style', 'position: absolute; ' + positionStyle);
+                        $bubble.attr('data-animation', animation);
+                        $bubble
+                            .removeClass('sweetaddons-wa-bottom-right sweetaddons-wa-bottom-left sweetaddons-wa-top-right sweetaddons-wa-top-left sweetaddons-wa-center-right sweetaddons-wa-center-left')
+                            .addClass(`sweetaddons-wa-${position}`);
 
                         // Update bubble style and content
                         let innerStyle = '';
+                        $shell.removeClass('sweetaddons-wa-circle sweetaddons-wa-extended').addClass(`sweetaddons-wa-${bubble_style}`);
                         if (bubble_style === 'extended') {
                             innerStyle = `display: flex; align-items: center; padding: 12px 20px; background: ${color}; border-radius: 25px; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
                             $text.show().text(button_text);
-                            $bubble.find('svg').css('margin-right', '8px');
+                            $icon.css('margin-right', '8px');
                         } else {
                             innerStyle = `width: ${size}px; height: ${size}px; display: flex; align-items: center; justify-content: center; background: ${color}; border-radius: 50%; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);`;
                             $text.hide();
-                            $bubble.find('svg').css('margin-right', '0');
+                            $icon.css('margin-right', '0');
                         }
                         $inner.attr('style', innerStyle);
+                        $tooltip.text(button_text).toggle(show_tooltip);
 
                     } else {
                         $container.hide();
@@ -2408,7 +2573,9 @@ class Custom_Admin_Option_Page
                 $('#sweetaddons_whatsapp_button_text').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
+                $('#sweetaddons_whatsapp_animation').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_bubble_style').on('change', updateWhatsAppPreview);
+                $('input[name="sweetaddons_whatsapp_show_tooltip"]').on('change', updateWhatsAppPreview);
 
                 // Initialize preview on page load
                 updateWhatsAppPreview();
