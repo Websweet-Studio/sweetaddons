@@ -171,7 +171,6 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_description');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_default_og_image');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_twitter_site');
-        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_google_search_console');
 
         // reCaptcha settings
         register_setting('sweetaddons_recaptcha_group', 'captcha_Sweetaddons');
@@ -1055,7 +1054,6 @@ class Custom_Admin_Option_Page
                 'sweetaddons_seo_home_description',
                 'sweetaddons_seo_default_og_image',
                 'sweetaddons_seo_twitter_site',
-                'sweetaddons_seo_google_search_console',
                 'sweetaddons_seo_template_single_title',
                 'sweetaddons_seo_template_single_description',
                 'sweetaddons_seo_template_page_title',
@@ -1077,7 +1075,6 @@ class Custom_Admin_Option_Page
         $home_description = get_option('sweetaddons_seo_home_description', '');
         $default_og_image = get_option('sweetaddons_seo_default_og_image', '');
         $twitter_site = get_option('sweetaddons_seo_twitter_site', '');
-        $google_search_console = get_option('sweetaddons_seo_google_search_console', '');
         $tpl_single_title = get_option('sweetaddons_seo_template_single_title', '{post_title} | {site_name}');
         $tpl_single_desc = get_option('sweetaddons_seo_template_single_description', '{excerpt}');
         $tpl_page_title = get_option('sweetaddons_seo_template_page_title', '{page_title} | {site_name}');
@@ -1222,19 +1219,6 @@ class Custom_Admin_Option_Page
                                 <th scope="row"><label for="sweetaddons_seo_twitter_site">Twitter Username</label></th>
                                 <td>
                                     <input type="text" id="sweetaddons_seo_twitter_site" name="sweetaddons_seo_twitter_site" value="<?php echo esc_attr($twitter_site); ?>" class="regular-text" placeholder="username" />
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- Analytics -->
-                    <div class="sad-card">
-                        <div class="sad-card-title">Analytics & Tools</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_google_search_console">Search Console</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_google_search_console" name="sweetaddons_seo_google_search_console" value="<?php echo esc_attr($google_search_console); ?>" class="large-text" placeholder="Verification Code / File Name" />
                                 </td>
                             </tr>
                         </table>

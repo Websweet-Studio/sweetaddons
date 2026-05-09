@@ -77,6 +77,10 @@ class sweetaddons
         $this->plugin_name = 'sweetaddons';
 
         $this->load_dependencies();
+        new Sweetaddons_Auto_Updater(
+            plugin_dir_path(dirname(__FILE__)) . 'sweetaddons.php',
+            $this->version
+        );
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
