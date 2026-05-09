@@ -141,36 +141,34 @@ class Sweet_Option_Block
             $whitelist_count = count(explode(',', $wl_ip));
         }
 ?>
-        <div class="wrap vd-ons sweetaddons-dashboard">
-            <h1 class="sad-title">🔒 Pengaturan Blokir Login</h1>
+        <?php Sweetaddons_Admin_Layout::open('Pengaturan Blokir Login', 'Sweetaddons_block'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Pengaturan Utama</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('Sweetaddons_block_group'); ?>
+                    <?php do_settings_sections('Sweetaddons_block_group'); ?>
 
-            <div class="sad-grid">
-                <div class="sad-card">
-                    <div class="sad-card-title">Pengaturan Utama</div>
-                    <form method="post" action="options.php" class="sad-form">
-                        <?php settings_fields('Sweetaddons_block_group'); ?>
-                        <?php do_settings_sections('Sweetaddons_block_group'); ?>
+                    <table class="form-table">
+                        <?php
+                        foreach ($block_fields as $data) :
+                            echo '<tr>';
+                            echo '<th scope="row">' . $data['title'] . '</th>';
+                            echo '<td>';
+                            $this->field($data);
+                            echo '</td>';
+                            echo '</tr>';
+                        endforeach;
+                        ?>
+                    </table>
 
-                        <table class="form-table">
-                            <?php
-                            foreach ($block_fields as $data) :
-                                echo '<tr>';
-                                echo '<th scope="row">' . $data['title'] . '</th>';
-                                echo '<td>';
-                                $this->field($data);
-                                echo '</td>';
-                                echo '</tr>';
-                            endforeach;
-                            ?>
-                        </table>
-
-                        <div class="sad-actions-row" style="justify-content: flex-end;">
-                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
-                        </div>
-                    </form>
-                </div>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
             </div>
         </div>
+        <?php Sweetaddons_Admin_Layout::close(); ?>
 <?php
     }
 }

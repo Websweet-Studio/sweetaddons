@@ -125,37 +125,36 @@ class Sweet_Option_Maintenance
         ];
 
 ?>
-        <div class="wrap vd-ons sweetaddons-dashboard">
-            <h1 class="sad-title">Maintenance Mode</h1>
-            <div class="sad-grid">
-                <div class="sad-card">
-                    <div class="sad-card-title">Pengaturan Maintenance</div>
-                    <form method="post" action="options.php" class="sad-form">
-                        <?php settings_fields('Sweetaddons_maintenance_group'); ?>
-                        <?php do_settings_sections('Sweetaddons_maintenance_group'); ?>
+        <?php Sweetaddons_Admin_Layout::open('Maintenance Mode', 'Sweetaddons_maintenance'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Pengaturan Maintenance</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('Sweetaddons_maintenance_group'); ?>
+                    <?php do_settings_sections('Sweetaddons_maintenance_group'); ?>
 
-                        <table class="form-table">
-                            <?php
-                            foreach ($maintenance_fields as $data) :
-                                echo '<tr>';
-                                echo '<th scope="row">';
-                                echo $data['title'];
-                                echo '</th>';
-                                echo '<td>';
-                                $this->field($data);
-                                echo '</td>';
-                                echo '</tr>';
-                            endforeach;
-                            ?>
-                        </table>
+                    <table class="form-table">
+                        <?php
+                        foreach ($maintenance_fields as $data) :
+                            echo '<tr>';
+                            echo '<th scope="row">';
+                            echo $data['title'];
+                            echo '</th>';
+                            echo '<td>';
+                            $this->field($data);
+                            echo '</td>';
+                            echo '</tr>';
+                        endforeach;
+                        ?>
+                    </table>
 
-                        <div class="sad-actions-row" style="justify-content: flex-end;">
-                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
-                        </div>
-                    </form>
-                </div>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
             </div>
         </div>
+        <?php Sweetaddons_Admin_Layout::close(); ?>
 <?php
     }
 }

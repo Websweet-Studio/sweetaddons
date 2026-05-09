@@ -218,6 +218,7 @@ class sweetaddons
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweetaddons-admin.php';
 
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweetaddons-admin-layout.php';
 
         /**
          * Class untuk menambah option page untuk Admin Option

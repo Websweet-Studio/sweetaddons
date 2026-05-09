@@ -142,37 +142,36 @@ class Sweet_Option_Umum
         ];
 
 ?>
-        <div class="wrap vd-ons sweetaddons-dashboard">
-            <h1 class="sad-title">Pengaturan Umum</h1>
-            <div class="sad-grid">
-                <div class="sad-card">
-                    <div class="sad-card-title">Pengaturan Utama</div>
-                    <form method="post" action="options.php" class="sad-form">
-                        <?php settings_fields('Sweetaddons_umum_group'); ?>
-                        <?php do_settings_sections('Sweetaddons_umum_group'); ?>
+        <?php Sweetaddons_Admin_Layout::open('Pengaturan Umum', 'Sweetaddons_umum'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Pengaturan Utama</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('Sweetaddons_umum_group'); ?>
+                    <?php do_settings_sections('Sweetaddons_umum_group'); ?>
 
-                        <table class="form-table">
-                            <?php
-                            foreach ($umum_fields as $data) :
-                                echo '<tr>';
-                                echo '<th scope="row">';
-                                echo $data['title'];
-                                echo '</th>';
-                                echo '<td>';
-                                $this->field($data);
-                                echo '</td>';
-                                echo '</tr>';
-                            endforeach;
-                            ?>
-                        </table>
+                    <table class="form-table">
+                        <?php
+                        foreach ($umum_fields as $data) :
+                            echo '<tr>';
+                            echo '<th scope="row">';
+                            echo $data['title'];
+                            echo '</th>';
+                            echo '<td>';
+                            $this->field($data);
+                            echo '</td>';
+                            echo '</tr>';
+                        endforeach;
+                        ?>
+                    </table>
 
-                        <div class="sad-actions-row" style="justify-content: flex-end;">
-                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
-                        </div>
-                    </form>
-                </div>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
             </div>
         </div>
+        <?php Sweetaddons_Admin_Layout::close(); ?>
 <?php
     }
 }
