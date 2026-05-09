@@ -1,7 +1,8 @@
 <?php
 class Sweetaddons_Captcha
 {
-    private $active = false;
+    public $difficulty;
+    public $active;
     private $areas = array(
         'login' => '1',
         'comment' => '1',
