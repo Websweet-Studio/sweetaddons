@@ -120,8 +120,8 @@ class Sweetaddons_WhatsApp
     {
         $primary_color = get_option('sweetaddons_whatsapp_color', '#25D366');
         $size = get_option('sweetaddons_whatsapp_size', '60');
-        $offset_x = get_option('sweetaddons_whatsapp_offset_x', '20');
-        $offset_y = get_option('sweetaddons_whatsapp_offset_y', '20');
+        $offset_x = '20';
+        $offset_y = '20';
 
         return "
         .sweetaddons-wa-widget {
@@ -298,7 +298,7 @@ class Sweetaddons_WhatsApp
 
         @keyframes sweetaddons-wa-pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
 

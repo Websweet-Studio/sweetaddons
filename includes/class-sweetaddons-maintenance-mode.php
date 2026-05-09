@@ -31,6 +31,17 @@ class Sweetaddons_Maintenance_Mode
         }
     }
 
+    private function is_sweetaddons_admin_page()
+    {
+        if (!is_admin()) {
+            return false;
+        }
+
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+
+        return $page === 'custom_admin_options' || strpos($page, 'Sweetaddons_') === 0;
+    }
+
     public function check_maintenance_mode()
     {
         if (!current_user_can('manage_options') && !is_admin() && !is_page('myaccount')) {
@@ -166,6 +177,10 @@ class Sweetaddons_Maintenance_Mode
 
     public function qc_maintenance()
     {
+        if ($this->is_sweetaddons_admin_page()) {
+            return;
+        }
+
         echo '<div class="notice notice-warning notice-alt">';
         echo $this->check_permalink_settings();
         echo $this->check_site_icon();

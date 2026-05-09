@@ -32,14 +32,21 @@ class Sweetaddons_Hide_Admin_Notice
         add_action('admin_notices', array($this, 'hide_admin_notice'));
     }
 
+    private function is_sweetaddons_dashboard()
+    {
+        $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+
+        return $page === 'custom_admin_options' || strpos($page, 'Sweetaddons_') === 0;
+    }
+
     public function hide_admin_notice()
     {
         $hide_admin_notice_value = get_option('hide_admin_notice');
 
-        if ($hide_admin_notice_value) {
+        if ($hide_admin_notice_value || $this->is_sweetaddons_dashboard()) {
             global $wp_filter;
             remove_all_actions('admin_notices');
-            echo '<style>.notice { display: none !important; }</style>';
+            echo '<style>.notice, .update-nag, div.updated, div.error { display: none !important; }</style>';
         }
     }
 }

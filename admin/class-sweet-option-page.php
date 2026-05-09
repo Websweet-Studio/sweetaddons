@@ -189,8 +189,6 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_position');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_color');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_size');
-        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_offset_x');
-        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_offset_y');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_mobile');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_desktop');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_animation');
@@ -2249,8 +2247,6 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whatsapp_position',
                 'sweetaddons_whatsapp_color',
                 'sweetaddons_whatsapp_size',
-                'sweetaddons_whatsapp_offset_x',
-                'sweetaddons_whatsapp_offset_y',
                 'sweetaddons_whatsapp_show_mobile',
                 'sweetaddons_whatsapp_show_desktop',
                 'sweetaddons_whatsapp_animation',
@@ -2278,8 +2274,6 @@ class Custom_Admin_Option_Page
         $position = get_option('sweetaddons_whatsapp_position', 'bottom-right');
         $color = get_option('sweetaddons_whatsapp_color', '#25D366');
         $size = get_option('sweetaddons_whatsapp_size', '60');
-        $offset_x = get_option('sweetaddons_whatsapp_offset_x', '20');
-        $offset_y = get_option('sweetaddons_whatsapp_offset_y', '20');
         $show_mobile = get_option('sweetaddons_whatsapp_show_mobile', '1');
         $show_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
         $animation = get_option('sweetaddons_whatsapp_animation', 'pulse');
@@ -2425,18 +2419,6 @@ class Custom_Admin_Option_Page
                                         <p class="description">Where to position the chat button on your website.</p>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <th scope="row">Jarak Offset</th>
-                                    <td>
-                                        <label>
-                                            X: <input type="number" id="sweetaddons_whatsapp_offset_x" name="sweetaddons_whatsapp_offset_x" value="<?php echo esc_attr($offset_x); ?>" min="0" max="100" class="small-text" /> px
-                                        </label>
-                                        <label style="margin-left: 20px;">
-                                            Y: <input type="number" id="sweetaddons_whatsapp_offset_y" name="sweetaddons_whatsapp_offset_y" value="<?php echo esc_attr($offset_y); ?>" min="0" max="100" class="small-text" /> px
-                                        </label>
-                                        <p class="description">Distance from screen edges (X = horizontal, Y = vertical).</p>
-                                    </td>
-                                </tr>
                                 <!-- Visibility Section Header -->
                                 <tr>
                                     <td colspan="2">
@@ -2477,11 +2459,7 @@ class Custom_Admin_Option_Page
 
                         <div class="sad-card">
                             <div class="sad-card-title">👁️ Live Preview</div>
-                            <p style="margin-bottom: 20px;">This is how your WhatsApp chat button will look:</p>
-
                             <div style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
-                                <div style="position: absolute; top: 10px; left: 10px; color: #666; font-size: 12px;">Preview Area</div>
-
                                 <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
                                     <div id="whatsapp-preview-bubble" class="sweetaddons-wa-preview" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
                                         <div id="whatsapp-preview-inner" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
@@ -2528,8 +2506,8 @@ class Custom_Admin_Option_Page
                     const position = $('#sweetaddons_whatsapp_position').val();
                     const color = $('#sweetaddons_whatsapp_color').val();
                     const size = $('#sweetaddons_whatsapp_size').val() || '60';
-                    const offset_x = $('#sweetaddons_whatsapp_offset_x').val() || '20';
-                    const offset_y = $('#sweetaddons_whatsapp_offset_y').val() || '20';
+                    const offset_x = '20';
+                    const offset_y = '20';
                     const bubble_style = $('#sweetaddons_whatsapp_bubble_style').val();
 
                     const $container = $('#whatsapp-preview-container');
@@ -2593,8 +2571,6 @@ class Custom_Admin_Option_Page
                 $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_size').on('input', updateWhatsAppPreview);
-                $('#sweetaddons_whatsapp_offset_x').on('input', updateWhatsAppPreview);
-                $('#sweetaddons_whatsapp_offset_y').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_bubble_style').on('change', updateWhatsAppPreview);
 
                 // Initialize preview on page load
