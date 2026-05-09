@@ -321,7 +321,7 @@ class Custom_Admin_Option_Page
     {
     ?>
         <?php Sweetaddons_Admin_Layout::open('Dashboard', 'custom_admin_options'); ?>
-        <div class="sad-top">
+        <div class="sad-top sad-top--dashboard">
             <?php
             global $wpdb;
             $prefix = $wpdb->prefix;
@@ -337,8 +337,8 @@ class Custom_Admin_Option_Page
             $memory_limit = ini_get('memory_limit');
             $max_execution_time = ini_get('max_execution_time');
             ?>
-            <div class="sad-top-left">
-                <div class="sad-row">
+            <div class="sad-top-left sad-stack">
+                <div class="sad-row sad-row--stats">
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Hari Ini</div>
                         <div class="sad-card-value"><?php echo number_format($today ? (int)$today->pv : 0); ?></div>
@@ -355,13 +355,15 @@ class Custom_Admin_Option_Page
                         <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
                     </div>
                 </div>
-                <div class="sad-card">
+                <div class="sad-card sad-card--chart">
                     <div class="sad-card-title">Grafik 30 Hari Terakhir</div>
-                    <canvas id="sadThirtyChart"></canvas>
+                    <div class="sad-chartbox sad-chartbox--dashboard">
+                        <canvas id="sadThirtyChart"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="sad-top-right">
-                <div class="sad-card">
+            <div class="sad-top-right sad-stack">
+                <div class="sad-card sad-card--health">
                     <div class="sad-card-title">System Health</div>
                     <div class="sad-chips">
                         <span class="sad-chip">PHP <?php echo esc_html($php_version); ?></span>
@@ -369,11 +371,11 @@ class Custom_Admin_Option_Page
                         <span class="sad-chip">Max Exec <?php echo esc_html($max_execution_time); ?>s</span>
                     </div>
                 </div>
-                <div class="sad-card">
+                <div class="sad-card sad-card--site">
                     <div class="sad-card-title">Informasi Situs</div>
-                    <table class="widefat striped" style="border:none; box-shadow:none;">
+                    <table class="widefat striped sad-widefat sad-widefat--plain">
                         <thead>
-                            <tr style="background-color: #f0f0f1;">
+                            <tr>
                                 <th>Parameter</th>
                                 <th>Nilai</th>
                             </tr>
