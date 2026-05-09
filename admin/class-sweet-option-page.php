@@ -1552,7 +1552,7 @@ class Custom_Admin_Option_Page
         $description = get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client');
         $author = get_option('sweetaddons_whitelabel_author', 'WebsweetStudio');
         $author_uri = get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com');
-        $version = get_option('sweetaddons_whitelabel_version', '2.2.1');
+        $version = get_option('sweetaddons_whitelabel_version', '2.2.2');
         $menu_title = get_option('sweetaddons_whitelabel_menu_title', 'Sweet Addons');
         $hide_original = get_option('sweetaddons_whitelabel_hide_original', '');
         $accent_color = get_option('sweetaddons_whitelabel_accent_color', '#2271b1');

@@ -9,7 +9,7 @@
  * that starts the plugin.
  *
  * @link              https://websweetstudio.com
- * @since             1.1.0
+ * @since             2.2.2
  * @package           sweetaddons
  *
  * @wordpress-plugin
@@ -35,7 +35,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('SWEETADDONS_VERSION', '1.1.0');
+define('SWEETADDONS_VERSION', '2.2.2');
 define('PLUGIN_DIR', plugin_dir_path(__DIR__));
 define('PLUGIN_FILE', plugin_basename(__FILE__));
 define('PLUGIN_BASE_NAME', plugin_basename(__DIR__));
