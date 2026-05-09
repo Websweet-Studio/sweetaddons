@@ -18,7 +18,7 @@ class Sweetaddons_WhiteLabel
         add_filter('plugin_row_meta', array($this, 'modify_plugin_row_meta'), 10, 4);
         add_action('admin_head', array($this, 'custom_admin_styles'));
         add_filter('admin_footer_text', array($this, 'custom_admin_footer'));
-        add_action('admin_init', array($this, 'update_menu_title'));
+        add_action('admin_menu', array($this, 'update_menu_title'), 999);
     }
 
     public function modify_plugin_info($plugins)
@@ -142,6 +142,13 @@ class Sweetaddons_WhiteLabel
         global $menu, $submenu;
 
         $custom_menu_title = get_option('sweetaddons_whitelabel_menu_title');
+        if (!$custom_menu_title) {
+            $custom_menu_title = get_option('sweetaddons_whitelabel_plugin_name');
+        }
+        $plugin_name = get_option('sweetaddons_whitelabel_plugin_name');
+        if ($custom_menu_title === 'Sweet Addons' && $plugin_name && $plugin_name !== 'Sweet Addons') {
+            $custom_menu_title = $plugin_name;
+        }
 
         if ($custom_menu_title) {
             // Update main menu title
@@ -166,14 +173,19 @@ class Sweetaddons_WhiteLabel
 
     public static function get_white_labeled_info($key = null)
     {
+        $plugin_name = get_option('sweetaddons_whitelabel_plugin_name', 'Sweet Addons');
+        $menu_title = get_option('sweetaddons_whitelabel_menu_title', $plugin_name);
+        if ($menu_title === 'Sweet Addons' && $plugin_name !== 'Sweet Addons') {
+            $menu_title = $plugin_name;
+        }
         $white_label_data = array(
-            'plugin_name' => get_option('sweetaddons_whitelabel_plugin_name', 'Sweet Addons'),
+            'plugin_name' => $plugin_name,
             'plugin_uri' => get_option('sweetaddons_whitelabel_plugin_uri', 'https://websweetstudio.com'),
             'description' => get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client'),
             'author' => get_option('sweetaddons_whitelabel_author', 'WebsweetStudio'),
             'author_uri' => get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com'),
             'version' => get_option('sweetaddons_whitelabel_version', '2.2.2'),
-            'menu_title' => get_option('sweetaddons_whitelabel_menu_title', 'Sweet Addons'),
+            'menu_title' => $menu_title,
             'hide_original' => get_option('sweetaddons_whitelabel_hide_original', '')
         );
 
