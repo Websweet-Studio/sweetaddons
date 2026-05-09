@@ -35,7 +35,7 @@
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
     ?>
         <div class="wrap vd-ons sweetaddons-dashboard">
-            <h1 class="sad-title">🎨 Login Page Customizer</h1>
+            <h1 class="sad-title"> Login Page Customizer</h1>
 
             <form method="post" action="">
                 <?php wp_nonce_field('sweetaddons_login_customizer_settings'); ?>
@@ -43,7 +43,7 @@
                 <div class="sad-top">
                     <div class="sad-top-left">
                         <div class="sad-card">
-                            <div class="sad-card-title">⚙️ Konfigurasi Tampilan</div>
+                            <div class="sad-card-title">Konfigurasi Tampilan</div>
                             <table class="form-table">
                                 <tr>
                                     <th scope="row">Logo URL</th>
@@ -85,7 +85,7 @@
 
                     <div class="sad-top-right">
                         <div class="sad-card">
-                            <div class="sad-card-title">💾 Simpan Perubahan</div>
+                            <div class="sad-card-title">Simpan Perubahan</div>
                             <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
                         </div>
                     </div>

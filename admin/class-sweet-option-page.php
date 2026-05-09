@@ -598,7 +598,7 @@ class Custom_Admin_Option_Page
 
             <!-- Theme & Plugin Information -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">🎨 Theme & Plugin</h3>
+                <h3 style="margin-top: 0; color: #23282d;"> Theme & Plugin</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Active Theme:</strong></td>
@@ -644,7 +644,7 @@ class Custom_Admin_Option_Page
 
             <!-- Sweet Addons Status -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">⚙️ <?php echo class_exists('Sweetaddons_WhiteLabel') ? esc_html(Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name')) : 'Sweet Addons'; ?> Status</h3>
+                <h3 style="margin-top: 0; color: #23282d;"><?php echo class_exists('Sweetaddons_WhiteLabel') ? esc_html(Sweetaddons_WhiteLabel::get_white_labeled_info('plugin_name')) : 'Sweet Addons'; ?> Status</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Disable Comments:</strong></td>
@@ -673,7 +673,7 @@ class Custom_Admin_Option_Page
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h3 style="margin-top: 0; color: #23282d;">🚀 Quick Actions</h3>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">📊 Visitor Statistics</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Visitor Statistics</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">🔍 SEO Settings</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">🛡️ reCaptcha</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">🏷️ White Label</a>
@@ -1178,7 +1178,7 @@ class Custom_Admin_Option_Page
 
                     <!-- Social Media Settings -->
                     <div class="sad-card sad-mb-16" id="seo-social-settings">
-                        <div class="sad-card-title">📱 Social Media</div>
+                        <div class="sad-card-title">Social Media</div>
                         <table class="form-table">
                             <tr>
                                 <th scope="row"><label for="sweetaddons_seo_default_og_image">Default OG Image</label></th>
@@ -1193,7 +1193,7 @@ class Custom_Admin_Option_Page
                                                 </div>
                                             <?php else: ?>
                                                 <div style="width: 100%; height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; color: #999; background: #f9f9f9; border-radius: 4px;">
-                                                    <span>📷 Select Image</span>
+                                                    <span>Select Image</span>
                                                 </div>
                                             <?php endif; ?>
                                         </div>
@@ -1217,7 +1217,7 @@ class Custom_Admin_Option_Page
 
                     <!-- Analytics -->
                     <div class="sad-card">
-                        <div class="sad-card-title">📊 Analytics & Tools</div>
+                        <div class="sad-card-title">Analytics & Tools</div>
                         <table class="form-table">
                             <tr>
                                 <th scope="row"><label for="sweetaddons_seo_google_search_console">Search Console</label></th>
@@ -1235,7 +1235,7 @@ class Custom_Admin_Option_Page
 
                     <!-- Save Button Card -->
                     <div class="sad-card">
-                        <div class="sad-card-title">💾 Simpan Perubahan</div>
+                        <div class="sad-card-title">Simpan Perubahan</div>
                         <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
                         <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
                     </div>
@@ -1572,10 +1572,10 @@ class Custom_Admin_Option_Page
             <div class="sad-top">
                 <div class="sad-top-left">
                     <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title">⚙️ Konfigurasi White Label</div>
+                        <div class="sad-card-title">Konfigurasi White Label</div>
 
                         <!-- Plugin Information -->
-                        <h3 style="margin-bottom: 20px;">📋 Informasi Plugin</h3>
+                        <h3 style="margin-bottom: 20px;">Informasi Plugin</h3>
                         <p style="margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
                         <table class="form-table">
                             <tr>
@@ -1619,7 +1619,7 @@ class Custom_Admin_Option_Page
                         <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
                         <!-- Author Information -->
-                        <h3 style="margin-bottom: 20px;">👤 Informasi Penulis</h3>
+                        <h3 style="margin-bottom: 20px;">Informasi Penulis</h3>
                         <p style="margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
 
                         <table class="form-table">
@@ -1646,7 +1646,7 @@ class Custom_Admin_Option_Page
                         <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
                         <!-- Admin Customization -->
-                        <h3 style="margin-bottom: 20px;">⚙️ Admin Customization</h3>
+                        <h3 style="margin-bottom: 20px;">Admin Customization</h3>
                         <p style="margin-bottom: 20px;">Customize the admin interface appearance.</p>
 
                         <table class="form-table">
@@ -1673,7 +1673,7 @@ class Custom_Admin_Option_Page
                     </div>
 
                     <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title">🎨 Warna Brand</div>
+                        <div class="sad-card-title"> Warna Brand</div>
                         <table class="form-table">
                             <tr>
                                 <th scope="row"><label for="sweetaddons_whitelabel_accent_color">Accent Color</label></th>
@@ -1702,10 +1702,10 @@ class Custom_Admin_Option_Page
                     </div>
 
                     <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title">📊 Perbandingan Branding</div>
+                        <div class="sad-card-title">Perbandingan Branding</div>
                         <div class="sad-grid" style="gap: 20px;">
                             <div class="sad-card">
-                                <div class="sad-card-title">🔴 Current (Original)</div>
+                                <div class="sad-card-title">Current (Original)</div>
                                 <table class="form-table sad-table-fixed">
                                     <tr>
                                         <th>Plugin Name</th>
@@ -1730,7 +1730,7 @@ class Custom_Admin_Option_Page
                                 </table>
                             </div>
                             <div class="sad-card">
-                                <div class="sad-card-title">🟢 New (White Labeled)</div>
+                                <div class="sad-card-title">New (White Labeled)</div>
                                 <table class="form-table sad-table-fixed">
                                     <tr>
                                         <th>Plugin Name</th>
@@ -1887,7 +1887,7 @@ class Custom_Admin_Option_Page
 
                 <div class="sad-top-right">
                     <div class="sad-card">
-                        <div class="sad-card-title">💾 Simpan Perubahan</div>
+                        <div class="sad-card-title">Simpan Perubahan</div>
                         <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
                     </div>
                 </div>
@@ -2047,7 +2047,7 @@ class Custom_Admin_Option_Page
             <div class="sad-top">
                 <div class="sad-top-left">
                     <div class="sad-card">
-                        <div class="sad-card-title">🗑️ Item yang Dapat Diberishkan</div>
+                        <div class="sad-card-title">Item yang Dapat Diberishkan</div>
                         <table class="form-table">
                             <tr>
                                 <th scope="row"><input type="checkbox" name="items[]" value="revisions" checked> Post Revisions</th>
@@ -2191,7 +2191,7 @@ class Custom_Admin_Option_Page
                             </tr>
                             <tr>
                                 <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;">🎨 Pengaturan Tampilan</h3>
+                                    <h3 style="margin: 0;"> Pengaturan Tampilan</h3>
                                 </th>
                             </tr>
                             <tr>
