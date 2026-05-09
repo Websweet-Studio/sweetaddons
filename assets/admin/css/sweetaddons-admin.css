@@ -688,6 +688,19 @@
   margin-bottom: 16px;
 }
 
+.sad-table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.sad-truncate {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sad-lead {
   margin: 0 0 16px;
   color: var(--sad-ink);

@@ -47,7 +47,7 @@ class Sweetaddons_WhatsApp
         $position = get_option('sweetaddons_whatsapp_position', 'bottom-right');
         $show_on_mobile = get_option('sweetaddons_whatsapp_show_mobile', '1');
         $show_on_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
-        $animation = get_option('sweetaddons_whatsapp_animation', 'pulse');
+        $animation = get_option('sweetaddons_whatsapp_animation', 'none');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
 
         // Clean phone number
@@ -119,7 +119,7 @@ class Sweetaddons_WhatsApp
     private function get_whatsapp_css()
     {
         $primary_color = get_option('sweetaddons_whatsapp_color', '#25D366');
-        $size = get_option('sweetaddons_whatsapp_size', '60');
+        $size = '60';
         $offset_x = '20';
         $offset_y = '20';
 

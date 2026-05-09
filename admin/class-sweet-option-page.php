@@ -187,7 +187,6 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_button_text');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_position');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_color');
-        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_size');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_mobile');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_desktop');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_animation');
@@ -1707,14 +1706,14 @@ class Custom_Admin_Option_Page
                         <div class="sad-grid" style="gap: 20px;">
                             <div class="sad-card">
                                 <div class="sad-card-title">🔴 Current (Original)</div>
-                                <table class="form-table">
+                                <table class="form-table sad-table-fixed">
                                     <tr>
                                         <th>Plugin Name</th>
                                         <td><?php echo esc_html($plugin_data['Name']); ?></td>
                                     </tr>
                                     <tr>
                                         <th>Description</th>
-                                        <td><?php echo esc_html($plugin_data['Description']); ?></td>
+                                        <td title="<?php echo esc_attr($plugin_data['Description']); ?>"><span class="sad-truncate"><?php echo esc_html($plugin_data['Description']); ?></span></td>
                                     </tr>
                                     <tr>
                                         <th>Version</th>
@@ -1722,24 +1721,24 @@ class Custom_Admin_Option_Page
                                     </tr>
                                     <tr>
                                         <th>Author</th>
-                                        <td><?php echo esc_html($plugin_data['Author']); ?></td>
+                                        <td title="<?php echo esc_attr($plugin_data['Author']); ?>"><span class="sad-truncate"><?php echo esc_html($plugin_data['Author']); ?></span></td>
                                     </tr>
                                     <tr>
                                         <th>Plugin URI</th>
-                                        <td><?php echo esc_html($plugin_data['PluginURI']); ?></td>
+                                        <td title="<?php echo esc_attr($plugin_data['PluginURI']); ?>"><span class="sad-truncate"><?php echo esc_attr($plugin_data['PluginURI']); ?></span></td>
                                     </tr>
                                 </table>
                             </div>
                             <div class="sad-card">
                                 <div class="sad-card-title">🟢 New (White Labeled)</div>
-                                <table class="form-table">
+                                <table class="form-table sad-table-fixed">
                                     <tr>
                                         <th>Plugin Name</th>
                                         <td><?php echo esc_html($plugin_name); ?></td>
                                     </tr>
                                     <tr>
                                         <th>Description</th>
-                                        <td><?php echo esc_html($description); ?></td>
+                                        <td title="<?php echo esc_attr($description); ?>"><span class="sad-truncate"><?php echo esc_html($description); ?></span></td>
                                     </tr>
                                     <tr>
                                         <th>Version</th>
@@ -1747,11 +1746,11 @@ class Custom_Admin_Option_Page
                                     </tr>
                                     <tr>
                                         <th>Author</th>
-                                        <td><?php echo esc_html($author); ?></td>
+                                        <td title="<?php echo esc_attr($author); ?>"><span class="sad-truncate"><?php echo esc_attr($author); ?></span></td>
                                     </tr>
                                     <tr>
                                         <th>Plugin URI</th>
-                                        <td><?php echo esc_html($plugin_uri); ?></td>
+                                        <td title="<?php echo esc_attr($plugin_uri); ?>"><span class="sad-truncate"><?php echo esc_attr($plugin_uri); ?></span></td>
                                     </tr>
                                 </table>
                             </div>
@@ -2098,7 +2097,6 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whatsapp_button_text',
                 'sweetaddons_whatsapp_position',
                 'sweetaddons_whatsapp_color',
-                'sweetaddons_whatsapp_size',
                 'sweetaddons_whatsapp_show_mobile',
                 'sweetaddons_whatsapp_show_desktop',
                 'sweetaddons_whatsapp_animation',
@@ -2125,10 +2123,9 @@ class Custom_Admin_Option_Page
         $button_text = get_option('sweetaddons_whatsapp_button_text', 'Chat dengan kami');
         $position = get_option('sweetaddons_whatsapp_position', 'bottom-right');
         $color = get_option('sweetaddons_whatsapp_color', '#25D366');
-        $size = get_option('sweetaddons_whatsapp_size', '60');
         $show_mobile = get_option('sweetaddons_whatsapp_show_mobile', '1');
         $show_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
-        $animation = get_option('sweetaddons_whatsapp_animation', 'pulse');
+        $animation = get_option('sweetaddons_whatsapp_animation', 'none');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
 
@@ -2145,7 +2142,7 @@ class Custom_Admin_Option_Page
             <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
             <div class="sad-top">
                 <div class="sad-top-left">
-                    <div class="sad-card">
+                    <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">Pengaturan Dasar</div>
 
                         <table class="form-table">
@@ -2217,15 +2214,6 @@ class Custom_Admin_Option_Page
                                     <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
                                     <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly />
                                     <p class="description">Background color of the WhatsApp button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_size">Ukuran Tombol</label>
-                                </th>
-                                <td>
-                                    <input type="number" id="sweetaddons_whatsapp_size" name="sweetaddons_whatsapp_size" value="<?php echo esc_attr($size); ?>" min="40" max="100" class="small-text" /> px
-                                    <p class="description">Ukuran tombol chat (40-100px).</p>
                                 </td>
                             </tr>
                             <tr>
@@ -2355,7 +2343,7 @@ class Custom_Admin_Option_Page
                     const button_text = $('#sweetaddons_whatsapp_button_text').val().trim() || 'Chat dengan kami';
                     const position = $('#sweetaddons_whatsapp_position').val();
                     const color = $('#sweetaddons_whatsapp_color').val();
-                    const size = $('#sweetaddons_whatsapp_size').val() || '60';
+                    const size = '60';
                     const offset_x = '20';
                     const offset_y = '20';
                     const bubble_style = $('#sweetaddons_whatsapp_bubble_style').val();
@@ -2420,7 +2408,6 @@ class Custom_Admin_Option_Page
                 $('#sweetaddons_whatsapp_button_text').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
-                $('#sweetaddons_whatsapp_size').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_bubble_style').on('change', updateWhatsAppPreview);
 
                 // Initialize preview on page load
