@@ -828,10 +828,6 @@ class Sweetaddons_SEO
     public function handle_sitemap_request()
     {
         $qv = get_query_var('sweetaddons_sitemap');
-        $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
-        if ($enabled !== '1') {
-            return;
-        }
         if ($qv === 'index') {
             $this->generate_xml_sitemap_index();
             exit;
@@ -1010,9 +1006,8 @@ class Sweetaddons_SEO
         add_rewrite_rule('^sitemap-pages-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=pages&sweetaddons_sitemap_page=$matches[1]', 'top');
         add_rewrite_rule('^sitemap-categories-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=categories&sweetaddons_sitemap_page=$matches[1]', 'top');
         add_rewrite_rule('^sitemap-tags-([0-9]+)\.xml/?$', 'index.php?sweetaddons_sitemap=tags&sweetaddons_sitemap_page=$matches[1]', 'top');
-        $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
         $initialized = get_option('sweetaddons_sitemap_rules_initialized');
-        if ($enabled === '1' && $initialized !== '2') {
+        if ($initialized !== '2') {
             flush_rewrite_rules();
             update_option('sweetaddons_sitemap_rules_initialized', 2);
         }
@@ -1027,10 +1022,6 @@ class Sweetaddons_SEO
 
     public function template_redirect_sitemap()
     {
-        $enabled = get_option('sweetaddons_seo_enable_sitemap', '1');
-        if ($enabled !== '1') {
-            return;
-        }
         $qv = get_query_var('sweetaddons_sitemap');
         if ($qv === 'index') {
             $cache = get_transient($this->get_sitemap_cache_key('index'));

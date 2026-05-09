@@ -27,7 +27,6 @@ class Sweetaddons_Maintenance_Mode
     {
         if (get_option('maintenance_mode')) {
             add_action('wp', array($this, 'check_maintenance_mode'));
-            add_action('admin_notices', [$this, 'qc_maintenance']);
         }
     }
 
@@ -177,18 +176,18 @@ class Sweetaddons_Maintenance_Mode
 
     public function qc_maintenance()
     {
-        if ($this->is_sweetaddons_admin_page()) {
-            return;
-        }
+        return $this->get_qc_maintenance_content();
+    }
 
-        echo '<div class="notice notice-warning notice-alt">';
-        echo $this->check_permalink_settings();
-        echo $this->check_site_icon();
-        echo $this->check_recaptcha();
-        echo $this->check_seo();
-        echo $this->check_domain_extension();
-        echo $this->check_installed_plugins();
-        echo '</div>';
+    public function get_qc_maintenance_content()
+    {
+        return
+            $this->check_permalink_settings()
+            . $this->check_site_icon()
+            . $this->check_recaptcha()
+            . $this->check_seo()
+            . $this->check_domain_extension()
+            . $this->check_installed_plugins();
     }
 
     public function check_domain_extension()

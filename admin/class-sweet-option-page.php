@@ -165,7 +165,6 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_description');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_default_og_image');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_twitter_site');
-        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_enable_sitemap');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_google_search_console');
 
         // reCaptcha settings
@@ -336,6 +335,15 @@ class Custom_Admin_Option_Page
             $php_version = phpversion();
             $memory_limit = ini_get('memory_limit');
             $max_execution_time = ini_get('max_execution_time');
+            $qc_content = '';
+            if (class_exists('Sweetaddons_Maintenance_Mode')) {
+                global $sweet_maintenance_mode;
+                if ($sweet_maintenance_mode instanceof Sweetaddons_Maintenance_Mode) {
+                    $qc_content = $sweet_maintenance_mode->qc_maintenance();
+                } else {
+                    $qc_content = (new Sweetaddons_Maintenance_Mode())->qc_maintenance();
+                }
+            }
             ?>
             <div class="sad-top-left sad-stack">
                 <div class="sad-row sad-row--stats">
@@ -403,6 +411,16 @@ class Custom_Admin_Option_Page
             </div>
         </div>
         <div class="sad-grid">
+            <div class="sad-card sad-card--qc">
+                <div class="sad-card-title">QC</div>
+                <?php if (!empty(trim(wp_strip_all_tags($qc_content)))) : ?>
+                    <div class="sad-qc-list">
+                        <?php echo wp_kses_post($qc_content); ?>
+                    </div>
+                <?php else : ?>
+                    <p class="sad-qc-empty">Tidak ada catatan QC saat ini.</p>
+                <?php endif; ?>
+            </div>
             <div class="sad-card sad-actions">
                 <div class="sad-card-title">Aksi Cepat</div>
                 <div class="sad-actions-row">
@@ -720,7 +738,7 @@ class Custom_Admin_Option_Page
         <?php echo $rebuild_message; ?>
 
         <!-- Rebuild Stats Button -->
-        <div class="sad-card sad-card--spaced">
+        <div class="sad-card sad-card--spaced sad-mb-16">
             <div class="sad-card-title">Maintenance</div>
             <form method="post" class="sad-inline">
                 <?php wp_nonce_field('rebuild_stats'); ?>
@@ -1026,7 +1044,6 @@ class Custom_Admin_Option_Page
                 'sweetaddons_seo_home_description',
                 'sweetaddons_seo_default_og_image',
                 'sweetaddons_seo_twitter_site',
-                'sweetaddons_seo_enable_sitemap',
                 'sweetaddons_seo_google_search_console',
                 'sweetaddons_seo_template_single_title',
                 'sweetaddons_seo_template_single_description',
@@ -1041,11 +1058,6 @@ class Custom_Admin_Option_Page
             foreach ($fields as $field) {
                 if (isset($_POST[$field])) {
                     update_option($field, sanitize_text_field($_POST[$field]));
-                } else {
-                    // For checkboxes that might be unchecked
-                    if ($field === 'sweetaddons_seo_enable_sitemap') {
-                        update_option($field, '0');
-                    }
                 }
             }
         }
@@ -1054,7 +1066,6 @@ class Custom_Admin_Option_Page
         $home_description = get_option('sweetaddons_seo_home_description', '');
         $default_og_image = get_option('sweetaddons_seo_default_og_image', '');
         $twitter_site = get_option('sweetaddons_seo_twitter_site', '');
-        $enable_sitemap = get_option('sweetaddons_seo_enable_sitemap', '1');
         $google_search_console = get_option('sweetaddons_seo_google_search_console', '');
         $tpl_single_title = get_option('sweetaddons_seo_template_single_title', '{post_title} | {site_name}');
         $tpl_single_desc = get_option('sweetaddons_seo_template_single_description', '{excerpt}');
@@ -1082,7 +1093,7 @@ class Custom_Admin_Option_Page
                 <div class="sad-top-left">
 
                     <!-- General SEO Settings -->
-                    <div class="sad-card" id="seo-general-settings">
+                    <div class="sad-card sad-mb-16" id="seo-general-settings">
                         <div class="sad-card-title">SEO Halaman Utama</div>
                         <table class="form-table">
                             <tr>
@@ -1104,7 +1115,7 @@ class Custom_Admin_Option_Page
                         </table>
                     </div>
 
-                    <div class="sad-card" id="seo-templates-settings">
+                    <div class="sad-card sad-mb-16" id="seo-templates-settings">
                         <div class="sad-card-title">Template Judul & Deskripsi</div>
                         <table class="form-table">
                             <tr>
@@ -1167,7 +1178,7 @@ class Custom_Admin_Option_Page
                     </div>
 
                     <!-- Social Media Settings -->
-                    <div class="sad-card" id="seo-social-settings">
+                    <div class="sad-card sad-mb-16" id="seo-social-settings">
                         <div class="sad-card-title">📱 Social Media</div>
                         <table class="form-table">
                             <tr>
@@ -1228,22 +1239,6 @@ class Custom_Admin_Option_Page
                         <div class="sad-card-title">💾 Simpan Perubahan</div>
                         <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
                         <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
-                    </div>
-
-                    <!-- Technical SEO -->
-                    <div class="sad-card" id="seo-technical-settings">
-                        <div class="sad-card-title">Technical SEO</div>
-                        <p>
-                            <label>
-                                <input type="checkbox" name="sweetaddons_seo_enable_sitemap" value="1" <?php checked($enable_sitemap, '1'); ?> />
-                                Enable XML Sitemap
-                            </label>
-                        </p>
-                        <?php if ($enable_sitemap): ?>
-                            <p class="description">
-                                <a href="<?php echo home_url('/sitemap.xml'); ?>" target="_blank" class="button button-small">View Sitemap</a>
-                            </p>
-                        <?php endif; ?>
                     </div>
 
                 </div>
@@ -1400,7 +1395,7 @@ class Custom_Admin_Option_Page
                 <div class="sad-top-left">
 
                     <!-- reCaptcha Configuration -->
-                    <div class="sad-card" id="recaptcha-general-settings">
+                    <div class="sad-card sad-mb-16" id="recaptcha-general-settings">
                         <div class="sad-card-title">Konfigurasi Utama</div>
                         <table class="form-table">
                             <tr>
@@ -1492,7 +1487,7 @@ class Custom_Admin_Option_Page
                 <div class="sad-top-right">
 
                     <!-- Save Button Card -->
-                    <div class="sad-card">
+                    <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">Simpan Perubahan</div>
                         <div class="sad-subtext sad-mb-12">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan kesulitan atau area proteksi.</div>
                         <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('class' => 'sad-btn-block')); ?>
@@ -1572,13 +1567,12 @@ class Custom_Admin_Option_Page
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan White Label berhasil disimpan.</p></div>';
         }
         ?>
-        <p class="sad-lead">Kustomisasi branding plugin dan informasi yang ditampilkan kepada pengguna.</p>
 
         <form method="post" action="" class="sad-form">
             <?php wp_nonce_field('sweetaddons_whitelabel_settings'); ?>
             <div class="sad-top">
                 <div class="sad-top-left">
-                    <div class="sad-card">
+                    <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">⚙️ Konfigurasi White Label</div>
 
                         <!-- Plugin Information -->
@@ -1679,7 +1673,7 @@ class Custom_Admin_Option_Page
                         </table>
                     </div>
 
-                    <div class="sad-card">
+                    <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">🎨 Warna Brand</div>
                         <table class="form-table">
                             <tr>
@@ -1708,9 +1702,9 @@ class Custom_Admin_Option_Page
                         </script>
                     </div>
 
-                    <div class="sad-card">
+                    <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">📊 Perbandingan Branding</div>
-                        <div class="sad-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="sad-grid" style="gap: 20px;">
                             <div class="sad-card">
                                 <div class="sad-card-title">🔴 Current (Original)</div>
                                 <table class="form-table">

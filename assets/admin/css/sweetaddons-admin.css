@@ -204,6 +204,26 @@
 .sad-widefat--plain td {
   word-break: break-word;
 }
+.sad-qc-list {
+  display: grid;
+  gap: 10px;
+}
+.sad-qc-list p {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #f4d38c;
+  border-radius: 12px;
+  background: #fff9eb;
+  color: #7c5a10;
+  line-height: 1.55;
+}
+.sad-qc-list a {
+  font-weight: 600;
+}
+.sad-qc-empty {
+  margin: 0;
+  color: #6b7280;
+}
 
 @media (max-width: 1200px) {
   .sad-row--stats {
@@ -497,12 +517,12 @@
 }
 
 .sad-apple .sad-grid {
-  gap: 24px;
+  gap: 16px;
 }
 
 .sad-apple .sad-top {
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .sad-apple .sad-top--dashboard {
@@ -510,12 +530,12 @@
 }
 
 .sad-apple .sad-row {
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .sad-apple .sad-stack {
-  gap: 24px;
+  gap: 16px;
 }
 
 .sad-apple .sad-stack > .sad-card,
@@ -554,6 +574,16 @@
   letter-spacing: -0.12px;
 }
 
+.sad-apple .sad-qc-list p {
+  background: rgba(255, 243, 205, 0.6);
+  border-color: rgba(180, 136, 0, 0.18);
+  color: var(--sad-ink);
+}
+
+.sad-apple .sad-qc-empty {
+  color: var(--sad-ink-muted);
+}
+
 .sad-apple .sad-stat {
   border-left: 0;
 }
@@ -588,11 +618,11 @@
 }
 
 .sad-card--spaced {
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 .sad-grid--spaced {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .sad-grid--charts {
@@ -601,7 +631,7 @@
 
 .sad-grid--tables {
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 16px;
 }
 
 .sad-chartbox {
@@ -652,6 +682,10 @@
 
 .sad-mb-12 {
   margin-bottom: 12px;
+}
+
+.sad-mb-16 {
+  margin-bottom: 16px;
 }
 
 .sad-lead {
