@@ -180,7 +180,6 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_description');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_author');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_author_uri');
-        register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_version');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_menu_title');
         register_setting('sweetaddons_whitelabel_group', 'sweetaddons_whitelabel_hide_original');
 
@@ -1523,7 +1522,6 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whitelabel_description',
                 'sweetaddons_whitelabel_author',
                 'sweetaddons_whitelabel_author_uri',
-                'sweetaddons_whitelabel_version',
                 'sweetaddons_whitelabel_menu_title',
                 'sweetaddons_whitelabel_hide_original',
                 'sweetaddons_whitelabel_accent_color'
@@ -1539,6 +1537,8 @@ class Custom_Admin_Option_Page
                     }
                 }
             }
+
+            delete_option('sweetaddons_whitelabel_version');
         }
 
         // Get current settings
@@ -1547,7 +1547,6 @@ class Custom_Admin_Option_Page
         $description = get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client');
         $author = get_option('sweetaddons_whitelabel_author', 'WebsweetStudio');
         $author_uri = get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com');
-        $version = get_option('sweetaddons_whitelabel_version', '2.2.2');
         $menu_title = get_option('sweetaddons_whitelabel_menu_title', $plugin_name);
         if ($menu_title === 'Sweet Addons' && $plugin_name !== 'Sweet Addons') {
             $menu_title = $plugin_name;
@@ -1592,15 +1591,6 @@ class Custom_Admin_Option_Page
                                 <td>
                                     <textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea>
                                     <p class="description">Deskripsi yang ditampilkan di daftar plugin.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_version">Versi</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whitelabel_version" name="sweetaddons_whitelabel_version" value="<?php echo esc_attr($version); ?>" class="regular-text" />
-                                    <p class="description">Nomor versi plugin.</p>
                                 </td>
                             </tr>
                             <tr>
@@ -1737,10 +1727,6 @@ class Custom_Admin_Option_Page
                                     <tr>
                                         <th>Description</th>
                                         <td title="<?php echo esc_attr($description); ?>"><span class="sad-truncate"><?php echo esc_html($description); ?></span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Version</th>
-                                        <td><?php echo esc_html($version); ?></td>
                                     </tr>
                                     <tr>
                                         <th>Author</th>
@@ -2125,6 +2111,7 @@ class Custom_Admin_Option_Page
 
                 if (!empty($agents)) {
                     update_option('sweetaddons_whatsapp_agents', $agents);
+                    delete_option('sweetaddons_whatsapp_phone');
                 } else {
                     delete_option('sweetaddons_whatsapp_agents');
                 }

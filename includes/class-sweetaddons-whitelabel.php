@@ -35,7 +35,6 @@ class Sweetaddons_WhiteLabel
         $description = get_option('sweetaddons_whitelabel_description');
         $author = get_option('sweetaddons_whitelabel_author');
         $author_uri = get_option('sweetaddons_whitelabel_author_uri');
-        $version = get_option('sweetaddons_whitelabel_version');
 
         // Apply white label settings if they exist
         if ($plugin_name) {
@@ -58,10 +57,6 @@ class Sweetaddons_WhiteLabel
 
         if ($author_uri) {
             $plugins[$plugin_file]['AuthorURI'] = $author_uri;
-        }
-
-        if ($version) {
-            $plugins[$plugin_file]['Version'] = $version;
         }
 
         return $plugins;
@@ -184,7 +179,6 @@ class Sweetaddons_WhiteLabel
             'description' => get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client'),
             'author' => get_option('sweetaddons_whitelabel_author', 'WebsweetStudio'),
             'author_uri' => get_option('sweetaddons_whitelabel_author_uri', 'https://websweetstudio.com'),
-            'version' => get_option('sweetaddons_whitelabel_version', '2.2.2'),
             'menu_title' => $menu_title,
             'hide_original' => get_option('sweetaddons_whitelabel_hide_original', '')
         );
