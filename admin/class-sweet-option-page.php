@@ -186,7 +186,6 @@ class Custom_Admin_Option_Page
 
         // WhatsApp settings
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_enable');
-        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_phone');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_message');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_button_text');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_position');
@@ -196,6 +195,7 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_animation');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_bubble_style');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_tooltip');
+        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_agents');
     }
 
     public function field($data)
@@ -2086,11 +2086,54 @@ class Custom_Admin_Option_Page
 
     public function whatsapp_page_callback()
     {
+        wp_enqueue_media();
+
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
+            if (isset($_POST['sweetaddons_whatsapp_agents']) && is_array($_POST['sweetaddons_whatsapp_agents'])) {
+                $agents = array();
+                foreach ($_POST['sweetaddons_whatsapp_agents'] as $agent) {
+                    if (!is_array($agent)) {
+                        continue;
+                    }
+
+                    $name = isset($agent['name']) ? sanitize_text_field($agent['name']) : '';
+                    $phone_raw = isset($agent['phone']) ? sanitize_text_field($agent['phone']) : '';
+                    $phone = preg_replace('/[^0-9]/', '', $phone_raw);
+                    $role = isset($agent['role']) ? sanitize_text_field($agent['role']) : '';
+                    $note = isset($agent['note']) ? sanitize_text_field($agent['note']) : '';
+                    $status = isset($agent['status']) ? sanitize_text_field($agent['status']) : 'online';
+                    $avatar = isset($agent['avatar']) ? esc_url_raw($agent['avatar']) : '';
+
+                    if (empty($phone)) {
+                        continue;
+                    }
+
+                    if (!in_array($status, array('online', 'offline'), true)) {
+                        $status = 'online';
+                    }
+
+                    $agents[] = array(
+                        'name'   => $name,
+                        'phone'  => $phone,
+                        'role'   => $role,
+                        'note'   => $note,
+                        'status' => $status,
+                        'avatar' => $avatar,
+                    );
+                }
+
+                if (!empty($agents)) {
+                    update_option('sweetaddons_whatsapp_agents', $agents);
+                } else {
+                    delete_option('sweetaddons_whatsapp_agents');
+                }
+            } else {
+                delete_option('sweetaddons_whatsapp_agents');
+            }
+
             $fields = array(
                 'sweetaddons_whatsapp_enable',
-                'sweetaddons_whatsapp_phone',
                 'sweetaddons_whatsapp_message',
                 'sweetaddons_whatsapp_button_text',
                 'sweetaddons_whatsapp_position',
@@ -2126,8 +2169,32 @@ class Custom_Admin_Option_Page
         $animation = get_option('sweetaddons_whatsapp_animation', 'none');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
+        $agents = get_option('sweetaddons_whatsapp_agents', array());
+        if (!is_array($agents)) {
+            $agents = array();
+        }
 
-        $display_phone = !empty($phone) ? $phone : 'Not Configured';
+        if (empty($agents) && !empty($phone)) {
+            $agents = array(
+                array(
+                    'name'   => '',
+                    'phone'  => $phone,
+                    'role'   => 'Customer Service',
+                    'note'   => '',
+                    'status' => 'online',
+                    'avatar' => '',
+                ),
+            );
+        }
+
+        $has_agents = false;
+        foreach ($agents as $agent) {
+            if (is_array($agent) && !empty($agent['phone'])) {
+                $has_agents = true;
+                break;
+            }
+        }
+
         $display_position = ucwords(str_replace('-', ' ', $position));
     ?>
         <?php Sweetaddons_Admin_Layout::open('WhatsApp', 'Sweetaddons_whatsapp'); ?>
@@ -2155,12 +2222,108 @@ class Custom_Admin_Option_Page
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_phone">WhatsApp Number</label>
-                                </th>
+                                <th scope="row">Multi Agen</th>
                                 <td>
-                                    <input type="text" id="sweetaddons_whatsapp_phone" name="sweetaddons_whatsapp_phone" value="<?php echo esc_attr($phone); ?>" class="large-text" placeholder="+62812345678901" />
-                                    <p class="description">Your WhatsApp number with country code (e.g., +62812345678901).</p>
+                                    <div id="sweetaddons-wa-agents">
+                                        <?php
+                                        $agent_index = 0;
+                                        foreach ($agents as $agent) :
+                                            if (!is_array($agent)) {
+                                                continue;
+                                            }
+                                            $agent_name = isset($agent['name']) ? $agent['name'] : '';
+                                            $agent_phone = isset($agent['phone']) ? $agent['phone'] : '';
+                                            $agent_role = isset($agent['role']) ? $agent['role'] : '';
+                                            $agent_note = isset($agent['note']) ? $agent['note'] : '';
+                                            $agent_status = isset($agent['status']) ? $agent['status'] : 'online';
+                                            $agent_avatar = isset($agent['avatar']) ? $agent['avatar'] : '';
+                                        ?>
+                                            <div class="sweetaddons-wa-agent-row" style="border: 1px solid #e5e5e5; border-radius: 10px; padding: 12px; margin: 0 0 12px; background: #fff;">
+                                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                                    <div style="flex: 1; min-width: 160px;">
+                                                        <label style="display:block; margin: 0 0 6px;">Nama</label>
+                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][name]" value="<?php echo esc_attr($agent_name); ?>" class="regular-text" style="width: 100%;" placeholder="Nama Agen" />
+                                                    </div>
+                                                    <div style="flex: 1; min-width: 160px;">
+                                                        <label style="display:block; margin: 0 0 6px;">Nomor WhatsApp</label>
+                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][phone]" value="<?php echo esc_attr($agent_phone); ?>" class="regular-text" style="width: 100%;" placeholder="62812345678901" />
+                                                    </div>
+                                                    <div style="flex: 1; min-width: 160px;">
+                                                        <label style="display:block; margin: 0 0 6px;">Role</label>
+                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][role]" value="<?php echo esc_attr($agent_role); ?>" class="regular-text" style="width: 100%;" placeholder="Customer Service" />
+                                                    </div>
+                                                    <div style="flex: 1; min-width: 160px;">
+                                                        <label style="display:block; margin: 0 0 6px;">Status</label>
+                                                        <select name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][status]" style="width: 100%;">
+                                                            <option value="online" <?php selected($agent_status, 'online'); ?>>Online</option>
+                                                            <option value="offline" <?php selected($agent_status, 'offline'); ?>>Offline</option>
+                                                        </select>
+                                                    </div>
+                                                    <div style="flex: 1 1 100%; min-width: 160px;">
+                                                        <label style="display:block; margin: 0 0 6px;">Note</label>
+                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][note]" value="<?php echo esc_attr($agent_note); ?>" class="regular-text" style="width: 100%;" placeholder="Contoh: Saya akan kembali dalam 4 jam" />
+                                                    </div>
+                                                    <div style="flex: 1 1 100%; min-width: 160px;">
+                                                        <label style="display:block; margin: 0 0 6px;">Avatar URL (opsional)</label>
+                                                        <div style="display:flex; gap: 8px; align-items: center;">
+                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][avatar]" value="<?php echo esc_attr($agent_avatar); ?>" class="regular-text sweetaddons-wa-avatar-input" style="width: 100%;" placeholder="https://..." />
+                                                            <button type="button" class="button sweetaddons-wa-upload-avatar">Upload</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div style="margin-top: 8px;">
+                                                    <button type="button" class="button-link-delete sweetaddons-wa-remove-agent">Hapus</button>
+                                                </div>
+                                            </div>
+                                        <?php
+                                            $agent_index++;
+                                        endforeach;
+                                        ?>
+                                    </div>
+                                    <div style="display:flex; gap: 8px; align-items:center;">
+                                        <button type="button" class="button" id="sweetaddons-wa-add-agent">Tambah Agen</button>
+                                        <p class="description" style="margin: 0;">Agen pertama menjadi default. Jika lebih dari satu agen, widget menampilkan daftar pilihan agen.</p>
+                                    </div>
+
+                                    <script type="text/template" id="sweetaddons-wa-agent-template">
+                                        <div class="sweetaddons-wa-agent-row" style="border: 1px solid #e5e5e5; border-radius: 10px; padding: 12px; margin: 0 0 12px; background: #fff;">
+                                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                                <div style="flex: 1; min-width: 160px;">
+                                                    <label style="display:block; margin: 0 0 6px;">Nama</label>
+                                                    <input type="text" name="sweetaddons_whatsapp_agents[__i__][name]" value="" class="regular-text" style="width: 100%;" placeholder="Nama Agen" />
+                                                </div>
+                                                <div style="flex: 1; min-width: 160px;">
+                                                    <label style="display:block; margin: 0 0 6px;">Nomor WhatsApp</label>
+                                                    <input type="text" name="sweetaddons_whatsapp_agents[__i__][phone]" value="" class="regular-text" style="width: 100%;" placeholder="62812345678901" />
+                                                </div>
+                                                <div style="flex: 1; min-width: 160px;">
+                                                    <label style="display:block; margin: 0 0 6px;">Role</label>
+                                                    <input type="text" name="sweetaddons_whatsapp_agents[__i__][role]" value="Customer Service" class="regular-text" style="width: 100%;" placeholder="Customer Service" />
+                                                </div>
+                                                <div style="flex: 1; min-width: 160px;">
+                                                    <label style="display:block; margin: 0 0 6px;">Status</label>
+                                                    <select name="sweetaddons_whatsapp_agents[__i__][status]" style="width: 100%;">
+                                                        <option value="online">Online</option>
+                                                        <option value="offline">Offline</option>
+                                                    </select>
+                                                </div>
+                                                <div style="flex: 1 1 100%; min-width: 160px;">
+                                                    <label style="display:block; margin: 0 0 6px;">Note</label>
+                                                    <input type="text" name="sweetaddons_whatsapp_agents[__i__][note]" value="" class="regular-text" style="width: 100%;" placeholder="Contoh: Saya akan kembali dalam 4 jam" />
+                                                </div>
+                                                <div style="flex: 1 1 100%; min-width: 160px;">
+                                                    <label style="display:block; margin: 0 0 6px;">Avatar URL (opsional)</label>
+                                                    <div style="display:flex; gap: 8px; align-items: center;">
+                                                        <input type="text" name="sweetaddons_whatsapp_agents[__i__][avatar]" value="" class="regular-text sweetaddons-wa-avatar-input" style="width: 100%;" placeholder="https://..." />
+                                                        <button type="button" class="button sweetaddons-wa-upload-avatar">Upload</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="margin-top: 8px;">
+                                                <button type="button" class="button-link-delete sweetaddons-wa-remove-agent">Hapus</button>
+                                            </div>
+                                        </div>
+                                    </script>
                                 </td>
                             </tr>
                             <tr>
@@ -2432,7 +2595,7 @@ class Custom_Admin_Option_Page
                             }
                         </style>
                         <div id="whatsapp-preview-stage" style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
-                            <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $phone) ? 'block' : 'none'; ?>;">
+                            <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $has_agents) ? 'block' : 'none'; ?>;">
                                 <div id="whatsapp-preview-bubble" class="sweetaddons-wa-widget sweetaddons-wa-preview sweetaddons-wa-<?php echo esc_attr($position); ?>" data-animation="<?php echo esc_attr($animation); ?>" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
                                     <div id="whatsapp-preview-shell" class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
                                         <div id="whatsapp-preview-inner" class="sweetaddons-wa-link" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
@@ -2450,8 +2613,8 @@ class Custom_Admin_Option_Page
                                 </div>
                             </div>
 
-                            <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $phone) ? 'none' : 'block'; ?>;">
-                                <p>Aktifkan WhatsApp dan tambahkan nomor telepon untuk melihat preview</p>
+                            <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $has_agents) ? 'none' : 'block'; ?>;">
+                                <p>Aktifkan WhatsApp dan tambahkan agen untuk melihat preview</p>
                             </div>
                         </div>
                     </div>
@@ -2470,6 +2633,60 @@ class Custom_Admin_Option_Page
 
         <script>
             jQuery(document).ready(function($) {
+                function syncAgentIndices() {
+                    $('#sweetaddons-wa-agents .sweetaddons-wa-agent-row').each(function(i) {
+                        $(this).find('input, select, textarea').each(function() {
+                            const name = $(this).attr('name');
+                            if (!name) {
+                                return;
+                            }
+                            $(this).attr('name', name.replace(/sweetaddons_whatsapp_agents\[\d+\]/, 'sweetaddons_whatsapp_agents[' + i + ']'));
+                        });
+                    });
+                }
+
+                $('#sweetaddons-wa-add-agent').on('click', function() {
+                    const template = $('#sweetaddons-wa-agent-template').html() || '';
+                    const nextIndex = $('#sweetaddons-wa-agents .sweetaddons-wa-agent-row').length;
+                    const html = template.replace(/__i__/g, String(nextIndex));
+                    $('#sweetaddons-wa-agents').append(html);
+                    syncAgentIndices();
+                    updateWhatsAppPreview();
+                });
+
+                $(document).on('click', '.sweetaddons-wa-remove-agent', function() {
+                    $(this).closest('.sweetaddons-wa-agent-row').remove();
+                    syncAgentIndices();
+                    updateWhatsAppPreview();
+                });
+
+                $(document).on('click', '.sweetaddons-wa-upload-avatar', function(e) {
+                    e.preventDefault();
+
+                    var $row = $(this).closest('.sweetaddons-wa-agent-row');
+                    var $input = $row.find('.sweetaddons-wa-avatar-input').first();
+                    if (!$input.length || typeof wp === 'undefined' || !wp.media) {
+                        return;
+                    }
+
+                    var frame = wp.media({
+                        title: 'Pilih Avatar',
+                        button: {
+                            text: 'Gunakan gambar'
+                        },
+                        multiple: false
+                    });
+
+                    frame.on('select', function() {
+                        var attachment = frame.state().get('selection').first().toJSON();
+                        if (attachment && attachment.url) {
+                            $input.val(attachment.url).trigger('input');
+                        }
+                    });
+
+                    frame.open();
+                });
+
                 // Color picker sync
                 $('#sweetaddons_whatsapp_color').on('change', function() {
                     $(this).next('input[type="text"]').val($(this).val());
@@ -2479,7 +2696,9 @@ class Custom_Admin_Option_Page
                 // Real-time preview update function
                 function updateWhatsAppPreview() {
                     const enable = $('#sweetaddons_whatsapp_enable').is(':checked');
-                    const phone = $('#sweetaddons_whatsapp_phone').val().trim();
+                    const has_agents = $('#sweetaddons-wa-agents input[name*="[phone]"]').filter(function() {
+                        return ($(this).val() || '').trim() !== '';
+                    }).length > 0;
                     const button_text = $('#sweetaddons_whatsapp_button_text').val().trim() || 'Chat dengan kami';
                     const position = $('#sweetaddons_whatsapp_position').val();
                     const color = $('#sweetaddons_whatsapp_color').val();
@@ -2500,7 +2719,7 @@ class Custom_Admin_Option_Page
                     const $icon = $bubble.find('.sweetaddons-wa-icon svg');
 
                     // Show/hide preview
-                    if (enable && phone) {
+                    if (enable && has_agents) {
                         $container.show();
                         $placeholder.hide();
 
@@ -2555,13 +2774,13 @@ class Custom_Admin_Option_Page
 
                 // Event listeners for all WhatsApp fields
                 $('#sweetaddons_whatsapp_enable').on('change', updateWhatsAppPreview);
-                $('#sweetaddons_whatsapp_phone').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_button_text').on('input', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_position').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_color').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_animation').on('change', updateWhatsAppPreview);
                 $('#sweetaddons_whatsapp_bubble_style').on('change', updateWhatsAppPreview);
                 $('input[name="sweetaddons_whatsapp_show_tooltip"]').on('change', updateWhatsAppPreview);
+                $(document).on('input change', '#sweetaddons-wa-agents input, #sweetaddons-wa-agents select, #sweetaddons-wa-agents textarea', updateWhatsAppPreview);
 
                 // Initialize preview on page load
                 updateWhatsAppPreview();

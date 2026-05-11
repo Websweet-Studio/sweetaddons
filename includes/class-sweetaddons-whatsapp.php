@@ -21,8 +21,11 @@ class Sweetaddons_WhatsApp
     public function enqueue_whatsapp_styles()
     {
         $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
+        $phone_number = get_option('sweetaddons_whatsapp_phone');
+        $agents = get_option('sweetaddons_whatsapp_agents', array());
+        $has_agents = is_array($agents) && !empty($agents);
 
-        if ($enable_whatsapp && !is_admin()) {
+        if ($enable_whatsapp && !is_admin() && ($phone_number || $has_agents)) {
             wp_register_style('sweetaddons-whatsapp-css', false);
             wp_enqueue_style('sweetaddons-whatsapp-css');
             wp_add_inline_style('sweetaddons-whatsapp-css', $this->get_whatsapp_css());
@@ -37,8 +40,12 @@ class Sweetaddons_WhatsApp
 
         $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
         $phone_number = get_option('sweetaddons_whatsapp_phone');
+        $agents = get_option('sweetaddons_whatsapp_agents', array());
+        if (!is_array($agents)) {
+            $agents = array();
+        }
 
-        if (!$enable_whatsapp || !$phone_number) {
+        if (!$enable_whatsapp || (!$phone_number && empty($agents))) {
             return;
         }
 
@@ -49,20 +56,6 @@ class Sweetaddons_WhatsApp
         $show_on_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
         $animation = get_option('sweetaddons_whatsapp_animation', 'none');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
-
-        // Clean phone number
-        $clean_phone = preg_replace('/[^0-9]/', '', $phone_number);
-
-        // handle 0 prefix to 62
-        if (substr($clean_phone, 0, 1) === '0') {
-            $clean_phone = '62' . substr($clean_phone, 1);
-        }
-
-        // Generate WhatsApp URL
-        $whatsapp_url = 'https://wa.me/' . $clean_phone . '?text=' . urlencode($message);
-
-        // Position classes
-        $position_classes = $this->get_position_classes($position);
         $device_classes = '';
 
         if (!$show_on_mobile) {
@@ -72,20 +65,136 @@ class Sweetaddons_WhatsApp
             $device_classes .= ' sweetaddons-wa-hide-desktop';
         }
 
+        $agents_normalized = array();
+        foreach ($agents as $agent) {
+            if (!is_array($agent)) {
+                continue;
+            }
+
+            $agent_phone = isset($agent['phone']) ? $this->normalize_phone_number($agent['phone']) : '';
+            if (empty($agent_phone)) {
+                continue;
+            }
+
+            $agents_normalized[] = array(
+                'name'   => isset($agent['name']) ? $agent['name'] : '',
+                'phone'  => $agent_phone,
+                'role'   => isset($agent['role']) ? $agent['role'] : '',
+                'note'   => isset($agent['note']) ? $agent['note'] : '',
+                'status' => isset($agent['status']) ? $agent['status'] : 'online',
+                'avatar' => isset($agent['avatar']) ? $agent['avatar'] : '',
+            );
+        }
+
+        $is_multi_agent = !empty($agents_normalized);
+
+        if (!$is_multi_agent) {
+            if (!$phone_number) {
+                return;
+            }
+
+            // Clean phone number
+            $clean_phone = $this->normalize_phone_number($phone_number);
+            if (empty($clean_phone)) {
+                return;
+            }
+
+            // Generate WhatsApp URL
+            $whatsapp_url = 'https://wa.me/' . $clean_phone . '?text=' . urlencode($message);
+
+            // Position classes
+            $position_classes = $this->get_position_classes($position);
 ?>
-        <div id="sweetaddons-whatsapp-widget" class="sweetaddons-wa-widget <?php echo esc_attr($position_classes . $device_classes); ?>" data-animation="<?php echo esc_attr($animation); ?>">
+            <div id="sweetaddons-whatsapp-widget" class="sweetaddons-wa-widget <?php echo esc_attr($position_classes . $device_classes); ?>" data-animation="<?php echo esc_attr($animation); ?>">
+                <div class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
+                    <a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener" class="sweetaddons-wa-link">
+                        <div class="sweetaddons-wa-ripple-container"></div>
+                        <div class="sweetaddons-wa-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                            </svg>
+                        </div>
+                        <?php if ($bubble_style === 'extended'): ?>
+                            <span class="sweetaddons-wa-text"><?php echo esc_html($button_text); ?></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+
+                <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '1')): ?>
+                    <div class="sweetaddons-wa-tooltip">
+                        <?php echo esc_html($button_text); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php
+            return;
+        }
+
+        // Position classes
+        $position_classes = $this->get_position_classes($position);
+        ?>
+        <div id="sweetaddons-whatsapp-widget" class="sweetaddons-wa-widget sweetaddons-wa-multi <?php echo esc_attr($position_classes . $device_classes); ?>" data-animation="<?php echo esc_attr($animation); ?>">
+            <div id="sweetaddons-wa-panel" class="sweetaddons-wa-panel" hidden>
+                <div class="sweetaddons-wa-panel-header">
+                    <div class="sweetaddons-wa-panel-header-row">
+                        <div class="sweetaddons-wa-panel-title">Mulai Chat</div>
+                    </div>
+                </div>
+                <div class="sweetaddons-wa-panel-body">
+                    <?php foreach ($agents_normalized as $agent): ?>
+                        <?php
+                        $agent_name = !empty($agent['name']) ? $agent['name'] : $button_text;
+                        $agent_role = !empty($agent['role']) ? $agent['role'] : '';
+                        $agent_note = !empty($agent['note']) ? $agent['note'] : '';
+                        $agent_status = !empty($agent['status']) ? $agent['status'] : 'online';
+                        $agent_avatar = !empty($agent['avatar']) ? $agent['avatar'] : '';
+                        $agent_url = 'https://wa.me/' . $agent['phone'] . '?text=' . urlencode($message);
+                        $agent_initial = strtoupper(substr(trim($agent_name), 0, 1));
+                        ?>
+                        <a class="sweetaddons-wa-agent sweetaddons-wa-agent--<?php echo esc_attr($agent_status); ?>" href="<?php echo esc_url($agent_url); ?>" target="_blank" rel="noopener">
+                            <div class="sweetaddons-wa-agent-left">
+                                <div class="sweetaddons-wa-agent-avatar">
+                                    <?php if (!empty($agent_avatar)): ?>
+                                        <img src="<?php echo esc_url($agent_avatar); ?>" alt="<?php echo esc_attr($agent_name); ?>" />
+                                    <?php else: ?>
+                                        <span><?php echo esc_html($agent_initial); ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="sweetaddons-wa-agent-meta">
+                                    <div class="sweetaddons-wa-agent-name"><?php echo esc_html($agent_name); ?></div>
+                                    <?php if (!empty($agent_role)): ?>
+                                        <div class="sweetaddons-wa-agent-role"><?php echo esc_html($agent_role); ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($agent_note)): ?>
+                                        <div class="sweetaddons-wa-agent-note"><?php echo esc_html($agent_note); ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="sweetaddons-wa-agent-cta">
+                                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884" />
+                                </svg>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
             <div class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
-                <a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener" class="sweetaddons-wa-link">
+                <button type="button" class="sweetaddons-wa-link sweetaddons-wa-trigger" aria-controls="sweetaddons-wa-panel" aria-expanded="false">
                     <div class="sweetaddons-wa-ripple-container"></div>
                     <div class="sweetaddons-wa-icon">
-                        <svg viewBox="0 0 24 24" width="24" height="24">
+                        <svg class="sweetaddons-wa-icon-chat" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                             <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                        </svg>
+                        <svg class="sweetaddons-wa-icon-close" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                            <path fill="currentColor" d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
                         </svg>
                     </div>
                     <?php if ($bubble_style === 'extended'): ?>
                         <span class="sweetaddons-wa-text"><?php echo esc_html($button_text); ?></span>
                     <?php endif; ?>
-                </a>
+                </button>
             </div>
 
             <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '1')): ?>
@@ -94,6 +203,57 @@ class Sweetaddons_WhatsApp
                 </div>
             <?php endif; ?>
         </div>
+        <script>
+            (function() {
+                var widget = document.getElementById('sweetaddons-whatsapp-widget');
+                if (!widget) {
+                    return;
+                }
+                var panel = document.getElementById('sweetaddons-wa-panel');
+                var trigger = widget.querySelector('.sweetaddons-wa-trigger');
+                if (!panel || !trigger) {
+                    return;
+                }
+
+                function openPanel() {
+                    panel.hidden = false;
+                    panel.classList.add('is-open');
+                    widget.classList.add('sweetaddons-wa-panel-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+
+                function closePanel() {
+                    panel.classList.remove('is-open');
+                    panel.hidden = true;
+                    widget.classList.remove('sweetaddons-wa-panel-open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                }
+
+                trigger.addEventListener('click', function() {
+                    if (panel.hidden) {
+                        openPanel();
+                    } else {
+                        closePanel();
+                    }
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (panel.hidden) {
+                        return;
+                    }
+                    if (widget.contains(e.target)) {
+                        return;
+                    }
+                    closePanel();
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && !panel.hidden) {
+                        closePanel();
+                    }
+                });
+            })();
+        </script>
 <?php
     }
 
@@ -114,6 +274,20 @@ class Sweetaddons_WhatsApp
             case 'center-right':
                 return 'sweetaddons-wa-center-right';
         }
+    }
+
+    private function normalize_phone_number($phone_number)
+    {
+        $clean_phone = preg_replace('/[^0-9]/', '', (string) $phone_number);
+        if (empty($clean_phone)) {
+            return '';
+        }
+
+        if (substr($clean_phone, 0, 1) === '0') {
+            $clean_phone = '62' . substr($clean_phone, 1);
+        }
+
+        return $clean_phone;
     }
 
     private function get_whatsapp_css()
@@ -195,6 +369,7 @@ class Sweetaddons_WhatsApp
             white-space: nowrap;
             position: relative;
             overflow: hidden;
+            border: none;
         }
 
         .sweetaddons-wa-ripple-container {
@@ -236,6 +411,207 @@ class Sweetaddons_WhatsApp
         .sweetaddons-wa-icon svg {
             width: 24px;
             height: 24px;
+        }
+
+        .sweetaddons-wa-icon-close {
+            display: none;
+        }
+
+        .sweetaddons-wa-panel-open .sweetaddons-wa-icon-chat {
+            display: none;
+        }
+
+        .sweetaddons-wa-panel-open .sweetaddons-wa-icon-close {
+            display: inline;
+        }
+
+        .sweetaddons-wa-panel {
+            position: absolute;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            --wa-panel-open-transform: translateY(0);
+            --wa-panel-closed-transform: translateY(10px);
+            transform: var(--wa-panel-closed-transform);
+        }
+
+        .sweetaddons-wa-panel.is-open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: var(--wa-panel-open-transform);
+        }
+
+        .sweetaddons-wa-panel-header {
+            background: {$primary_color};
+            color: #fff;
+            padding: 14px 16px;
+        }
+
+        .sweetaddons-wa-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .sweetaddons-wa-panel-body {
+            background: #f3f5f7;
+            padding: 10px;
+            max-height: 360px;
+            overflow: auto;
+        }
+
+        .sweetaddons-wa-agent {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 12px 12px 16px;
+            background: #fff;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #111;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+            position: relative;
+        }
+
+        .sweetaddons-wa-agent + .sweetaddons-wa-agent {
+            margin-top: 10px;
+        }
+
+        .sweetaddons-wa-agent::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 12px 0 0 12px;
+            background: #2ecc71;
+        }
+
+        .sweetaddons-wa-agent--offline::before {
+            background: #d0d5dd;
+        }
+
+        .sweetaddons-wa-agent-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .sweetaddons-wa-agent-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #e9edf1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 42px;
+            color: #475467;
+            font-weight: 700;
+        }
+
+        .sweetaddons-wa-agent-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sweetaddons-wa-agent-meta {
+            min-width: 0;
+        }
+
+        .sweetaddons-wa-agent-name {
+            font-weight: 700;
+            line-height: 1.2;
+            font-size: 14px;
+        }
+
+        .sweetaddons-wa-agent-role {
+            font-size: 12px;
+            color: #667085;
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+
+        .sweetaddons-wa-agent-note {
+            font-size: 12px;
+            color: #f97316;
+            margin-top: 4px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+        }
+
+        .sweetaddons-wa-agent-cta {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(37, 211, 102, 0.12);
+            color: {$primary_color};
+            flex: 0 0 34px;
+        }
+
+        .sweetaddons-wa-bottom-right .sweetaddons-wa-panel {
+            bottom: calc(100% + 12px);
+            right: 0;
+            --wa-panel-open-transform: translateY(0);
+            --wa-panel-closed-transform: translateY(10px);
+        }
+
+        .sweetaddons-wa-bottom-left .sweetaddons-wa-panel {
+            bottom: calc(100% + 12px);
+            left: 0;
+            --wa-panel-open-transform: translateY(0);
+            --wa-panel-closed-transform: translateY(10px);
+        }
+
+        .sweetaddons-wa-top-right .sweetaddons-wa-panel {
+            top: calc(100% + 12px);
+            right: 0;
+            --wa-panel-open-transform: translateY(0);
+            --wa-panel-closed-transform: translateY(-10px);
+        }
+
+        .sweetaddons-wa-top-left .sweetaddons-wa-panel {
+            top: calc(100% + 12px);
+            left: 0;
+            --wa-panel-open-transform: translateY(0);
+            --wa-panel-closed-transform: translateY(-10px);
+        }
+
+        .sweetaddons-wa-center-right .sweetaddons-wa-panel {
+            right: calc(100% + 12px);
+            top: 50%;
+            --wa-panel-open-transform: translateY(-50%);
+            --wa-panel-closed-transform: translateY(-50%) translateX(10px);
+        }
+
+        .sweetaddons-wa-center-left .sweetaddons-wa-panel {
+            left: calc(100% + 12px);
+            top: 50%;
+            --wa-panel-open-transform: translateY(-50%);
+            --wa-panel-closed-transform: translateY(-50%) translateX(-10px);
+        }
+
+        .sweetaddons-wa-panel-open .sweetaddons-wa-tooltip {
+            opacity: 0 !important;
+            visibility: hidden !important;
         }
 
         .sweetaddons-wa-tooltip {
@@ -334,6 +710,10 @@ class Sweetaddons_WhatsApp
             
             .sweetaddons-wa-extended .sweetaddons-wa-icon {
                 margin-right: 0;
+            }
+
+            .sweetaddons-wa-panel {
+                width: 290px;
             }
         }
 
