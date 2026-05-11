@@ -34,7 +34,6 @@ class Sweet_Option_Block
     {
         register_setting('Sweetaddons_block_group', 'block_wp_login');
         register_setting('Sweetaddons_block_group', 'whitelist_block_wp_login');
-        register_setting('Sweetaddons_block_group', 'whitelist_country');
         register_setting('Sweetaddons_block_group', 'redirect_to');
     }
 
@@ -116,13 +115,6 @@ class Sweet_Option_Block
                 'title' => 'IP Whitelist',
                 'std'   => '',
                 'label' => 'Daftar IP yang dikecualikan (pisahkan dengan koma).',
-            ],
-            [
-                'id'    => 'whitelist_country',
-                'type'  => 'text',
-                'title' => 'Negara Diizinkan',
-                'std'   => 'ID',
-                'label' => 'Kode negara (ID, MY, US) yang diizinkan mengakses.',
             ],
             [
                 'id'    => 'redirect_to',

@@ -157,7 +157,6 @@ class Custom_Admin_Option_Page
         register_setting('custom_admin_options_group', 'disable_gutenberg');
         register_setting('custom_admin_options_group', 'block_wp_login');
         register_setting('custom_admin_options_group', 'whitelist_block_wp_login');
-        register_setting('custom_admin_options_group', 'whitelist_country');
         register_setting('custom_admin_options_group', 'redirect_to');
         // register_setting('custom_admin_options_group', 'standar_editor_Sweetaddons');
         register_setting('custom_admin_options_group', 'classic_widget_Sweetaddons');

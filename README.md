@@ -5,7 +5,6 @@ Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan U
 ## Fitur Utama
 
 - Keamanan & Anti-Spam
-
   - Batasi percobaan login per IP (limit login attempts)
   - Blokir akses `wp-login.php` berdasarkan whitelist IP/negara dan redirect
   - CAPTCHA gambar teks: login, komentar, lostpassword, register, integrasi Contact Form 7
@@ -14,12 +13,10 @@ Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan U
   - Nonaktifkan REST API (dengan pengecualian endpoint widget)
 
 - Maintenance
-
   - Maintenance Mode (halaman 503 custom untuk pengunjung non-admin)
   - Pemeriksaan cepat: permalink, site icon, reCaptcha, pengaturan SEO, domain, auto-update plugin
 
 - SEO
-
   - Meta tags: description, keywords, robots, canonical
   - Open Graph & Twitter Card
   - Schema.org: Article & WebSite
@@ -27,13 +24,11 @@ Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan U
   - Sitemap XML di `/sitemap.xml` dengan cache dan dukungan 304
 
 - Statistik Pengunjung
-
   - Logging kunjungan, agregasi harian/bulanan
   - Statistik halaman dan referrer
   - Halaman admin dengan grafik dan tabel, tombol “Bangun Ulang Statistik”
 
 - UI/UX
-
   - Widget WhatsApp mengambang: posisi, warna, ukuran, tooltip, gaya bubble
   - Breadcrumb shortcode dengan beberapa gaya tampilan
 
@@ -49,7 +44,7 @@ Plugin ini menambahkan rangkaian fitur keamanan, utilitas, SEO, statistik, dan U
 - `[breadcrumb]` — menampilkan breadcrumb navigasi (opsi: `separator`, `home_text`, `show_home`, `show_current`, `style`).
 - `[sweet_recaptcha]` — menampilkan reCaptcha v2 sebagai shortcode.
 - `[sweet_captcha]` — menampilkan CAPTCHA gambar teks sebagai shortcode.
-- Contact Form 7: tag `recaptcha`
+- Contact Form 7: tag `recaptcha` — menampilkan reCaptcha pada form Contact Form 7.
 
 ## Pengaturan Admin
 
