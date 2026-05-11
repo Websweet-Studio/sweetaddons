@@ -1524,7 +1524,6 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whitelabel_author_uri',
                 'sweetaddons_whitelabel_menu_title',
                 'sweetaddons_whitelabel_hide_original',
-                'sweetaddons_whitelabel_accent_color'
             );
 
             foreach ($fields as $field) {
@@ -1539,6 +1538,7 @@ class Custom_Admin_Option_Page
             }
 
             delete_option('sweetaddons_whitelabel_version');
+            delete_option('sweetaddons_whitelabel_accent_color');
         }
 
         // Get current settings
@@ -1552,7 +1552,6 @@ class Custom_Admin_Option_Page
             $menu_title = $plugin_name;
         }
         $hide_original = get_option('sweetaddons_whitelabel_hide_original', '');
-        $accent_color = get_option('sweetaddons_whitelabel_accent_color', '#2271b1');
 
         // Get current plugin data for reference
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
@@ -1658,35 +1657,6 @@ class Custom_Admin_Option_Page
                                 </td>
                             </tr>
                         </table>
-                    </div>
-
-                    <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title"> Warna Brand</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_whitelabel_accent_color">Accent Color</label></th>
-                                <td>
-                                    <input type="color" id="sweetaddons_whitelabel_accent_color" name="sweetaddons_whitelabel_accent_color" value="<?php echo esc_attr($accent_color); ?>" />
-                                    <div class="sad-color-swatches" style="margin-top:10px;">
-                                        <?php
-                                        $swatches = array('#2271b1', '#00a32a', '#d63638', '#ff922b', '#7c3aed', '#db2777', '#059669', '#dc2626');
-                                        foreach ($swatches as $sw) {
-                                            echo '<span class="sad-swatch" data-color="' . esc_attr($sw) . '" style="display:inline-block;width:22px;height:22px;border-radius:4px;margin-right:6px;border:1px solid #ccd0d4; background:' . esc_attr($sw) . '; cursor:pointer;"></span>';
-                                        }
-                                        ?>
-                                    </div>
-                                    <p class="description">Warna aksen untuk branding admin. Gunakan palet cepat di atas atau pilih manual.</p>
-                                </td>
-                            </tr>
-                        </table>
-                        <script>
-                            jQuery(function($) {
-                                $('.sad-swatch').on('click', function() {
-                                    var c = $(this).data('color');
-                                    $('#sweetaddons_whitelabel_accent_color').val(c);
-                                });
-                            });
-                        </script>
                     </div>
 
                     <div class="sad-card sad-mb-16">
