@@ -113,69 +113,86 @@ class Sweetaddons_SEO
 
     private function get_page_title()
     {
-        global $post;
+        static $in_progress = false;
+        if ($in_progress) {
+            return get_bloginfo('name');
+        }
+        $in_progress = true;
+        try {
+            global $post;
 
-        if (is_singular()) {
-            $custom_title = get_post_meta($post->ID, '_sweetaddons_seo_title', true);
-            if ($custom_title) {
-                return $custom_title;
+            if (is_singular()) {
+                $custom_title = get_post_meta($post->ID, '_sweetaddons_seo_title', true);
+                if ($custom_title) {
+                    return $custom_title;
+                }
+                $site_name = get_bloginfo('name');
+                if (get_post_type($post) === 'page') {
+                    $tpl = get_option('sweetaddons_seo_template_page_title');
+                    if ($tpl) {
+                        return $this->apply_template($tpl, array(
+                            'page_title' => get_the_title($post->ID),
+                            'site_name' => $site_name
+                        ));
+                    }
+                } else {
+                    $tpl = get_option('sweetaddons_seo_template_single_title');
+                    if ($tpl) {
+                        return $this->apply_template($tpl, array(
+                            'post_title' => get_the_title($post->ID),
+                            'site_name' => $site_name
+                        ));
+                    }
+                }
+                return get_the_title($post->ID);
             }
-            $site_name = get_bloginfo('name');
-            if (get_post_type($post) === 'page') {
-                $tpl = get_option('sweetaddons_seo_template_page_title');
+
+            if (is_home() || is_front_page()) {
+                $home_title = get_option('sweetaddons_seo_home_title');
+                if ($home_title) {
+                    return $home_title;
+                }
+                return get_bloginfo('name') . ' - ' . get_bloginfo('description');
+            }
+
+            if (is_category()) {
+                $tpl = get_option('sweetaddons_seo_template_category_title');
                 if ($tpl) {
                     return $this->apply_template($tpl, array(
-                        'page_title' => get_the_title($post->ID),
-                        'site_name' => $site_name
+                        'category_name' => single_cat_title('', false),
+                        'site_name' => get_bloginfo('name')
                     ));
                 }
-            } else {
-                $tpl = get_option('sweetaddons_seo_template_single_title');
+                return single_cat_title('', false);
+            }
+
+            if (is_tag()) {
+                $tpl = get_option('sweetaddons_seo_template_tag_title');
                 if ($tpl) {
                     return $this->apply_template($tpl, array(
-                        'post_title' => get_the_title($post->ID),
-                        'site_name' => $site_name
+                        'tag_name' => single_tag_title('', false),
+                        'site_name' => get_bloginfo('name')
                     ));
                 }
+                return single_tag_title('', false);
             }
-            return get_the_title($post->ID);
-        }
 
-        if (is_home() || is_front_page()) {
-            $home_title = get_option('sweetaddons_seo_home_title');
-            if ($home_title) {
-                return $home_title;
+            if (is_search()) {
+                return sprintf(__('Search results for: %s'), get_search_query());
             }
-            return get_bloginfo('name') . ' - ' . get_bloginfo('description');
-        }
 
-        if (is_category()) {
-            $tpl = get_option('sweetaddons_seo_template_category_title');
-            if ($tpl) {
-                return $this->apply_template($tpl, array(
-                    'category_name' => single_cat_title('', false),
-                    'site_name' => get_bloginfo('name')
-                ));
+            if (is_404()) {
+                return __('Page not found');
             }
-            return single_cat_title('', false);
-        }
 
-        if (is_tag()) {
-            $tpl = get_option('sweetaddons_seo_template_tag_title');
-            if ($tpl) {
-                return $this->apply_template($tpl, array(
-                    'tag_name' => single_tag_title('', false),
-                    'site_name' => get_bloginfo('name')
-                ));
+            if (is_archive()) {
+                return strip_tags(get_the_archive_title());
             }
-            return single_tag_title('', false);
-        }
 
-        if (is_archive()) {
-            return strip_tags(get_the_archive_title());
+            return get_bloginfo('name');
+        } finally {
+            $in_progress = false;
         }
-
-        return wp_get_document_title();
     }
 
     private function get_meta_description()
