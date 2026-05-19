@@ -376,10 +376,13 @@ class Sweetaddons_WhatsApp
             border-radius: 50%;
             color: white;
             text-decoration: none;
+            border: none !important;
+            outline: none !important;
             box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .sweetaddons-wa-extended .sweetaddons-wa-link {
@@ -753,6 +756,21 @@ class Sweetaddons_WhatsApp
         .sweetaddons-wa-link:focus {
             outline: 2px solid #fff;
             outline-offset: 2px;
+        }
+
+        .sweetaddons-wa-circle .sweetaddons-wa-link:focus,
+        .sweetaddons-wa-circle .sweetaddons-wa-link:active {
+            outline: none !important;
+        }
+
+        @supports selector(:focus-visible) {
+            .sweetaddons-wa-circle .sweetaddons-wa-link:focus {
+                outline: none !important;
+            }
+
+            .sweetaddons-wa-circle .sweetaddons-wa-link:focus-visible {
+                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.92), 0 4px 12px rgba(37, 211, 102, 0.4);
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
