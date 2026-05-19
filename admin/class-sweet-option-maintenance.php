@@ -59,6 +59,7 @@ class Sweet_Option_Maintenance
         //jika field checkbox
         if ($type == 'checkbox') {
             $checked = ($value == 1) ? 'checked' : '';
+            echo '<input type="hidden" name="' . $name . '" value="0">';
             echo '<input type="checkbox" id="' . $id . '" name="' . $name . '" value="1" ' . $checked . '> ';
         }
         //jika field text
@@ -105,7 +106,7 @@ class Sweet_Option_Maintenance
                 'id'    => 'maintenance_mode',
                 'type'  => 'checkbox',
                 'title' => 'Maintenance Mode',
-                'std'   => 1,
+                'std'   => 0,
                 'label' => 'Aktifkan Maintenance Mode pada situs. Saat Maintenance Mode diaktifkan, pengunjung situs akan melihat halaman pemberitahuan perawatan yang menunjukkan bahwa situs sedang dalam perbaikan atau tidak tersedia sementara waktu.',
             ],
             [

@@ -25,9 +25,7 @@ class Sweetaddons_Maintenance_Mode
 {
     public function __construct()
     {
-        if (get_option('maintenance_mode')) {
-            add_action('wp', array($this, 'check_maintenance_mode'));
-        }
+        add_action('template_redirect', array($this, 'check_maintenance_mode'), 0);
     }
 
     private function is_sweetaddons_admin_page()
@@ -43,17 +41,48 @@ class Sweetaddons_Maintenance_Mode
 
     public function check_maintenance_mode()
     {
-        if (!current_user_can('manage_options') && !is_admin() && !is_page('myaccount')) {
-            $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-            if (strpos($request_uri, 'sweetaddons_captcha=image') !== false) {
-                return;
-            }
-            $opt    = get_option('maintenance_mode_data', []);
-            $hd     = isset($opt['header']) && !empty($opt['header']) ? $opt['header'] : 'Maintenance Mode';
-            $bd     = isset($opt['body']) && !empty($opt['body']) ? $opt['body'] : '';
-
-            $this->show_maintenance_page($hd, $bd);
+        if (!get_option('maintenance_mode')) {
+            return;
         }
+
+        if (is_admin()) {
+            return;
+        }
+
+        if (function_exists('wp_doing_ajax') && wp_doing_ajax()) {
+            return;
+        }
+
+        if (function_exists('wp_doing_cron') && wp_doing_cron()) {
+            return;
+        }
+
+        if (defined('REST_REQUEST') && REST_REQUEST) {
+            return;
+        }
+
+        if (function_exists('wp_is_json_request') && wp_is_json_request()) {
+            return;
+        }
+
+        if (current_user_can('manage_options')) {
+            return;
+        }
+
+        if (is_page('myaccount')) {
+            return;
+        }
+
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+        if ($request_uri && strpos($request_uri, 'sweetaddons_captcha=image') !== false) {
+            return;
+        }
+
+        $opt    = get_option('maintenance_mode_data', []);
+        $hd     = isset($opt['header']) && !empty($opt['header']) ? $opt['header'] : 'Maintenance Mode';
+        $bd     = isset($opt['body']) && !empty($opt['body']) ? $opt['body'] : '';
+
+        $this->show_maintenance_page($hd, $bd);
     }
 
     private function show_maintenance_page($title, $message)
@@ -63,6 +92,9 @@ class Sweetaddons_Maintenance_Mode
         $site_icon_url = get_site_icon_url() ? get_site_icon_url() : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiNGM0Y0RjYiLz4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiM5Q0EzQUYiLz4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMTYiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+';
 
         // Set proper HTTP headers
+        if (function_exists('nocache_headers')) {
+            nocache_headers();
+        }
         status_header(503);
         header('Content-Type: text/html; charset=utf-8');
         header('Retry-After: 3600'); // Suggest retry after 1 hour
