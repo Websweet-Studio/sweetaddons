@@ -170,6 +170,30 @@ class Sweet_Option_Umum
                     </div>
                 </form>
             </div>
+            <div class="sad-card">
+                <div class="sad-card-title">Update Plugin</div>
+                <?php
+                $checked = isset($_GET['sweetaddons_update_check']) ? sanitize_text_field(wp_unslash($_GET['sweetaddons_update_check'])) : '';
+                if ($checked === '1') {
+                    $has_update = isset($_GET['sweetaddons_has_update']) ? sanitize_text_field(wp_unslash($_GET['sweetaddons_has_update'])) : '0';
+                    echo '<div class="sad-notice sad-notice-success"><p>';
+                    echo $has_update === '1' ? 'Cek update selesai. Update tersedia di halaman Plugins.' : 'Cek update selesai. Tidak ada update terbaru.';
+                    echo '</p></div>';
+                }
+
+                $check_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=sweetaddons_check_update'),
+                    'sweetaddons_check_update'
+                );
+                ?>
+                <div class="sad-row" style="justify-content: space-between; align-items: center;">
+                    <div class="sad-stack" style="gap: 6px;">
+                        <div>Versi saat ini: <strong><?php echo defined('SWEETADDONS_VERSION') ? esc_html(SWEETADDONS_VERSION) : ''; ?></strong></div>
+                        <div><small>Cek update akan mengambil versi terbaru dari GitHub Releases.</small></div>
+                    </div>
+                    <a href="<?php echo esc_url($check_url); ?>" class="button button-secondary">Cek Update</a>
+                </div>
+            </div>
         </div>
         <?php Sweetaddons_Admin_Layout::close(); ?>
 <?php

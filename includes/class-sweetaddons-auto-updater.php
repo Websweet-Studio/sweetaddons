@@ -84,6 +84,47 @@ class Sweetaddons_Auto_Updater
     add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_updates'));
     add_filter('plugins_api', array($this, 'plugin_information'), 20, 3);
     add_action('upgrader_process_complete', array($this, 'purge_cache'), 10, 2);
+    add_action('admin_post_sweetaddons_check_update', array($this, 'handle_manual_check_update'));
+  }
+
+  public function handle_manual_check_update()
+  {
+    if (!current_user_can('manage_options')) {
+      wp_die(esc_html__('You do not have permission to perform this action.', 'sweetaddons'));
+    }
+
+    check_admin_referer('sweetaddons_check_update');
+
+    delete_site_transient($this->cache_key);
+    delete_site_transient('update_plugins');
+
+    if (function_exists('wp_clean_plugins_cache')) {
+      wp_clean_plugins_cache(true);
+    }
+
+    if (function_exists('wp_update_plugins')) {
+      wp_update_plugins();
+    }
+
+    $transient = get_site_transient('update_plugins');
+    $has_update = is_object($transient) && isset($transient->response) && is_array($transient->response) && isset($transient->response[$this->plugin_basename]);
+
+    $redirect = wp_get_referer();
+    if (!$redirect) {
+      $redirect = admin_url('admin.php?page=Sweetaddons_umum');
+    }
+
+    $redirect = remove_query_arg(array('sweetaddons_update_check', 'sweetaddons_has_update'), $redirect);
+    $redirect = add_query_arg(
+      array(
+        'sweetaddons_update_check' => '1',
+        'sweetaddons_has_update' => $has_update ? '1' : '0',
+      ),
+      $redirect
+    );
+
+    wp_safe_redirect($redirect);
+    exit;
   }
 
   /**
