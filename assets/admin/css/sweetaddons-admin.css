@@ -487,8 +487,9 @@
 .sad-apple__nav::-webkit-scrollbar {
   display: none;
 }
-
-.sad-apple__navlink {
+.sad-apple__navlink,
+.sad-apple__navlink:active,
+.sad-apple__navlink:focus {
   display: inline-flex;
   align-items: center;
   height: 28px;
@@ -499,6 +500,8 @@
   font-size: 12px;
   letter-spacing: -0.12px;
   white-space: nowrap;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 .sad-apple__navlink:hover {

@@ -79,7 +79,7 @@ class Sweetaddons_Activator
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			PRIMARY KEY (id),
-			UNIQUE KEY year_month (stat_year, stat_month)
+			UNIQUE KEY stat_year_month (stat_year, stat_month)
 		) $charset_collate;";
 
 		// Table untuk page statistics

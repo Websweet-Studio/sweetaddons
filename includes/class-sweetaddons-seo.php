@@ -357,8 +357,46 @@ class Sweetaddons_SEO
             return get_tag_link(get_queried_object_id());
         }
 
-        if (is_archive()) {
-            return get_term_link(get_queried_object());
+        if (is_post_type_archive()) {
+            $pt = get_query_var('post_type');
+            if (is_array($pt)) {
+                $pt = reset($pt);
+            }
+            if (!is_string($pt) || $pt === '') {
+                $pt = (string) get_post_type();
+            }
+            if ($pt !== '') {
+                $link = get_post_type_archive_link($pt);
+                if (is_string($link) && $link !== '') {
+                    return $link;
+                }
+            }
+        }
+
+        if (is_tax()) {
+            $term = get_queried_object();
+            if ($term instanceof WP_Term) {
+                $link = get_term_link($term);
+                if (!is_wp_error($link)) {
+                    return $link;
+                }
+            }
+        }
+
+        if (is_author()) {
+            return get_author_posts_url(get_queried_object_id());
+        }
+
+        if (is_day()) {
+            return get_day_link((int) get_query_var('year'), (int) get_query_var('monthnum'), (int) get_query_var('day'));
+        }
+
+        if (is_month()) {
+            return get_month_link((int) get_query_var('year'), (int) get_query_var('monthnum'));
+        }
+
+        if (is_year()) {
+            return get_year_link((int) get_query_var('year'));
         }
 
         return '';

@@ -17,6 +17,7 @@ class Sweetaddons_Visitor_Stats
     private $monthly_stats_table;
     private $page_stats_table;
     private $referrer_stats_table;
+    private $tables_checked = false;
 
     public function __construct()
     {
@@ -37,6 +38,8 @@ class Sweetaddons_Visitor_Stats
         if (is_admin() || wp_doing_ajax() || wp_doing_cron()) {
             return;
         }
+
+        $this->ensure_tables_exist();
 
         global $wpdb;
 
@@ -177,6 +180,7 @@ class Sweetaddons_Visitor_Stats
 
     public function run_daily_aggregation()
     {
+        $this->ensure_tables_exist();
         $this->aggregate_monthly_stats();
         $this->cleanup_old_logs();
     }
@@ -234,6 +238,7 @@ class Sweetaddons_Visitor_Stats
     // Optimized methods using aggregated tables
     public function get_daily_stats($days = 30)
     {
+        $this->ensure_tables_exist();
         global $wpdb;
 
         return $wpdb->get_results($wpdb->prepare(
@@ -250,6 +255,7 @@ class Sweetaddons_Visitor_Stats
 
     public function get_page_stats($days = 30)
     {
+        $this->ensure_tables_exist();
         global $wpdb;
 
         return $wpdb->get_results($wpdb->prepare(
@@ -268,6 +274,7 @@ class Sweetaddons_Visitor_Stats
 
     public function get_referer_stats($days = 30)
     {
+        $this->ensure_tables_exist();
         global $wpdb;
 
         return $wpdb->get_results($wpdb->prepare(
@@ -285,6 +292,7 @@ class Sweetaddons_Visitor_Stats
 
     public function get_summary_stats()
     {
+        $this->ensure_tables_exist();
         global $wpdb;
 
         // Today's stats from daily aggregation
@@ -317,11 +325,11 @@ class Sweetaddons_Visitor_Stats
         // All time stats from monthly aggregation + current month daily
         $all_time = $wpdb->get_row(
             "SELECT 
-                (SELECT SUM(unique_visitors) FROM {$this->monthly_stats_table}) +
-                (SELECT SUM(unique_visitors) FROM {$this->daily_stats_table} 
+                (SELECT COALESCE(SUM(unique_visitors), 0) FROM {$this->monthly_stats_table}) +
+                (SELECT COALESCE(SUM(unique_visitors), 0) FROM {$this->daily_stats_table} 
                  WHERE MONTH(stat_date) = MONTH(CURDATE()) AND YEAR(stat_date) = YEAR(CURDATE())) as unique_visitors,
-                (SELECT SUM(total_pageviews) FROM {$this->monthly_stats_table}) +
-                (SELECT SUM(total_pageviews) FROM {$this->daily_stats_table} 
+                (SELECT COALESCE(SUM(total_pageviews), 0) FROM {$this->monthly_stats_table}) +
+                (SELECT COALESCE(SUM(total_pageviews), 0) FROM {$this->daily_stats_table} 
                  WHERE MONTH(stat_date) = MONTH(CURDATE()) AND YEAR(stat_date) = YEAR(CURDATE())) as total_visits"
         );
 
@@ -335,6 +343,7 @@ class Sweetaddons_Visitor_Stats
 
     public function rebuild_daily_stats()
     {
+        $this->ensure_tables_exist();
         global $wpdb;
 
         // Clear existing daily stats
@@ -368,6 +377,7 @@ class Sweetaddons_Visitor_Stats
 
     public function rebuild_page_stats()
     {
+        $this->ensure_tables_exist();
         global $wpdb;
 
         // Clear existing page stats
@@ -403,6 +413,7 @@ class Sweetaddons_Visitor_Stats
 
     public function statistics_shortcode($atts)
     {
+        $this->ensure_tables_exist();
         $atts = shortcode_atts(array(
             'style' => 'default', // default, minimal, cards
             'show' => 'all', // all, today, total
@@ -450,6 +461,119 @@ class Sweetaddons_Visitor_Stats
         }
 
         return ob_get_clean();
+    }
+
+    private function ensure_tables_exist()
+    {
+        if ($this->tables_checked) {
+            return;
+        }
+
+        global $wpdb;
+
+        $tables = array(
+            $this->logs_table,
+            $this->daily_stats_table,
+            $this->monthly_stats_table,
+            $this->page_stats_table,
+            $this->referrer_stats_table,
+        );
+
+        $missing = false;
+        foreach ($tables as $table) {
+            $exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table));
+            if ($exists !== $table) {
+                $missing = true;
+                break;
+            }
+        }
+
+        if ($missing) {
+            $this->create_tables();
+        }
+
+        $this->tables_checked = true;
+    }
+
+    private function create_tables()
+    {
+        global $wpdb;
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql1 = "CREATE TABLE {$this->logs_table} (
+			id mediumint(9) NOT NULL AUTO_INCREMENT,
+			visitor_ip varchar(45) NOT NULL,
+			user_agent text,
+			page_url varchar(255) NOT NULL,
+			referer varchar(255),
+			visit_date date NOT NULL,
+			visit_time time NOT NULL,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			KEY visit_date (visit_date),
+			KEY visitor_ip (visitor_ip),
+			KEY page_url (page_url)
+		) $charset_collate;";
+
+        $sql2 = "CREATE TABLE {$this->daily_stats_table} (
+			id mediumint(9) NOT NULL AUTO_INCREMENT,
+			stat_date date NOT NULL,
+			unique_visitors int(11) DEFAULT 0,
+			total_pageviews int(11) DEFAULT 0,
+			bounce_rate decimal(5,2) DEFAULT 0.00,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			UNIQUE KEY stat_date (stat_date)
+		) $charset_collate;";
+
+        $sql3 = "CREATE TABLE {$this->monthly_stats_table} (
+			id mediumint(9) NOT NULL AUTO_INCREMENT,
+			stat_year int(4) NOT NULL,
+			stat_month int(2) NOT NULL,
+			unique_visitors int(11) DEFAULT 0,
+			total_pageviews int(11) DEFAULT 0,
+			avg_bounce_rate decimal(5,2) DEFAULT 0.00,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			UNIQUE KEY stat_year_month (stat_year, stat_month)
+		) $charset_collate;";
+
+        $sql4 = "CREATE TABLE {$this->page_stats_table} (
+			id mediumint(9) NOT NULL AUTO_INCREMENT,
+			page_url varchar(255) NOT NULL,
+			stat_date date NOT NULL,
+			unique_visitors int(11) DEFAULT 0,
+			total_views int(11) DEFAULT 0,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			UNIQUE KEY page_date (page_url, stat_date),
+			KEY page_url (page_url),
+			KEY stat_date (stat_date)
+		) $charset_collate;";
+
+        $sql5 = "CREATE TABLE {$this->referrer_stats_table} (
+			id mediumint(9) NOT NULL AUTO_INCREMENT,
+			referrer_domain varchar(255) NOT NULL,
+			stat_date date NOT NULL,
+			total_visits int(11) DEFAULT 0,
+			created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			UNIQUE KEY referrer_date (referrer_domain, stat_date),
+			KEY referrer_domain (referrer_domain),
+			KEY stat_date (stat_date)
+		) $charset_collate;";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql1);
+        dbDelta($sql2);
+        dbDelta($sql3);
+        dbDelta($sql4);
+        dbDelta($sql5);
     }
 
     private function add_shortcode_styles()
