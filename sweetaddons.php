@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://websweetstudio.com
- * @since             3.0.1
+ * @since             3.1.0
  * @package           sweetaddons
  *
  * @wordpress-plugin
  * Plugin Name:       Sweet Addons
  * Plugin URI:        https://websweetstudio.com
  * Description:       Addon plugin for WebsweetStudio Client
- * Version:           3.0.1
+ * Version:           3.1.0
  * Author:            WebsweetStudio
  * Author URI:        https://websweetstudio.com
  * License:           GPL-2.0+
@@ -32,57 +32,41 @@ if (!defined('WPINC')) {
 
 /**
  * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
  */
-define('SWEETADDONS_VERSION', '3.0.1');
+define('SWEETADDONS_VERSION', '3.1.0');
 define('PLUGIN_DIR', plugin_dir_path(__DIR__));
 define('PLUGIN_FILE', plugin_basename(__FILE__));
 define('PLUGIN_BASE_NAME', plugin_basename(__DIR__));
 define('SWEETADDONS_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
 
+// Load PSR-4 autoloader
+require plugin_dir_path(__FILE__) . 'includes/autoloader.php';
+
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-sweetaddons-activator.php
  */
 function activate_Sweetaddons()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-sweetaddons-activator.php';
-    Sweetaddons_Activator::activate();
+    \Sweetaddons\Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-sweetaddons-deactivator.php
  */
 function deactivate_Sweetaddons()
 {
-    require_once plugin_dir_path(__FILE__) . 'includes/class-sweetaddons-deactivator.php';
-    Sweetaddons_Deactivator::deactivate();
+    \Sweetaddons\Deactivator::deactivate();
 }
 
 register_activation_hook(__FILE__, 'activate_Sweetaddons');
 register_deactivation_hook(__FILE__, 'deactivate_Sweetaddons');
 
 /**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path(__FILE__) . 'includes/class-sweetaddons.php';
-
-/**
  * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
  */
 function run_sweetaddons()
 {
-
-    $plugin = new sweetaddons();
+    $plugin = new \Sweetaddons\Core();
     $plugin->run();
 }
 run_sweetaddons();

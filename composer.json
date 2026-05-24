@@ -1,0 +1,13 @@
+{
+    "name": "websweetstudio/sweetaddons",
+    "description": "Addon plugin for WebsweetStudio Client",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0+",
+    "autoload": {
+        "psr-4": {
+            "Sweetaddons\\": "includes/",
+            "Sweetaddons\\Admin\\": "admin/",
+            "Sweetaddons\\Public\\": "public/"
+        }
+    }
+}
