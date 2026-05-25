@@ -59,6 +59,7 @@ class Core
     private function load_dependencies()
     {
         $this->loader = new Loader();
+        $this->loader->add_action('init', $this, 'redirect_legacy_admin_paths', 0);
     }
 
     private function set_locale()
@@ -112,6 +113,35 @@ class Core
     public function run()
     {
         $this->loader->run();
+    }
+
+    public function redirect_legacy_admin_paths()
+    {
+        if (is_admin() || wp_doing_ajax() || wp_doing_cron()) {
+            return;
+        }
+
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+        if ($request_uri === '') {
+            return;
+        }
+
+        $path = wp_parse_url($request_uri, PHP_URL_PATH);
+        if (!is_string($path) || $path === '') {
+            return;
+        }
+
+        $path = rtrim($path, '/');
+
+        $admin_page_by_path = array(
+            '/wp-admin/Sweetaddons_umum' => 'Sweetaddons_umum',
+            '/wp-admin/custom_admin_options' => 'custom_admin_options',
+        );
+
+        if (isset($admin_page_by_path[$path])) {
+            wp_safe_redirect(admin_url('admin.php?page=' . $admin_page_by_path[$path]));
+            exit;
+        }
     }
 
     public function get_plugin_name()
