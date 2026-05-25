@@ -34,9 +34,9 @@ if (!defined('WPINC')) {
  * Currently plugin version.
  */
 define('SWEETADDONS_VERSION', '3.1.0');
-define('PLUGIN_DIR', plugin_dir_path(__DIR__));
+define('PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('PLUGIN_FILE', plugin_basename(__FILE__));
-define('PLUGIN_BASE_NAME', plugin_basename(__DIR__));
+define('PLUGIN_BASE_NAME', plugin_basename(__FILE__));
 define('SWEETADDONS_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
 
 // Load PSR-4 autoloader

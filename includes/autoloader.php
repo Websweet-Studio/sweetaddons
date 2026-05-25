@@ -7,7 +7,7 @@
  * @package    sweetaddons
  */
 
-spl_autoload_register(function (string $class) {
+spl_autoload_register(function ($class) {
     $prefixes = [
         'Sweetaddons\\Admin\\' => __DIR__ . '/../admin/',
         'Sweetaddons\\Public\\' => __DIR__ . '/../public/',

@@ -164,3 +164,5 @@ class OptionBlock
         <?php AdminLayout::close(); ?>
 <?php
 }
+
+}

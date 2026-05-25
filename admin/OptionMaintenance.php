@@ -159,3 +159,5 @@ class OptionMaintenance
         <?php AdminLayout::close(); ?>
 <?php
 }
+
+}

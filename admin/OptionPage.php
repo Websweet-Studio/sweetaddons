@@ -893,3 +893,5 @@ class OptionPage
         <?php AdminLayout::close(); ?>
 <?php
 }
+
+}

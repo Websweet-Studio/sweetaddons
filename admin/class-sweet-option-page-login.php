@@ -1,5 +1,9 @@
 <?php
 
+namespace Sweetaddons\Admin;
+
+class OptionPageLogin
+{
     public function login_customizer_page_callback()
     {
         // Handle settings save
@@ -33,7 +37,7 @@
         $bg_image = isset($login_settings['bg_image']) ? $login_settings['bg_image'] : '';
         $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
-    ?>
+?>
         <div class="wrap vd-ons sweetaddons-dashboard">
             <h1 class="sad-title"> Login Page Customizer</h1>
 
@@ -91,53 +95,54 @@
                     </div>
                 </div>
             </form>
-            
-            <script>
-            jQuery(document).ready(function($){
-                var mediaUploader;
-                
-                $('#upload_logo_button').click(function(e) {
-                    e.preventDefault();
-                    if (mediaUploader) {
-                        mediaUploader.open();
-                        return;
-                    }
-                    mediaUploader = wp.media.frames.file_frame = wp.media({
-                        title: 'Pilih Logo',
-                        button: {
-                            text: 'Pilih Logo'
-                        },
-                        multiple: false
-                    });
-                    mediaUploader.on('select', function() {
-                        var attachment = mediaUploader.state().get('selection').first().toJSON();
-                        $('#login_logo_url').val(attachment.url);
-                    });
-                    mediaUploader.open();
-                });
 
-                var bgUploader;
-                $('#upload_bg_button').click(function(e) {
-                    e.preventDefault();
-                    if (bgUploader) {
+            <script>
+                jQuery(document).ready(function($) {
+                    var mediaUploader;
+
+                    $('#upload_logo_button').click(function(e) {
+                        e.preventDefault();
+                        if (mediaUploader) {
+                            mediaUploader.open();
+                            return;
+                        }
+                        mediaUploader = wp.media.frames.file_frame = wp.media({
+                            title: 'Pilih Logo',
+                            button: {
+                                text: 'Pilih Logo'
+                            },
+                            multiple: false
+                        });
+                        mediaUploader.on('select', function() {
+                            var attachment = mediaUploader.state().get('selection').first().toJSON();
+                            $('#login_logo_url').val(attachment.url);
+                        });
+                        mediaUploader.open();
+                    });
+
+                    var bgUploader;
+                    $('#upload_bg_button').click(function(e) {
+                        e.preventDefault();
+                        if (bgUploader) {
+                            bgUploader.open();
+                            return;
+                        }
+                        bgUploader = wp.media.frames.file_frame = wp.media({
+                            title: 'Pilih Background',
+                            button: {
+                                text: 'Pilih Background'
+                            },
+                            multiple: false
+                        });
+                        bgUploader.on('select', function() {
+                            var attachment = bgUploader.state().get('selection').first().toJSON();
+                            $('#login_bg_image').val(attachment.url);
+                        });
                         bgUploader.open();
-                        return;
-                    }
-                    bgUploader = wp.media.frames.file_frame = wp.media({
-                        title: 'Pilih Background',
-                        button: {
-                            text: 'Pilih Background'
-                        },
-                        multiple: false
                     });
-                    bgUploader.on('select', function() {
-                        var attachment = bgUploader.state().get('selection').first().toJSON();
-                        $('#login_bg_image').val(attachment.url);
-                    });
-                    bgUploader.open();
                 });
-            });
             </script>
         </div>
-    <?php
+<?php
     }
+}
