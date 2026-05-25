@@ -74,8 +74,7 @@ class Sweetaddons_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_style($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/frontend/css/sweetaddons-public.css', array(), $this->version, 'all');
+		return;
 	}
 
 	/**
@@ -97,12 +96,6 @@ class Sweetaddons_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		// Enqueue GSAP if not already present
-		if (!wp_script_is('gsap', 'registered') && !wp_script_is('gsap', 'enqueued')) {
-			wp_enqueue_script('gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', array(), '3.12.5', true);
-		}
-
-		wp_enqueue_script($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/frontend/js/sweetaddons-public.js', array('jquery', 'gsap'), $this->version, false);
+		return;
 	}
 }

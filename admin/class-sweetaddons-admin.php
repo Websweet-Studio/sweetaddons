@@ -55,12 +55,23 @@ class Sweetaddons_Admin
 		$this->version = $version;
 	}
 
+	private function is_sweetaddons_admin_page($hook)
+	{
+		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+		$hook = (string) $hook;
+
+		return stripos($hook, 'sweetaddons') !== false
+			|| stripos($hook, 'custom_admin_options') !== false
+			|| stripos($page, 'sweetaddons') !== false
+			|| $page === 'custom_admin_options';
+	}
+
 	/**
 	 * Register the stylesheets for the admin area.
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles()
+	public function enqueue_styles($hook)
 	{
 
 		/**
@@ -74,6 +85,10 @@ class Sweetaddons_Admin
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
+
+		if (!$this->is_sweetaddons_admin_page($hook)) {
+			return;
+		}
 
 		wp_enqueue_style($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/admin/css/sweetaddons-admin.css', array(), $this->version, 'all');
 	}
@@ -83,7 +98,7 @@ class Sweetaddons_Admin
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts()
+	public function enqueue_scripts($hook)
 	{
 
 		/**
@@ -97,17 +112,8 @@ class Sweetaddons_Admin
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script($this->plugin_name, SWEETADDONS_PLUGIN_DIR_URL . 'assets/admin/js/sweetaddons-admin.js', array('jquery'), $this->version, false);
-	}
-
-	/**
-	 * Define a global JS variable to prevent conflicts.
-	 *
-	 * @since    1.0.0
-	 */
-	public function define_global_js_variable()
-	{
-		echo '<script>var active = window.active || false;</script>';
+		if (!$this->is_sweetaddons_admin_page($hook)) {
+			return;
+		}
 	}
 }

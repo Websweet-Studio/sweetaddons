@@ -170,7 +170,6 @@ class sweetaddons
         /**
          * Berisi Class untuk standar Editor
          */
-        // require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-standar-editor.php';
 
         /**
          * Berisi Class untuk hapus slug category
@@ -272,7 +271,6 @@ class sweetaddons
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
-        $this->loader->add_action('admin_head', $plugin_admin, 'define_global_js_variable');
     }
 
     /**
