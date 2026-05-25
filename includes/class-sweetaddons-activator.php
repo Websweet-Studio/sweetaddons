@@ -128,5 +128,9 @@ class Sweetaddons_Activator
 		// Mengarahkan pengguna ke halaman custom_admin_options saat plugin diaktifkan
 		// wp_redirect(admin_url('options-general.php?page=custom_admin_options'));
 		// exit;
+
+		if (function_exists('sweetaddons_build_classmap')) {
+			sweetaddons_build_classmap(true);
+		}
 	}
 }

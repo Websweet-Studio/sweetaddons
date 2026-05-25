@@ -127,6 +127,7 @@ typography:
 rounded:
   none: 0px
   xs: 5px
+  input: 6px
   sm: 8px
   md: 11px
   lg: 18px

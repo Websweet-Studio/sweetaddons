@@ -40,7 +40,7 @@ class Custom_Admin_Option_Page
 
         if ($is_sweetaddons_page) {
             wp_enqueue_script('jquery');
-            if ($page === 'Sweetaddons_visitor_stats') {
+            if ($page === 'custom_admin_options' || $page === 'Sweetaddons_visitor_stats') {
                 wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
             }
         }
