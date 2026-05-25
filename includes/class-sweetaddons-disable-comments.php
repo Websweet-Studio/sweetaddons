@@ -64,6 +64,3 @@ class Sweetaddons_Fully_Disable_Comment
         remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
     }
 }
-
-// Initialize the Sweetaddons_Fully_Disable_Comment class
-$Sweetaddons_Fully_Disable_Comment = new Sweetaddons_Fully_Disable_Comment();

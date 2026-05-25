@@ -54,6 +54,3 @@ class Sweetaddons_Hide_Admin_Notice
         }
     }
 }
-
-// Initialize the Sweetaddons_Hide_Admin_Notice class
-$hide_admin_notice = new Sweetaddons_Hide_Admin_Notice();

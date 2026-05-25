@@ -199,6 +199,3 @@ class Sweet_Option_Umum
 <?php
     }
 }
-
-// Initialize the Umum page
-$sweet_option_umum = new Sweet_Option_Umum();

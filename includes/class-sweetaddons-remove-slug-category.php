@@ -26,7 +26,9 @@ class Sweetaddons_Remove_Slug_Category
 {
     public function __construct()
     {
-        add_filter('post_type_link', array($this, 'remove_category_slug'), 10, 2);
+        if (get_option('remove_slug_category_Sweetaddons')) {
+            add_filter('post_type_link', array($this, 'remove_category_slug'), 10, 2);
+        }
         add_action('update_option_remove_slug_category_Sweetaddons', array($this, 'maybe_flush_rewrite_rules_on_change'), 10, 2);
         add_action('add_option_remove_slug_category_Sweetaddons', array($this, 'flush_rewrite_rules_now'), 10, 2);
     }
@@ -62,6 +64,3 @@ class Sweetaddons_Remove_Slug_Category
         }
     }
 }
-
-// Inisialisasi class Sweetaddons_Remove_Slug_Category
-$Sweetaddons_Remove_Slug_Category = new Sweetaddons_Remove_Slug_Category();

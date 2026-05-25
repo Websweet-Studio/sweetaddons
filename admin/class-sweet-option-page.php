@@ -2749,5 +2749,3 @@ class Custom_Admin_Option_Page
     }
 }
 
-// Initialize the Pengaturan Admin page
-$custom_admin_options_page = new Custom_Admin_Option_Page();

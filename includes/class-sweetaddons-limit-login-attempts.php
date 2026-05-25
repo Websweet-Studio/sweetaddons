@@ -85,6 +85,3 @@ class Sweetaddons_Limit_Login_Attempts
         error_log('Login attempts exceeded for username: ' . $username . ' from IP address: ' . $ip_address);
     }
 }
-
-// Inisialisasi class Sweetaddons_Limit_Login_Attempts
-$sweet_limit_login_attempts = new Sweetaddons_Limit_Login_Attempts();

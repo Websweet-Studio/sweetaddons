@@ -63,8 +63,3 @@ class Sweetaddons_Disable_Rest_Api
         $wp_rewrite->set_permalink_structure('/%postname%/%category%/');
     }
 }
-
-// Inisialisasi class Sweetaddons_Disable_Rest_Api - hanya jika dibutuhkan
-if (function_exists('get_option') && get_option('disable_rest_api')) {
-    $sweet_disable_rest_api = new Sweetaddons_Disable_Rest_Api();
-}

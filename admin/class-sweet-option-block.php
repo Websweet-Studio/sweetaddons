@@ -164,6 +164,3 @@ class Sweet_Option_Block
 <?php
     }
 }
-
-// Initialize the Block page
-$sweet_option_block = new Sweet_Option_Block();

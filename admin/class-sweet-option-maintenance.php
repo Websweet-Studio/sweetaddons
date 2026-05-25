@@ -159,6 +159,3 @@ class Sweet_Option_Maintenance
 <?php
     }
 }
-
-// Initialize the Maintenance page
-$sweet_option_maintenance = new Sweet_Option_Maintenance();

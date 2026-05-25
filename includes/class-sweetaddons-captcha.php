@@ -222,4 +222,3 @@ class Sweetaddons_Captcha
         return $this->make_block();
     }
 }
-$captcha_handler = new Sweetaddons_Captcha();

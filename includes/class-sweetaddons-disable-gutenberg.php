@@ -39,6 +39,3 @@ class Sweetaddons_Disable_Gutenberg
         return $use_block_editor;
     }
 }
-
-// Inisialisasi class Sweetaddons_Disable_Gutenberg
-$sweet_disable_gutenberg = new Sweetaddons_Disable_Gutenberg();

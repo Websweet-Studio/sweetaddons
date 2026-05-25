@@ -46,7 +46,3 @@ class Sweetaddons_Classic_Widget
         return null;
     }
 }
-// Initialize the Sweetaddons_Classic_Widget class safely
-if (is_admin()) {
-    $Sweetaddons_classic_widget = new Sweetaddons_Classic_Widget();
-}

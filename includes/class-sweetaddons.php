@@ -106,139 +106,6 @@ class sweetaddons
      */
     private function load_dependencies()
     {
-
-        /**
-         * The class responsible for orchestrating the actions and filters of the
-         * core plugin.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-loader.php';
-
-        /**
-         * The class responsible for defining internationalization functionality
-         * of the plugin.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-i18n.php';
-
-        /**
-         * Berisi Class untuk mematikan fungsi komentar di wordpress.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-disable-comments.php';
-
-        /**
-         * Berisi Class untuk mematikan semua notice di wp-admin.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-hide-admin-notice.php';
-
-        /**
-         * Berisi Class untuk membatasi gagal login.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-limit-login-attempts.php';
-
-        /**
-         * Berisi Class untuk fungsi maintenance mode.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-maintenance-mode.php';
-
-        /**
-         * Berisi Class untuk disable XML RPC.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-disable-xmlrpc.php';
-
-        /**
-         * Berisi Class untuk disable REST API.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-disable-rest-api.php';
-
-        /**
-         * Berisi Class untuk disable visual editor.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-disable-gutenberg.php';
-
-        /**
-         * Berisi Class untuk block akses ke wp-admin berdasarkan kode negara.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-block-wp-login.php';
-
-        /**
-         * Berisi Class untuk auto update plugin
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-auto-updater.php';
-
-        /**
-         * Berisi Class untuk Classic Widget
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-classic-widget.php';
-
-        /**
-         * Berisi Class untuk standar Editor
-         */
-
-        /**
-         * Berisi Class untuk hapus slug category
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-remove-slug-category.php';
-
-        /**
-         * Berisi Class untuk handle captcha
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-captcha.php';
-
-        /**
-         * Berisi Class untuk visitor statistics
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-visitor-stats.php';
-
-        /**
-         * Berisi Class untuk SEO functionality
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-seo.php';
-
-        /**
-         * Berisi Class untuk White Label functionality
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-whitelabel.php';
-
-        /**
-         * Berisi Class untuk WhatsApp functionality
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-whatsapp.php';
-
-        /**
-         * Berisi Class untuk Breadcrumb functionality
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-breadcrumb.php';
-
-        /**
-         * Berisi Class untuk Login Customizer functionality
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-login-customizer.php';
-
-        /**
-         * Berisi Class untuk Database Cleaner functionality
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-sweetaddons-database-cleaner.php';
-
-        /**
-         * The class responsible for defining all actions that occur in the admin area.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweetaddons-admin.php';
-
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweetaddons-admin-layout.php';
-
-        /**
-         * Class untuk menambah option page untuk Admin Option
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweet-option-page.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweet-option-umum.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweet-option-maintenance.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-sweet-option-block.php';
-
-        /**
-         * The class responsible for defining all actions that occur in the public-facing
-         * side of the site.
-         */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-sweetaddons-public.php';
-
         $this->loader = new Sweetaddons_Loader();
     }
 
@@ -273,6 +140,19 @@ class sweetaddons
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+
+        if (!is_admin()) {
+            return;
+        }
+
+        new Sweetaddons_Fully_Disable_Comment();
+        new Sweetaddons_Hide_Admin_Notice();
+        new Sweetaddons_Disable_Gutenberg();
+        new Sweetaddons_Classic_Widget();
+        new Custom_Admin_Option_Page();
+        new Sweet_Option_Umum();
+        new Sweet_Option_Maintenance();
+        new Sweet_Option_Block();
     }
 
     /**
@@ -290,6 +170,16 @@ class sweetaddons
             new Sweetaddons_WhiteLabel();
             return;
         }
+
+        new Sweetaddons_Fully_Disable_Comment();
+        new Sweetaddons_Limit_Login_Attempts();
+        new Sweetaddons_Maintenance_Mode();
+        new Sweetaddons_Disable_Xmlrpc();
+        new Sweetaddons_Disable_Rest_Api();
+        new Sweetaddons_Disable_Gutenberg();
+        new Sweetaddons_Block_Wp_Login();
+        new Sweetaddons_Captcha();
+        new Sweetaddons_Remove_Slug_Category();
 
         new Sweetaddons_Visitor_Stats();
 

@@ -335,6 +335,3 @@ class Sweetaddons_Maintenance_Mode
         return ob_get_clean();
     }
 }
-
-// Inisialisasi class Sweetaddons_Maintenance_Mode
-$sweet_maintenance_mode = new Sweetaddons_Maintenance_Mode();

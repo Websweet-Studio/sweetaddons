@@ -33,6 +33,3 @@ class Sweetaddons_Disable_Xmlrpc
         }
     }
 }
-
-// Inisialisasi class Sweetaddons_Disable_Xmlrpc
-$sweet_disable_xmlrpc = new Sweetaddons_Disable_Xmlrpc();

@@ -44,6 +44,3 @@ class Sweetaddons_Block_Wp_Login
         }
     }
 }
-
-// Inisialisasi class Sweetaddons_Block_Wp_Login
-$sweet_block_wp_login = new Sweetaddons_Block_Wp_Login();
