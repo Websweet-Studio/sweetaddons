@@ -14,17 +14,22 @@ class Sweetaddons_SEO
 {
     public function __construct()
     {
+        add_action('save_post', array($this, 'save_seo_meta_data'));
+
+        if (is_admin()) {
+            add_action('add_meta_boxes', array($this, 'add_seo_meta_boxes'));
+            add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+            return;
+        }
+
         add_action('wp_head', array($this, 'output_meta_tags'), 1);
         add_action('wp_head', array($this, 'output_og_tags'), 2);
-        add_action('add_meta_boxes', array($this, 'add_seo_meta_boxes'));
-        add_action('save_post', array($this, 'save_seo_meta_data'));
         add_action('init', array($this, 'handle_sitemap_request'));
         add_action('init', array($this, 'register_sitemap_rewrite'));
         add_filter('query_vars', array($this, 'add_query_vars'));
         add_action('template_redirect', array($this, 'template_redirect_sitemap'));
         add_filter('wp_title', array($this, 'custom_title'), 10, 2);
         add_filter('document_title_parts', array($this, 'custom_document_title_parts'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
     }
 
     public function output_meta_tags()

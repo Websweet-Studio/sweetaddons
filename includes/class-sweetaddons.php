@@ -77,10 +77,12 @@ class sweetaddons
         $this->plugin_name = 'sweetaddons';
 
         $this->load_dependencies();
-        new Sweetaddons_Auto_Updater(
-            plugin_dir_path(dirname(__FILE__)) . 'sweetaddons.php',
-            $this->version
-        );
+        if (is_admin() || (defined('DOING_CRON') && DOING_CRON)) {
+            new Sweetaddons_Auto_Updater(
+                plugin_dir_path(dirname(__FILE__)) . 'sweetaddons.php',
+                $this->version
+            );
+        }
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
@@ -282,34 +284,24 @@ class sweetaddons
      */
     private function define_public_hooks()
     {
-
-        $plugin_public = new Sweetaddons_Public($this->get_plugin_name(), $this->get_version());
-
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-
-        // Initialize visitor statistics
-        new Sweetaddons_Visitor_Stats();
-
-        // Initialize SEO functionality
         new Sweetaddons_SEO();
 
-        // Initialize White Label functionality (only in admin)
         if (is_admin()) {
             new Sweetaddons_WhiteLabel();
+            return;
         }
 
-        // Initialize WhatsApp functionality
-        new Sweetaddons_WhatsApp();
+        new Sweetaddons_Visitor_Stats();
 
-        // Initialize Breadcrumb functionality
+        $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
+        $whatsapp_phone = get_option('sweetaddons_whatsapp_phone');
+        $whatsapp_agents = get_option('sweetaddons_whatsapp_agents', array());
+        if ($enable_whatsapp && ($whatsapp_phone || (is_array($whatsapp_agents) && !empty($whatsapp_agents)))) {
+            new Sweetaddons_WhatsApp();
+        }
+
         new Sweetaddons_Breadcrumb();
-
-        // Initialize Login Customizer
         new Sweetaddons_Login_Customizer();
-
-        // Initialize Database Cleaner
-        new Sweetaddons_Database_Cleaner();
     }
 
     /**

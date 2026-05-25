@@ -29,6 +29,10 @@ class Sweetaddons_Hide_Admin_Notice
 {
     public function __construct()
     {
+        if (!is_admin()) {
+            return;
+        }
+
         add_action('admin_notices', array($this, 'hide_admin_notice'));
     }
 

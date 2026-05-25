@@ -39,9 +39,10 @@ class Custom_Admin_Option_Page
             || $page === 'custom_admin_options';
 
         if ($is_sweetaddons_page) {
-            wp_enqueue_media();
             wp_enqueue_script('jquery');
-            wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
+            if ($page === 'Sweetaddons_visitor_stats') {
+                wp_enqueue_script('chartjs', 'https://cdn.jsdelivr.net/npm/chart.js', array(), null);
+            }
         }
     }
 
@@ -718,7 +719,7 @@ class Custom_Admin_Option_Page
 
     public function visitor_stats_page_callback()
     {
-        $stats_handler = new Sweetaddons_Visitor_Stats();
+        $stats_handler = new Sweetaddons_Visitor_Stats(false);
 
         // Handle rebuild request
         $rebuild_message = '';

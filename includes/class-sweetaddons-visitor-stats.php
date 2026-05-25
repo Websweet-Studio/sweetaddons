@@ -19,7 +19,7 @@ class Sweetaddons_Visitor_Stats
     private $referrer_stats_table;
     private $tables_checked = false;
 
-    public function __construct()
+    public function __construct($register_hooks = true)
     {
         global $wpdb;
         $this->logs_table = $wpdb->prefix . 'sweetaddons_visitor_logs';
@@ -28,9 +28,11 @@ class Sweetaddons_Visitor_Stats
         $this->page_stats_table = $wpdb->prefix . 'sweetaddons_page_stats';
         $this->referrer_stats_table = $wpdb->prefix . 'sweetaddons_referrer_stats';
 
-        add_action('wp', array($this, 'track_visitor'));
-        add_action('sweetaddons_daily_aggregation', array($this, 'run_daily_aggregation'));
-        add_shortcode('statistic', array($this, 'statistics_shortcode'));
+        if ($register_hooks) {
+            add_action('wp', array($this, 'track_visitor'));
+            add_action('sweetaddons_daily_aggregation', array($this, 'run_daily_aggregation'));
+            add_shortcode('statistic', array($this, 'statistics_shortcode'));
+        }
     }
 
     public function track_visitor()

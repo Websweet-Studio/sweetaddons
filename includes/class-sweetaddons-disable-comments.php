@@ -26,7 +26,9 @@ class Sweetaddons_Fully_Disable_Comment
 {
     public function __construct()
     {
-        add_action('wp_loaded', array($this, 'disable_comment'));
+        if (get_option('fully_disable_comment')) {
+            add_action('wp_loaded', array($this, 'disable_comment'));
+        }
     }
 
     public function disable_comment()
