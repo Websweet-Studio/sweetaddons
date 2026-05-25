@@ -88,6 +88,72 @@
 .sad-stat .sad-subtext {
   margin-top: auto;
 }
+
+.sad-card--summary .sad-card-title {
+  margin-bottom: 12px;
+}
+
+.sad-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sad-summary-tile {
+  border: 1px solid #e5e7eb;
+  border-top: 4px solid var(--sad-summary-accent, #10b981);
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  background: #fff;
+  min-width: 0;
+}
+
+.sad-summary-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.sad-summary-value {
+  margin-top: 10px;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+}
+
+.sad-summary-meta {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.sad-summary-tile--today {
+  --sad-summary-accent: #10b981;
+}
+
+.sad-summary-tile--week {
+  --sad-summary-accent: #0ea5e9;
+}
+
+.sad-summary-tile--month {
+  --sad-summary-accent: #f59e0b;
+}
+
+@media (max-width: 1200px) {
+  .sad-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 782px) {
+  .sad-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .sad-table {
   display: grid;
   gap: 8px;
@@ -609,6 +675,21 @@
   border-left: 0;
 }
 
+.sad-apple .sad-summary-tile {
+  border-color: var(--sad-hairline);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.012), rgba(0, 0, 0, 0));
+}
+
+.sad-apple .sad-summary-title,
+.sad-apple .sad-summary-meta {
+  color: var(--sad-ink-muted);
+}
+
+.sad-apple .sad-summary-value {
+  color: var(--sad-ink);
+  font-weight: 700;
+}
+
 .sad-apple .sad-chip {
   background: var(--sad-parchment);
   color: var(--sad-ink);
@@ -647,7 +728,7 @@
 }
 
 .sad-grid--charts {
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 2fr;
 }
 
 .sad-grid--tables {
@@ -720,6 +801,38 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sad-table-scroll {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.sad-table-scroll table {
+  margin: 0;
+  min-width: 520px;
+}
+
+.sad-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sad-link,
+.sad-link:focus,
+.sad-link:active {
+  color: inherit;
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.sad-link:hover code {
+  text-decoration: underline;
+}
+
+.sad-stats-table td code {
+  display: block;
+  max-width: 100%;
 }
 
 .sad-lead {

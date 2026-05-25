@@ -171,6 +171,14 @@ class OptionPage
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_description');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_default_og_image');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_twitter_site');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_page_title');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_single_title');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_category_title');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_tag_title');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_page_description');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_single_description');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_category_description');
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_template_tag_description');
 
         // reCaptcha settings
         register_setting('sweetaddons_recaptcha_group', 'captcha_Sweetaddons');
@@ -186,6 +194,7 @@ class OptionPage
 
         // WhatsApp settings
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_enable');
+        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_phone');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_message');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_button_text');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_position');
@@ -893,5 +902,696 @@ class OptionPage
         <?php AdminLayout::close(); ?>
 <?php
 }
+
+    public function visitor_stats_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        global $wpdb;
+        $prefix = $wpdb->prefix;
+
+        $days = isset($_GET['days']) ? (int) $_GET['days'] : 30;
+        if ($days < 7) {
+            $days = 7;
+        }
+        if ($days > 365) {
+            $days = 365;
+        }
+
+        $today = $wpdb->get_row("SELECT unique_visitors as uv, total_pageviews as pv FROM {$prefix}sweetaddons_daily_stats WHERE stat_date = CURDATE()");
+        $this_week = $wpdb->get_row("SELECT SUM(unique_visitors) as uv, SUM(total_pageviews) as pv FROM {$prefix}sweetaddons_daily_stats WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
+        $this_month = $wpdb->get_row("SELECT SUM(unique_visitors) as uv, SUM(total_pageviews) as pv FROM {$prefix}sweetaddons_daily_stats WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)");
+
+        $daily_stats = $wpdb->get_results($wpdb->prepare(
+            "SELECT stat_date as visit_date, unique_visitors as unique_visits, total_pageviews as total_visits
+             FROM {$prefix}sweetaddons_daily_stats
+             WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+             ORDER BY stat_date ASC",
+            $days
+        ));
+
+        $top_pages = $wpdb->get_results($wpdb->prepare(
+            "SELECT page_url, SUM(unique_visitors) as unique_visitors, SUM(total_views) as total_views
+             FROM {$prefix}sweetaddons_page_stats
+             WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+             GROUP BY page_url
+             ORDER BY total_views DESC
+             LIMIT 10",
+            $days
+        ));
+
+        $top_referrers = $wpdb->get_results($wpdb->prepare(
+            "SELECT referrer_domain as referer, SUM(total_visits) as visits
+             FROM {$prefix}sweetaddons_referrer_stats
+             WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL %d DAY)
+             GROUP BY referrer_domain
+             ORDER BY visits DESC
+             LIMIT 10",
+            $days
+        ));
+
+        $labels = array();
+        $visits = array();
+        $uniques = array();
+        foreach ($daily_stats as $row) {
+            $labels[] = $row->visit_date;
+            $visits[] = (int) $row->total_visits;
+            $uniques[] = (int) $row->unique_visits;
+        }
+        ?>
+        <?php AdminLayout::open('Statistik Pengunjung', 'Sweetaddons_visitor_stats'); ?>
+        <div class="sad-grid sad-grid--charts sad-grid--spaced">
+            <div class="sad-card sad-card--summary">
+                <div class="sad-card-title">Ringkasan</div>
+                <div class="sad-summary-grid">
+                    <div class="sad-summary-tile sad-summary-tile--today">
+                        <div class="sad-summary-title">Hari Ini</div>
+                        <div class="sad-summary-value"><?php echo number_format($today ? (int) $today->pv : 0); ?></div>
+                        <div class="sad-summary-meta">Pengunjung: <?php echo number_format($today ? (int) $today->uv : 0); ?></div>
+                    </div>
+                    <div class="sad-summary-tile sad-summary-tile--week">
+                        <div class="sad-summary-title">Minggu Ini</div>
+                        <div class="sad-summary-value"><?php echo number_format($this_week ? (int) $this_week->pv : 0); ?></div>
+                        <div class="sad-summary-meta">Pengunjung: <?php echo number_format($this_week ? (int) $this_week->uv : 0); ?></div>
+                    </div>
+                    <div class="sad-summary-tile sad-summary-tile--month">
+                        <div class="sad-summary-title">Bulan Ini</div>
+                        <div class="sad-summary-value"><?php echo number_format($this_month ? (int) $this_month->pv : 0); ?></div>
+                        <div class="sad-summary-meta">Pengunjung: <?php echo number_format($this_month ? (int) $this_month->uv : 0); ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sad-card sad-card--chart">
+                <div class="sad-card-title">Grafik (<?php echo (int) $days; ?> hari)</div>
+                <div class="sad-chartbox">
+                    <canvas id="sweetaddonsVisitorChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="sad-grid sad-grid--tables">
+            <div class="sad-card">
+                <div class="sad-card-title">Top Pages (<?php echo (int) $days; ?> hari)</div>
+                <div class="sad-table-scroll">
+                    <table class="widefat striped sad-widefat sad-widefat--plain sad-table-fixed sad-stats-table">
+                        <colgroup>
+                            <col />
+                            <col style="width: 120px;" />
+                            <col style="width: 120px;" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th class="sad-num">Views</th>
+                                <th class="sad-num">Unique</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (is_array($top_pages) && !empty($top_pages)) : ?>
+                                <?php foreach ($top_pages as $p) : ?>
+                                    <?php
+                                    $page_path = isset($p->page_url) ? (string) $p->page_url : '';
+                                    $page_href = $page_path !== '' ? home_url($page_path) : '';
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <?php if ($page_href) : ?>
+                                                <a class="sad-link" href="<?php echo esc_url($page_href); ?>" target="_blank" rel="noopener noreferrer">
+                                                    <code class="sad-truncate" title="<?php echo esc_attr($page_path); ?>"><?php echo esc_html($page_path); ?></code>
+                                                </a>
+                                            <?php else : ?>
+                                                <code class="sad-truncate" title="<?php echo esc_attr($page_path); ?>"><?php echo esc_html($page_path); ?></code>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="sad-num"><?php echo number_format((int) $p->total_views); ?></td>
+                                        <td class="sad-num"><?php echo number_format((int) $p->unique_visitors); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <tr>
+                                    <td colspan="3" class="sad-empty">Belum ada data.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sad-card">
+                <div class="sad-card-title">Top Referrer (<?php echo (int) $days; ?> hari)</div>
+                <div class="sad-table-scroll">
+                    <table class="widefat striped sad-widefat sad-widefat--plain sad-table-fixed sad-stats-table">
+                        <colgroup>
+                            <col />
+                            <col style="width: 120px;" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Domain</th>
+                                <th class="sad-num">Visits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (is_array($top_referrers) && !empty($top_referrers)) : ?>
+                                <?php foreach ($top_referrers as $r) : ?>
+                                    <?php $domain = isset($r->referer) ? (string) $r->referer : ''; ?>
+                                    <tr>
+                                        <td><code class="sad-truncate" title="<?php echo esc_attr($domain); ?>"><?php echo esc_html($domain); ?></code></td>
+                                        <td class="sad-num"><?php echo number_format((int) $r->visits); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <tr>
+                                    <td colspan="2" class="sad-empty">Belum ada data.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function() {
+                var el = document.getElementById('sweetaddonsVisitorChart');
+                if (!el || typeof Chart === 'undefined') {
+                    return;
+                }
+                var labels = <?php echo wp_json_encode($labels); ?>;
+                var visits = <?php echo wp_json_encode($visits); ?>;
+                var uniques = <?php echo wp_json_encode($uniques); ?>;
+                new Chart(el, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Kunjungan',
+                                data: visits,
+                                borderColor: '#22c55e',
+                                backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Pengunjung',
+                                data: uniques,
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.08)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true } },
+                        scales: {
+                            x: { ticks: { maxRotation: 0, autoSkip: true } },
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            })();
+        </script>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
+
+    public function seo_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        $home_title = get_option('sweetaddons_seo_home_title', '');
+        $home_desc = get_option('sweetaddons_seo_home_description', '');
+        $og_image = get_option('sweetaddons_seo_default_og_image', '');
+        $twitter_site = get_option('sweetaddons_seo_twitter_site', '');
+
+        $tpl_page_title = get_option('sweetaddons_seo_template_page_title', '{page_title} - {site_name}');
+        $tpl_single_title = get_option('sweetaddons_seo_template_single_title', '{post_title} - {site_name}');
+        $tpl_cat_title = get_option('sweetaddons_seo_template_category_title', '{category_name} - {site_name}');
+        $tpl_tag_title = get_option('sweetaddons_seo_template_tag_title', '{tag_name} - {site_name}');
+
+        $tpl_page_desc = get_option('sweetaddons_seo_template_page_description', '{excerpt} - {site_tagline}');
+        $tpl_single_desc = get_option('sweetaddons_seo_template_single_description', '{excerpt} - {site_tagline}');
+        $tpl_cat_desc = get_option('sweetaddons_seo_template_category_description', '{category_description} - {site_tagline}');
+        $tpl_tag_desc = get_option('sweetaddons_seo_template_tag_description', '{tag_description} - {site_tagline}');
+        ?>
+        <?php AdminLayout::open('Pengaturan SEO', 'Sweetaddons_seo'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">SEO Global</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('sweetaddons_seo_group'); ?>
+                    <?php do_settings_sections('sweetaddons_seo_group'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_home_title">Home Title</label></th>
+                            <td><input type="text" id="sweetaddons_seo_home_title" name="sweetaddons_seo_home_title" value="<?php echo esc_attr($home_title); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_home_description">Home Description</label></th>
+                            <td><textarea id="sweetaddons_seo_home_description" name="sweetaddons_seo_home_description" rows="3" class="large-text"><?php echo esc_textarea($home_desc); ?></textarea></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_default_og_image">Default OG Image URL</label></th>
+                            <td><input type="text" id="sweetaddons_seo_default_og_image" name="sweetaddons_seo_default_og_image" value="<?php echo esc_attr($og_image); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_twitter_site">Twitter Site</label></th>
+                            <td><input type="text" id="sweetaddons_seo_twitter_site" name="sweetaddons_seo_twitter_site" value="<?php echo esc_attr($twitter_site); ?>" class="regular-text" /></td>
+                        </tr>
+                    </table>
+
+                    <div class="sad-card-title" style="margin-top: 18px;">Template Title</div>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_page_title">Page</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_page_title" name="sweetaddons_seo_template_page_title" value="<?php echo esc_attr($tpl_page_title); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_single_title">Post</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_single_title" name="sweetaddons_seo_template_single_title" value="<?php echo esc_attr($tpl_single_title); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_category_title">Category</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_category_title" name="sweetaddons_seo_template_category_title" value="<?php echo esc_attr($tpl_cat_title); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_tag_title">Tag</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_tag_title" name="sweetaddons_seo_template_tag_title" value="<?php echo esc_attr($tpl_tag_title); ?>" class="large-text" /></td>
+                        </tr>
+                    </table>
+
+                    <div class="sad-card-title" style="margin-top: 18px;">Template Description</div>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_page_description">Page</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_page_description" name="sweetaddons_seo_template_page_description" value="<?php echo esc_attr($tpl_page_desc); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_single_description">Post</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_single_description" name="sweetaddons_seo_template_single_description" value="<?php echo esc_attr($tpl_single_desc); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_category_description">Category</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_category_description" name="sweetaddons_seo_template_category_description" value="<?php echo esc_attr($tpl_cat_desc); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_seo_template_tag_description">Tag</label></th>
+                            <td><input type="text" id="sweetaddons_seo_template_tag_description" name="sweetaddons_seo_template_tag_description" value="<?php echo esc_attr($tpl_tag_desc); ?>" class="large-text" /></td>
+                        </tr>
+                    </table>
+
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
+
+    public function recaptcha_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        $opt = get_option('captcha_Sweetaddons', array());
+        $aktif = !empty($opt['aktif']) ? '1' : '0';
+        $difficulty = isset($opt['difficulty']) ? $opt['difficulty'] : 'medium';
+        $login = isset($opt['login']) ? (string) $opt['login'] : '1';
+        $comment = isset($opt['comment']) ? (string) $opt['comment'] : '1';
+        $register = isset($opt['register']) ? (string) $opt['register'] : '1';
+        ?>
+        <?php AdminLayout::open('reCaptcha', 'Sweetaddons_recaptcha'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Captcha</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('sweetaddons_recaptcha_group'); ?>
+                    <?php do_settings_sections('sweetaddons_recaptcha_group'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">Aktif</th>
+                            <td>
+                                <label class="sad-form-checkbox">
+                                    <input type="checkbox" name="captcha_Sweetaddons[aktif]" value="1" <?php checked($aktif, '1'); ?> />
+                                    Aktifkan Captcha
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tingkat Kesulitan</th>
+                            <td>
+                                <select name="captcha_Sweetaddons[difficulty]">
+                                    <option value="easy" <?php selected($difficulty, 'easy'); ?>>Easy</option>
+                                    <option value="medium" <?php selected($difficulty, 'medium'); ?>>Medium</option>
+                                    <option value="hard" <?php selected($difficulty, 'hard'); ?>>Hard</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Area</th>
+                            <td>
+                                <label class="sad-form-checkbox"><input type="checkbox" name="captcha_Sweetaddons[login]" value="1" <?php checked($login, '1'); ?> /> Login</label><br>
+                                <label class="sad-form-checkbox"><input type="checkbox" name="captcha_Sweetaddons[comment]" value="1" <?php checked($comment, '1'); ?> /> Komentar</label><br>
+                                <label class="sad-form-checkbox"><input type="checkbox" name="captcha_Sweetaddons[register]" value="1" <?php checked($register, '1'); ?> /> Register</label>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
+
+    public function whitelabel_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        $plugin_name = get_option('sweetaddons_whitelabel_plugin_name', '');
+        $plugin_uri = get_option('sweetaddons_whitelabel_plugin_uri', '');
+        $description = get_option('sweetaddons_whitelabel_description', '');
+        $author = get_option('sweetaddons_whitelabel_author', '');
+        $author_uri = get_option('sweetaddons_whitelabel_author_uri', '');
+        $menu_title = get_option('sweetaddons_whitelabel_menu_title', '');
+        $hide_original = get_option('sweetaddons_whitelabel_hide_original', '');
+        ?>
+        <?php AdminLayout::open('White Label', 'Sweetaddons_whitelabel'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Branding</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('sweetaddons_whitelabel_group'); ?>
+                    <?php do_settings_sections('sweetaddons_whitelabel_group'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whitelabel_plugin_name">Plugin Name</label></th>
+                            <td><input type="text" id="sweetaddons_whitelabel_plugin_name" name="sweetaddons_whitelabel_plugin_name" value="<?php echo esc_attr($plugin_name); ?>" class="regular-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whitelabel_menu_title">Menu Title</label></th>
+                            <td><input type="text" id="sweetaddons_whitelabel_menu_title" name="sweetaddons_whitelabel_menu_title" value="<?php echo esc_attr($menu_title); ?>" class="regular-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label></th>
+                            <td><input type="text" id="sweetaddons_whitelabel_plugin_uri" name="sweetaddons_whitelabel_plugin_uri" value="<?php echo esc_attr($plugin_uri); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whitelabel_description">Description</label></th>
+                            <td><textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whitelabel_author">Author</label></th>
+                            <td><input type="text" id="sweetaddons_whitelabel_author" name="sweetaddons_whitelabel_author" value="<?php echo esc_attr($author); ?>" class="regular-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whitelabel_author_uri">Author URI</label></th>
+                            <td><input type="text" id="sweetaddons_whitelabel_author_uri" name="sweetaddons_whitelabel_author_uri" value="<?php echo esc_attr($author_uri); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Hide Original</th>
+                            <td>
+                                <label class="sad-form-checkbox">
+                                    <input type="checkbox" name="sweetaddons_whitelabel_hide_original" value="1" <?php checked($hide_original, '1'); ?> />
+                                    Sembunyikan referensi WebsweetStudio
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
+
+    public function whatsapp_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        $enable = get_option('sweetaddons_whatsapp_enable', '');
+        $phone = get_option('sweetaddons_whatsapp_phone', '');
+        $message = get_option('sweetaddons_whatsapp_message', 'Halo! Saya butuh bantuan.');
+        $button_text = get_option('sweetaddons_whatsapp_button_text', 'Chat dengan kami');
+        $position = get_option('sweetaddons_whatsapp_position', 'bottom-right');
+        $color = get_option('sweetaddons_whatsapp_color', '#25d366');
+        $show_mobile = get_option('sweetaddons_whatsapp_show_mobile', '1');
+        $show_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
+        $animation = get_option('sweetaddons_whatsapp_animation', 'none');
+        $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
+        $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
+        ?>
+        <?php AdminLayout::open('Chat WhatsApp', 'Sweetaddons_whatsapp'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">WhatsApp</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('sweetaddons_whatsapp_group'); ?>
+                    <?php do_settings_sections('sweetaddons_whatsapp_group'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">Aktif</th>
+                            <td><label class="sad-form-checkbox"><input type="checkbox" name="sweetaddons_whatsapp_enable" value="1" <?php checked($enable, '1'); ?> /> Aktifkan WhatsApp</label></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_phone">Nomor WhatsApp</label></th>
+                            <td><input type="text" id="sweetaddons_whatsapp_phone" name="sweetaddons_whatsapp_phone" value="<?php echo esc_attr($phone); ?>" class="regular-text" placeholder="62812xxxxxx" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_message">Pesan Default</label></th>
+                            <td><textarea id="sweetaddons_whatsapp_message" name="sweetaddons_whatsapp_message" rows="3" class="large-text"><?php echo esc_textarea($message); ?></textarea></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_button_text">Teks Tombol</label></th>
+                            <td><input type="text" id="sweetaddons_whatsapp_button_text" name="sweetaddons_whatsapp_button_text" value="<?php echo esc_attr($button_text); ?>" class="regular-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_bubble_style">Style</label></th>
+                            <td>
+                                <select id="sweetaddons_whatsapp_bubble_style" name="sweetaddons_whatsapp_bubble_style">
+                                    <option value="circle" <?php selected($bubble_style, 'circle'); ?>>Circle</option>
+                                    <option value="extended" <?php selected($bubble_style, 'extended'); ?>>Extended</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_color">Warna</label></th>
+                            <td><input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_animation">Animasi</label></th>
+                            <td>
+                                <select id="sweetaddons_whatsapp_animation" name="sweetaddons_whatsapp_animation">
+                                    <option value="none" <?php selected($animation, 'none'); ?>>None</option>
+                                    <option value="pulse" <?php selected($animation, 'pulse'); ?>>Pulse</option>
+                                    <option value="bounce" <?php selected($animation, 'bounce'); ?>>Bounce</option>
+                                    <option value="shake" <?php selected($animation, 'shake'); ?>>Shake</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="sweetaddons_whatsapp_position">Posisi</label></th>
+                            <td>
+                                <select id="sweetaddons_whatsapp_position" name="sweetaddons_whatsapp_position">
+                                    <option value="bottom-right" <?php selected($position, 'bottom-right'); ?>>Kanan Bawah</option>
+                                    <option value="bottom-left" <?php selected($position, 'bottom-left'); ?>>Kiri Bawah</option>
+                                    <option value="top-right" <?php selected($position, 'top-right'); ?>>Kanan Atas</option>
+                                    <option value="top-left" <?php selected($position, 'top-left'); ?>>Kiri Atas</option>
+                                    <option value="center-right" <?php selected($position, 'center-right'); ?>>Center Right</option>
+                                    <option value="center-left" <?php selected($position, 'center-left'); ?>>Center Left</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Visibility</th>
+                            <td>
+                                <label class="sad-form-checkbox"><input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> /> Mobile</label><br>
+                                <label class="sad-form-checkbox"><input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> /> Desktop</label><br>
+                                <label class="sad-form-checkbox"><input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> /> Tooltip</label>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
+
+    public function login_customizer_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        $notice = '';
+        if (isset($_POST['sweetaddons_login_customizer_submit'])) {
+            check_admin_referer('sweetaddons_login_customizer_settings');
+            $login_data = array(
+                'logo_url' => isset($_POST['login_logo_url']) ? sanitize_text_field(wp_unslash($_POST['login_logo_url'])) : '',
+                'bg_color' => isset($_POST['login_bg_color']) ? sanitize_text_field(wp_unslash($_POST['login_bg_color'])) : '#f1f1f1',
+                'bg_image' => isset($_POST['login_bg_image']) ? sanitize_text_field(wp_unslash($_POST['login_bg_image'])) : '',
+                'btn_color' => isset($_POST['login_btn_color']) ? sanitize_text_field(wp_unslash($_POST['login_btn_color'])) : '#2271b1',
+                'btn_text_color' => isset($_POST['login_btn_text_color']) ? sanitize_text_field(wp_unslash($_POST['login_btn_text_color'])) : '#ffffff',
+            );
+            update_option('sweetaddons_login_customizer', $login_data);
+            $notice = 'Pengaturan Login Page Customizer berhasil disimpan.';
+        }
+
+        $login_settings = get_option('sweetaddons_login_customizer', array());
+        $logo_url = isset($login_settings['logo_url']) ? $login_settings['logo_url'] : '';
+        $bg_color = isset($login_settings['bg_color']) ? $login_settings['bg_color'] : '#f1f1f1';
+        $bg_image = isset($login_settings['bg_image']) ? $login_settings['bg_image'] : '';
+        $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
+        $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
+        ?>
+        <?php AdminLayout::open('Login Page', 'Sweetaddons_login_customizer'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Login Page Customizer</div>
+                <?php if ($notice) : ?>
+                    <div class="sad-notice sad-notice-success"><p><?php echo esc_html($notice); ?></p></div>
+                <?php endif; ?>
+                <form method="post" action="" class="sad-form">
+                    <?php wp_nonce_field('sweetaddons_login_customizer_settings'); ?>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><label for="login_logo_url">Logo URL</label></th>
+                            <td><input type="text" name="login_logo_url" id="login_logo_url" value="<?php echo esc_attr($logo_url); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="login_bg_color">Warna Background</label></th>
+                            <td><input type="color" name="login_bg_color" id="login_bg_color" value="<?php echo esc_attr($bg_color); ?>" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="login_bg_image">Background Image URL</label></th>
+                            <td><input type="text" name="login_bg_image" id="login_bg_image" value="<?php echo esc_attr($bg_image); ?>" class="large-text" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="login_btn_color">Warna Tombol</label></th>
+                            <td><input type="color" name="login_btn_color" id="login_btn_color" value="<?php echo esc_attr($btn_color); ?>" /></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="login_btn_text_color">Warna Teks Tombol</label></th>
+                            <td><input type="color" name="login_btn_text_color" id="login_btn_text_color" value="<?php echo esc_attr($btn_text_color); ?>" /></td>
+                        </tr>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <input type="submit" class="button button-primary" name="sweetaddons_login_customizer_submit" value="Simpan Pengaturan" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
+
+    public function db_cleaner_page_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
+        }
+
+        $cleaner = new \Sweetaddons\DatabaseCleaner();
+        $notice = '';
+
+        if (isset($_POST['sweetaddons_db_cleaner_submit'])) {
+            check_admin_referer('sweetaddons_db_cleaner_action');
+            $items = isset($_POST['items']) ? (array) $_POST['items'] : array();
+            $items = array_map('sanitize_text_field', wp_unslash($items));
+            $cleaned = $cleaner->clean_items($items);
+            if (!empty($cleaned)) {
+                $notice = 'Dibersihkan: ' . implode(', ', $cleaned);
+            } else {
+                $notice = 'Tidak ada item yang dibersihkan.';
+            }
+        }
+
+        $stats = $cleaner->get_stats();
+        ?>
+        <?php AdminLayout::open('DB Cleaner', 'Sweetaddons_db_cleaner'); ?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Database Cleaner</div>
+                <?php if ($notice) : ?>
+                    <div class="sad-notice sad-notice-success"><p><?php echo esc_html($notice); ?></p></div>
+                <?php endif; ?>
+                <form method="post" action="" class="sad-form">
+                    <?php wp_nonce_field('sweetaddons_db_cleaner_action'); ?>
+                    <table class="widefat striped sad-widefat sad-widefat--plain">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>Item</th>
+                                <th style="width: 120px;">Count</th>
+                                <th style="width: 140px;">Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox" name="items[]" value="revisions" /></td>
+                                <td>Post Revisions</td>
+                                <td><?php echo number_format((int) $stats['revisions']); ?></td>
+                                <td><?php echo esc_html($cleaner->format_bytes((int) $stats['size_revisions'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" name="items[]" value="auto_drafts" /></td>
+                                <td>Auto Drafts</td>
+                                <td><?php echo number_format((int) $stats['auto_drafts']); ?></td>
+                                <td><?php echo esc_html($cleaner->format_bytes((int) $stats['size_auto_drafts'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" name="items[]" value="spam_comments" /></td>
+                                <td>Spam Comments</td>
+                                <td><?php echo number_format((int) $stats['spam_comments']); ?></td>
+                                <td><?php echo esc_html($cleaner->format_bytes((int) $stats['size_spam_comments'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" name="items[]" value="trashed_comments" /></td>
+                                <td>Trashed Comments</td>
+                                <td><?php echo number_format((int) $stats['trashed_comments']); ?></td>
+                                <td><?php echo esc_html($cleaner->format_bytes((int) $stats['size_trashed_comments'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" name="items[]" value="expired_transients" /></td>
+                                <td>Expired Transients</td>
+                                <td><?php echo number_format((int) $stats['expired_transients']); ?></td>
+                                <td><?php echo esc_html($cleaner->format_bytes((int) $stats['size_expired_transients'])); ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <input type="submit" class="button button-primary" name="sweetaddons_db_cleaner_submit" value="Bersihkan" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <?php AdminLayout::close(); ?>
+        <?php
+    }
 
 }
