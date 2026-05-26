@@ -139,9 +139,9 @@ class Sweetaddons_Captcha
         $code = $this->generate_code();
         set_transient('sweetaddons_captcha_' . $token, $code, 15 * MINUTE_IN_SECONDS);
         $src = add_query_arg(array('sweetaddons_captcha' => 'image', 'token' => $token, 'v' => time()), home_url('/'));
-        $html = '<div class="sweetaddons-captcha" style="margin:10px 0; max-width:180px;">';
-        $html .= '<img src="' . esc_url($src) . '" alt="Captcha" style="display:block; border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px;" />';
-        $html .= '<input type="text" name="sweetaddons_captcha_input" placeholder="Masukkan teks di gambar" required style="margin-top:8px; padding:4px 6px; width:160px; font-size:12px; border:1px solid #d0d4d9; border-radius:4px;" />';
+        $html = '<div class="sweetaddons-captcha" style="margin:10px 0; width:100%;">';
+        $html .= '<img src="' . esc_url($src) . '" alt="Captcha" style="display:block; border:1px solid #d0d4d9; height:50px; width:100%; background:#f5f6fa; border-radius:4px; box-sizing:border-box;" />';
+        $html .= '<input type="text" name="sweetaddons_captcha_input" placeholder="Masukkan teks di gambar" required style="margin-top:8px; padding:8px 10px; width:100%; font-size:13px; border:1px solid #d0d4d9; border-radius:4px; box-sizing:border-box;" />';
         $html .= '<input type="hidden" name="sweetaddons_captcha_token" value="' . esc_attr($token) . '" />';
         $html .= '</div>';
         return $html;
