@@ -62,7 +62,7 @@ class Sweetaddons_Captcha
         // Handle preview mode
         if ($qv === 'preview') {
             if (!current_user_can('manage_options')) {
-                die('Access denied');
+                wp_die('Access denied');
             }
 
             $difficulty = isset($_GET['difficulty']) ? sanitize_text_field($_GET['difficulty']) : 'medium';
@@ -107,6 +107,7 @@ class Sweetaddons_Captcha
             $x += mt_rand(20, 28);
         }
         header('Content-Type: image/png');
+        header('X-Content-Type-Options: nosniff');
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         imagepng($img);
         imagedestroy($img);
@@ -213,7 +214,6 @@ class Sweetaddons_Captcha
 
     public function wpcf7_form_captcha()
     {
-        wpcf7_add_form_tag('recaptcha', array($this, 'wpcf7_display_captcha'));
         wpcf7_add_form_tag('recaptcha', array($this, 'wpcf7_display_captcha'));
     }
 

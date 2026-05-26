@@ -1335,39 +1335,32 @@ class Custom_Admin_Option_Page
 
     public function recaptcha_page_callback()
     {
-        // Handle settings save
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) {
-            $captcha_data = array();
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to access this page.', 'sweetaddons'));
+        }
 
-            if (isset($_POST['captcha_aktif'])) {
-                $captcha_data['aktif'] = sanitize_text_field($_POST['captcha_aktif']);
+        // Handle settings save
+        if (isset($_POST['submit'])) {
+            check_admin_referer('sweetaddons_recaptcha_settings');
+
+            $difficulty = isset($_POST['captcha_difficulty']) ? sanitize_key(wp_unslash($_POST['captcha_difficulty'])) : 'medium';
+            if (!in_array($difficulty, array('easy', 'medium', 'hard'), true)) {
+                $difficulty = 'medium';
             }
-            if (isset($_POST['captcha_sitekey'])) {
-                $captcha_data['sitekey'] = sanitize_text_field($_POST['captcha_sitekey']);
-            }
-            if (isset($_POST['captcha_secretkey'])) {
-                $captcha_data['secretkey'] = sanitize_text_field($_POST['captcha_secretkey']);
-            }
-            if (isset($_POST['captcha_login'])) {
-                $captcha_data['login'] = sanitize_text_field($_POST['captcha_login']);
-            }
-            if (isset($_POST['captcha_comment'])) {
-                $captcha_data['comment'] = sanitize_text_field($_POST['captcha_comment']);
-            }
-            if (isset($_POST['captcha_register'])) {
-                $captcha_data['register'] = sanitize_text_field($_POST['captcha_register']);
-            }
-            if (isset($_POST['captcha_difficulty'])) {
-                $captcha_data['difficulty'] = sanitize_text_field($_POST['captcha_difficulty']);
-            }
+
+            $captcha_data = array(
+                'aktif'      => isset($_POST['captcha_aktif']) ? '1' : '',
+                'login'      => isset($_POST['captcha_login']) ? '1' : '',
+                'comment'    => isset($_POST['captcha_comment']) ? '1' : '',
+                'register'   => isset($_POST['captcha_register']) ? '1' : '',
+                'difficulty' => $difficulty,
+            );
 
             update_option('captcha_Sweetaddons', $captcha_data);
         }
 
         $captcha_settings = get_option('captcha_Sweetaddons', array());
         $aktif = isset($captcha_settings['aktif']) ? $captcha_settings['aktif'] : '';
-        $sitekey = isset($captcha_settings['sitekey']) ? $captcha_settings['sitekey'] : '';
-        $secretkey = isset($captcha_settings['secretkey']) ? $captcha_settings['secretkey'] : '';
         $login = isset($captcha_settings['login']) ? $captcha_settings['login'] : '';
         $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
         $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';

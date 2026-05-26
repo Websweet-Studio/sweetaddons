@@ -157,6 +157,59 @@ class Sweetaddons_Maintenance_Mode
                     }
                 }
 
+                .lucide-server-crash-icon .sweetaddons-lightning {
+                    stroke: #facc15;
+                    filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.95)) drop-shadow(0 0 16px rgba(250, 204, 21, 0.55));
+                    transform-origin: 12px 12px;
+                    animation: sweetaddonsLightningFlicker 1.35s infinite steps(1, end);
+                }
+
+                @keyframes sweetaddonsLightningFlicker {
+                    0% {
+                        opacity: 1;
+                    }
+
+                    3% {
+                        opacity: 0.25;
+                    }
+
+                    6% {
+                        opacity: 1;
+                    }
+
+                    8% {
+                        opacity: 0.55;
+                    }
+
+                    10% {
+                        opacity: 1;
+                    }
+
+                    55% {
+                        opacity: 1;
+                    }
+
+                    57% {
+                        opacity: 0.1;
+                    }
+
+                    60% {
+                        opacity: 1;
+                    }
+
+                    80% {
+                        opacity: 0.6;
+                    }
+
+                    83% {
+                        opacity: 1;
+                    }
+
+                    100% {
+                        opacity: 1;
+                    }
+                }
+
                 /* Mobile Responsive */
                 @media (max-width: 640px) {
                     h1 {
@@ -173,6 +226,16 @@ class Sweetaddons_Maintenance_Mode
 
         <body>
             <div style="text-align: center;">
+                <div style="margin-bottom: 2rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="168" height="168" viewBox="0 0 24 24" fill="none" stroke="#a6a6a6" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-server-crash-icon lucide-server-crash">
+                        <path d="M6 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2" />
+                        <path d="M6 14H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2" />
+                        <path d="M6 6h.01" />
+                        <path d="M6 18h.01" />
+                        <path class="sweetaddons-lightning" d="m13 6-4 6h6l-4 6" />
+                    </svg>
+                </div>
+
                 <h1><?php echo esc_html($title); ?></h1>
                 <p><?php echo wp_kses_post($message); ?></p>
             </div>
