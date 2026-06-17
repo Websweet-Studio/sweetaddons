@@ -21,7 +21,7 @@ class Sweet_Option_Maintenance
     public function add_submenu_page()
     {
         add_submenu_page(
-            'custom_admin_options',     // Parent slug
+            'Sweetaddons_spam',     // Parent slug (Proteksi)
             'Maintenance Mode',         // Page title
             'Maintenance Mode',         // Menu title
             'manage_options',           // Capability
@@ -126,7 +126,9 @@ class Sweet_Option_Maintenance
         ];
 
 ?>
-        <?php Sweetaddons_Admin_Layout::open('Maintenance Mode', 'Sweetaddons_maintenance'); ?>
+        <?php
+        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
+        Sweetaddons_Admin_Layout::open('Maintenance', 'Sweetaddons_maintenance', $subnav); ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Maintenance</div>

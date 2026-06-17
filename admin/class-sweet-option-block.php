@@ -21,7 +21,7 @@ class Sweet_Option_Block
     public function add_submenu_page()
     {
         add_submenu_page(
-            'custom_admin_options',     // Parent slug
+            'Sweetaddons_spam',     // Parent slug (Proteksi)
             'Blokir Login',              // Page title
             'Blokir Login',              // Menu title
             'manage_options',           // Capability
@@ -133,7 +133,9 @@ class Sweet_Option_Block
             $whitelist_count = count(explode(',', $wl_ip));
         }
 ?>
-        <?php Sweetaddons_Admin_Layout::open('Pengaturan Blokir Login', 'Sweetaddons_block'); ?>
+        <?php
+        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
+        Sweetaddons_Admin_Layout::open('Blokir Login', 'Sweetaddons_block', $subnav); ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Utama</div>

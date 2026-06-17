@@ -559,6 +559,40 @@
   font-weight: 600;
   letter-spacing: 0.231px;
   color: var(--sad-ink);
+  margin-right: 20px;
+}
+
+.sad-apple__subnav-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.sad-apple__subnav-tab {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sad-ink-muted);
+  background: transparent;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sad-apple__subnav-tab:hover {
+  color: var(--sad-ink);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.sad-apple__subnav-tab.is-active {
+  color: #fff;
+  background: #1d1d1f;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.sad-apple__subnav-tab.is-active:hover {
+  color: #fff;
+  background: #1d1d1f;
 }
 
 .sad-apple__content {

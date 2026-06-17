@@ -61,14 +61,24 @@ class Custom_Admin_Option_Page
             70                         // Posisi menu (semakin kecil angkanya semakin tinggi posisinya)
         );
 
-        // Add spam submenu
+        // Add Proteksi submenu (main)
         add_submenu_page(
             'custom_admin_options',     // Parent slug
-            'Proteksi Spam',            // Page title
-            'Proteksi Spam',            // Menu title
+            'Proteksi',            // Page title
+            'Proteksi',            // Menu title
             'manage_options',           // Capability
             'Sweetaddons_spam',        // Menu slug
             array($this, 'spam_page_callback') // Callback function
+        );
+
+        // Add reCaptcha submenu under Proteksi
+        add_submenu_page(
+            'Sweetaddons_spam',     // Parent slug
+            'Pengaturan reCaptcha',     // Page title
+            'reCaptcha',               // Menu title
+            'manage_options',           // Capability
+            'Sweetaddons_recaptcha',   // Menu slug
+            array($this, 'recaptcha_page_callback') // Callback function
         );
 
         // Add visitor statistics submenu
@@ -89,16 +99,6 @@ class Custom_Admin_Option_Page
             'manage_options',           // Capability
             'Sweetaddons_seo',         // Menu slug
             array($this, 'seo_page_callback') // Callback function
-        );
-
-        // Add reCaptcha submenu
-        add_submenu_page(
-            'custom_admin_options',     // Parent slug
-            'Pengaturan reCaptcha',     // Page title
-            'reCaptcha',               // Menu title
-            'manage_options',           // Capability
-            'Sweetaddons_recaptcha',   // Menu slug
-            array($this, 'recaptcha_page_callback') // Callback function
         );
 
         // Add White Label submenu
@@ -288,7 +288,9 @@ class Custom_Admin_Option_Page
         ];
 
 ?>
-        <?php Sweetaddons_Admin_Layout::open('Proteksi Spam', 'Sweetaddons_spam'); ?>
+        <?php
+        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
+        Sweetaddons_Admin_Layout::open('Proteksi', 'Sweetaddons_spam', $subnav); ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Utama</div>
@@ -435,7 +437,7 @@ class Custom_Admin_Option_Page
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Umum</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Blokir Login</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Proteksi Spam</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Proteksi</a>
                 </div>
             </div>
         </div>
@@ -1367,7 +1369,9 @@ class Custom_Admin_Option_Page
         $difficulty = isset($captcha_settings['difficulty']) ? $captcha_settings['difficulty'] : 'medium';
 
     ?>
-        <?php Sweetaddons_Admin_Layout::open('Pengaturan CAPTCHA', 'Sweetaddons_recaptcha'); ?>
+        <?php
+        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
+        Sweetaddons_Admin_Layout::open('reCaptcha', 'Sweetaddons_recaptcha', $subnav); ?>
         <?php
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan CAPTCHA berhasil disimpan.</p></div>';
