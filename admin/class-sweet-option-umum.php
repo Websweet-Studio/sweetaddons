@@ -154,62 +154,65 @@ class Sweet_Option_Umum
             ],
         ];
         ?>
-        <div class="sad-grid">
-            <div class="sad-card">
-                <div class="sad-card-title">Pengaturan Utama</div>
-                <form method="post" action="options.php" class="sad-form">
-                    <?php settings_fields('Sweetaddons_umum_group'); ?>
-                    <?php do_settings_sections('Sweetaddons_umum_group'); ?>
+        <form method="post" action="options.php" class="sad-form">
+            <div class="sad-top">
+                <div class="sad-top-left">
+                    <div class="sad-card" style="margin-bottom: 16px;">
+                        <div class="sad-card-title">Pengaturan Utama</div>
+                        <?php settings_fields('Sweetaddons_umum_group'); ?>
+                        <?php do_settings_sections('Sweetaddons_umum_group'); ?>
 
-                    <table class="form-table">
+                        <table class="form-table">
+                            <?php
+                            foreach ($umum_fields as $data) :
+                                echo '<tr>';
+                                echo '<th scope="row">';
+                                echo $data['title'];
+                                echo '</th>';
+                                echo '<td>';
+                                $this->field($data);
+                                echo '</td>';
+                                echo '</tr>';
+                            endforeach;
+                            ?>
+                        </table>
+                    </div>
+                    <div class="sad-card">
+                        <div class="sad-card-title">Update Plugin</div>
                         <?php
-                        foreach ($umum_fields as $data) :
-                            echo '<tr>';
-                            echo '<th scope="row">';
-                            echo $data['title'];
-                            echo '</th>';
-                            echo '<td>';
-                            $this->field($data);
-                            echo '</td>';
-                            echo '</tr>';
-                        endforeach;
-                        ?>
-                    </table>
+                        $checked = isset($_GET['sweetaddons_update_check']) ? sanitize_text_field(wp_unslash($_GET['sweetaddons_update_check'])) : '';
+                        if ($checked === '1') {
+                            $has_update = isset($_GET['sweetaddons_has_update']) ? sanitize_text_field(wp_unslash($_GET['sweetaddons_has_update'])) : '0';
+                            echo '<div class="sad-notice sad-notice-success"><p>';
+                            echo $has_update === '1' ? 'Cek update selesai. Update tersedia di halaman Plugins.' : 'Cek update selesai. Tidak ada update terbaru.';
+                            echo '</p></div>';
+                        }
 
-                    <div class="sad-actions-row sad-actions-row--end">
+                        $check_url = wp_nonce_url(
+                            admin_url('admin-post.php?action=sweetaddons_check_update'),
+                            'sweetaddons_check_update'
+                        );
+                        ?>
+                        <div class="sad-stack" style="gap: 6px; margin-bottom: 12px;">
+                            <div>Versi saat ini: <strong><?php echo defined('SWEETADDONS_VERSION') ? esc_html(SWEETADDONS_VERSION) : ''; ?></strong></div>
+                            <div><small>Cek update akan mengambil versi terbaru dari GitHub Releases.</small></div>
+                        </div>
+                        <a href="<?php echo esc_url($check_url); ?>" class="button button-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;margin-top:-2px;width:14px;height:14px;">
+                                <path d="M12 13v8l-4-4" />
+                                <path d="m12 21 4-4" />
+                                <path d="M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284" />
+                            </svg>Cek Update</a>
+                    </div>
+                </div>
+
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-card-title">Simpan Pengaturan</div>
                         <?php $this->save_button(); ?>
                     </div>
-                </form>
-            </div>
-            <div class="sad-card">
-                <div class="sad-card-title">Update Plugin</div>
-                <?php
-                $checked = isset($_GET['sweetaddons_update_check']) ? sanitize_text_field(wp_unslash($_GET['sweetaddons_update_check'])) : '';
-                if ($checked === '1') {
-                    $has_update = isset($_GET['sweetaddons_has_update']) ? sanitize_text_field(wp_unslash($_GET['sweetaddons_has_update'])) : '0';
-                    echo '<div class="sad-notice sad-notice-success"><p>';
-                    echo $has_update === '1' ? 'Cek update selesai. Update tersedia di halaman Plugins.' : 'Cek update selesai. Tidak ada update terbaru.';
-                    echo '</p></div>';
-                }
-
-                $check_url = wp_nonce_url(
-                    admin_url('admin-post.php?action=sweetaddons_check_update'),
-                    'sweetaddons_check_update'
-                );
-                ?>
-                <div class="sad-row" style="justify-content: space-between; align-items: center;">
-                    <div class="sad-stack" style="gap: 6px;">
-                        <div>Versi saat ini: <strong><?php echo defined('SWEETADDONS_VERSION') ? esc_html(SWEETADDONS_VERSION) : ''; ?></strong></div>
-                        <div><small>Cek update akan mengambil versi terbaru dari GitHub Releases.</small></div>
-                    </div>
-                    <a href="<?php echo esc_url($check_url); ?>" class="button button-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;margin-top:-2px;width:14px;height:14px;">
-                            <path d="M12 13v8l-4-4" />
-                            <path d="m12 21 4-4" />
-                            <path d="M4.393 15.269A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.436 8.284" />
-                        </svg>Cek Update</a>
                 </div>
             </div>
-        </div>
+        </form>
     <?php
     }
 
