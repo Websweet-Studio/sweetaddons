@@ -14,20 +14,8 @@ class Sweet_Option_Maintenance
 {
     public function __construct()
     {
-        add_action('admin_menu', array($this, 'add_submenu_page'));
+        // Menu registration removed - now handled via tabs in Sweetaddons_protect
         add_action('admin_init', array($this, 'register_settings'));
-    }
-
-    public function add_submenu_page()
-    {
-        add_submenu_page(
-            'Sweetaddons_spam',     // Parent slug (Proteksi)
-            'Maintenance Mode',         // Page title
-            'Maintenance Mode',         // Menu title
-            'manage_options',           // Capability
-            'Sweetaddons_maintenance', // Menu slug
-            array($this, 'maintenance_page_callback') // Callback function
-        );
     }
 
     public function register_settings()

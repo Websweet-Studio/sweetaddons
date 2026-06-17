@@ -26,7 +26,7 @@ class Sweetaddons_Admin_Layout
             'label' => 'Umum',
           ),
           array(
-            'page'  => 'Sweetaddons_spam',
+            'page'  => 'Sweetaddons_protect',
             'label' => 'Proteksi',
           ),
           array(
@@ -58,12 +58,18 @@ class Sweetaddons_Admin_Layout
 
   public static function get_proteksi_subnav()
     {
+        $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
         return array(
-          array('page' => 'Sweetaddons_spam', 'label' => 'Proteksi'),
-          array('page' => 'Sweetaddons_maintenance', 'label' => 'Maintenance'),
-          array('page' => 'Sweetaddons_recaptcha', 'label' => 'reCaptcha'),
-          array('page' => 'Sweetaddons_block', 'label' => 'Blokir Login'),
+          array('tab' => 'protect', 'label' => 'Proteksi'),
+          array('tab' => 'maintenance', 'label' => 'Maintenance'),
+          array('tab' => 'recaptcha', 'label' => 'reCaptcha'),
+          array('tab' => 'block', 'label' => 'Blokir Login'),
         );
+    }
+
+  public static function get_proteksi_tab_url($tab)
+    {
+        return admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab);
     }
 
   public static function open($page_title, $active_page, $subnav = array())
@@ -92,8 +98,9 @@ class Sweetaddons_Admin_Layout
           <nav class="sad-apple__subnav-tabs" aria-label="Sub Navigation">
             <?php foreach ($subnav as $tab) : ?>
               <?php
-              $tab_url = admin_url('admin.php?page=' . $tab['page']);
-              $tab_active = ($active_page === $tab['page']);
+              $tab_url = self::get_proteksi_tab_url($tab['tab']);
+              $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
+              $tab_active = ($current_tab === $tab['tab']);
               ?>
               <a class="sad-apple__subnav-tab <?php echo $tab_active ? 'is-active' : ''; ?>" href="<?php echo esc_url($tab_url); ?>">
                 <?php echo esc_html($tab['label']); ?>
@@ -113,4 +120,85 @@ class Sweetaddons_Admin_Layout
     </div>
 <?php
     }
-  }
+
+    /**
+     * Redirect old separate pages to tab-based URLs
+     */
+    public static function redirect_old_pages()
+    {
+        global $pagenow;
+        
+        if ($pagenow !== 'admin.php') {
+            return;
+        }
+        
+        $old_pages = array(
+            'Sweetaddons_maintenance' => 'maintenance',
+            'Sweetaddons_recaptcha'   => 'recaptcha',
+            'Sweetaddons_block'       => 'block',
+        );
+        
+        if (isset($_GET['page']) && isset($old_pages[$_GET['page']])) {
+            $tab = $old_pages[$_GET['page']];
+            wp_safe_redirect(admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab));
+            exit;
+        }
+    }
+
+    /**
+     * Fix WordPress admin menu active state for Proteksi pages
+     */
+    public static function fix_parent_file($parent_file)
+    {
+        global $plugin_page;
+        
+        if ($plugin_page === 'Sweetaddons_protect') {
+            $parent_file = 'custom_admin_options';
+        }
+        
+        return $parent_file;
+    }
+
+    /**
+     * Fix WordPress admin submenu active state for Proteksi pages
+     */
+    public static function hide_proteksi_submenu_items($submenu_file)
+    {
+        global $plugin_page;
+        
+        if ($plugin_page === 'Sweetaddons_protect') {
+            $submenu_file = 'Sweetaddons_protect';
+        }
+        
+        return $submenu_file;
+    }
+
+    /**
+     * Remove submenu items from sidebar that are managed by tabs
+     */
+    public static function remove_admin_submenus()
+    {
+        global $submenu;
+        
+        // Remove individual items that are shown as tabs under Proteksi
+        // But keep them accessible (just hidden from sidebar)
+        $hidden_pages = array('Sweetaddons_maintenance', 'Sweetaddons_recaptcha', 'Sweetaddons_block');
+        
+        foreach ($hidden_pages as $page) {
+            if (isset($submenu['custom_admin_options'])) {
+                foreach ($submenu['custom_admin_options'] as $key => $item) {
+                    if (isset($item[2]) && $item[2] === $page) {
+                        unset($submenu['custom_admin_options'][$key]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Register actions and filters
+add_action('admin_init', array('Sweetaddons_Admin_Layout', 'redirect_old_pages'));
+add_filter('parent_file', array('Sweetaddons_Admin_Layout', 'fix_parent_file'));
+add_filter('submenu_file', array('Sweetaddons_Admin_Layout', 'hide_proteksi_submenu_items'));
+add_action('admin_menu', array('Sweetaddons_Admin_Layout', 'remove_admin_submenus'), 999);

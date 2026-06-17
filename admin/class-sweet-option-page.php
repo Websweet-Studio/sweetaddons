@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * The admin-specific functionality of the plugin.
@@ -67,18 +67,8 @@ class Custom_Admin_Option_Page
             'Proteksi',            // Page title
             'Proteksi',            // Menu title
             'manage_options',           // Capability
-            'Sweetaddons_spam',        // Menu slug
+            'Sweetaddons_protect',        // Menu slug
             array($this, 'spam_page_callback') // Callback function
-        );
-
-        // Add reCaptcha submenu under Proteksi
-        add_submenu_page(
-            'Sweetaddons_spam',     // Parent slug
-            'Pengaturan reCaptcha',     // Page title
-            'reCaptcha',               // Menu title
-            'manage_options',           // Capability
-            'Sweetaddons_recaptcha',   // Menu slug
-            array($this, 'recaptcha_page_callback') // Callback function
         );
 
         // Add visitor statistics submenu
@@ -263,6 +253,27 @@ class Custom_Admin_Option_Page
 
     public function spam_page_callback()
     {
+        $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
+?>
+        <?php
+        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
+        Sweetaddons_Admin_Layout::open('Proteksi', 'Sweetaddons_protect', $subnav);
+        
+        if ($current_tab === 'maintenance') {
+            $this->render_maintenance_tab();
+        } elseif ($current_tab === 'recaptcha') {
+            $this->render_recaptcha_tab();
+        } elseif ($current_tab === 'block') {
+            $this->render_block_tab();
+        } else {
+            $this->render_protect_tab();
+        }
+        
+        Sweetaddons_Admin_Layout::close();
+    }
+
+    private function render_protect_tab()
+    {
         $spam_fields = [
             [
                 'id'    => 'limit_login_attempts',
@@ -286,11 +297,7 @@ class Custom_Admin_Option_Page
                 'label' => 'Nonaktifkan akses ke REST API untuk keperluan keamanan atau privasi.',
             ],
         ];
-
 ?>
-        <?php
-        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
-        Sweetaddons_Admin_Layout::open('Proteksi', 'Sweetaddons_spam', $subnav); ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Utama</div>
@@ -317,8 +324,217 @@ class Custom_Admin_Option_Page
                 </form>
             </div>
         </div>
-        <?php Sweetaddons_Admin_Layout::close(); ?>
-    <?php
+<?php
+    }
+
+    private function render_maintenance_tab()
+    {
+        $maintenance_fields = [
+            [
+                'id'    => 'maintenance_mode',
+                'type'  => 'checkbox',
+                'title' => 'Mode Maintenance',
+                'std'   => 0,
+                'label' => 'Aktifkan mode maintenance untuk situs Anda.',
+            ],
+            [
+                'id'    => 'maintenance_mode_data',
+                'sub'   => 'title',
+                'type'  => 'text',
+                'title' => 'Judul Halaman',
+                'std'   => 'Segera Kembali',
+            ],
+            [
+                'id'    => 'maintenance_mode_data',
+                'sub'   => 'body',
+                'type'  => 'textarea',
+                'title' => 'Isi Pesan',
+                'std'   => 'Kami sedang melakukan perawatan sistem. Silakan kembali lagi nanti.',
+            ]
+        ];
+?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Pengaturan Maintenance</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('Sweetaddons_maintenance_group'); ?>
+                    <?php do_settings_sections('Sweetaddons_maintenance_group'); ?>
+                    <table class="form-table">
+                        <?php
+                        foreach ($maintenance_fields as $data) :
+                            echo '<tr>';
+                            echo '<th scope="row">';
+                            echo $data['title'];
+                            echo '</th>';
+                            echo '<td>';
+                            $this->field($data);
+                            echo '</td>';
+                            echo '</tr>';
+                        endforeach;
+                        ?>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+<?php
+    }
+
+    private function render_recaptcha_tab()
+    {
+        if (isset($_POST['submit'])) {
+            check_admin_referer('sweetaddons_recaptcha_settings');
+            $difficulty = isset($_POST['captcha_difficulty']) ? sanitize_key(wp_unslash($_POST['captcha_difficulty'])) : 'medium';
+            if (!in_array($difficulty, array('easy', 'medium', 'hard'), true)) {
+                $difficulty = 'medium';
+            }
+            $captcha_data = array(
+                'aktif'      => isset($_POST['captcha_aktif']) ? '1' : '',
+                'login'      => isset($_POST['captcha_login']) ? '1' : '',
+                'comment'    => isset($_POST['captcha_comment']) ? '1' : '',
+                'register'   => isset($_POST['captcha_register']) ? '1' : '',
+                'difficulty' => $difficulty,
+            );
+            update_option('captcha_Sweetaddons', $captcha_data);
+        }
+        
+        $captcha_settings = get_option('captcha_Sweetaddons', array());
+        $aktif = isset($captcha_settings['aktif']) ? $captcha_settings['aktif'] : '';
+        $login = isset($captcha_settings['login']) ? $captcha_settings['login'] : '';
+        $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
+        $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
+        $difficulty = isset($captcha_settings['difficulty']) ? $captcha_settings['difficulty'] : 'medium';
+?>
+        <?php if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) : ?>
+            <div class="sad-notice sad-notice-success"><p>Pengaturan CAPTCHA berhasil disimpan.</p></div>
+        <?php endif; ?>
+        <form method="post" action="" class="sad-form">
+            <?php wp_nonce_field('sweetaddons_recaptcha_settings'); ?>
+            <div class="sad-top">
+                <div class="sad-top-left">
+                    <div class="sad-card sad-mb-16" id="recaptcha-general-settings">
+                        <div class="sad-card-title">Konfigurasi Utama</div>
+                        <table class="form-table">
+                            <tr>
+                                <th scope="row">Status Fitur</th>
+                                <td>
+                                    <label>
+                                        <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
+                                        Aktifkan CAPTCHA
+                                    </label>
+                                    <p class="description">Aktifkan perlindungan CAPTCHA.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Tingkat Kesulitan</th>
+                                <td>
+                                    <select name="captcha_difficulty" id="captcha_difficulty">
+                                        <option value="easy" <?php selected($difficulty, 'easy'); ?>>Mudah (4 Angka)</option>
+                                        <option value="medium" <?php selected($difficulty, 'medium'); ?>>Sedang (5 Karakter)</option>
+                                        <option value="hard" <?php selected($difficulty, 'hard'); ?>>Sulit (6 Karakter + Noise)</option>
+                                    </select>
+                                    <p class="description">Atur kompleksitas kode dan visual CAPTCHA.</p>
+                                    <div id="captcha-preview-container" style="margin-top: 15px;">
+                                        <strong>Preview:</strong><br>
+                                        <img id="captcha-preview-img" src="<?php echo add_query_arg(array('sweetaddons_captcha' => 'preview', 'difficulty' => $difficulty), home_url('/')); ?>" alt="Captcha Preview" style="border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px; margin-top: 5px;">
+                                        <p><a href="#" id="refresh-captcha-preview" class="button button-small">Refresh Preview</a></p>
+                                    </div>
+                                    <script>
+                                        jQuery(document).ready(function($) {
+                                            function updateCaptchaPreview() {
+                                                var difficulty = $('#captcha_difficulty').val();
+                                                var src = '<?php echo home_url('/'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
+                                                $('#captcha-preview-img').attr('src', src);
+                                            }
+                                            $('#captcha_difficulty').on('change', function() { updateCaptchaPreview(); });
+                                            $('#refresh-captcha-preview').on('click', function(e) { e.preventDefault(); updateCaptchaPreview(); });
+                                        });
+                                    </script>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-card-title">Lokasi Aktif</div>
+                        <table class="form-table">
+                            <tr>
+                                <th scope="row">Form Login</th>
+                                <td><label><input type="checkbox" name="captcha_login" value="1" <?php checked($login, '1'); ?> /> Aktifkan</label></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Form Komentar</th>
+                                <td><label><input type="checkbox" name="captcha_comment" value="1" <?php checked($comment, '1'); ?> /> Aktifkan</label></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Form Registrasi</th>
+                                <td><label><input type="checkbox" name="captcha_register" value="1" <?php checked($register, '1'); ?> /> Aktifkan</label></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="sad-actions-row sad-actions-row--end">
+                <input type="submit" name="submit" class="button button-primary" value="Simpan Pengaturan">
+            </div>
+        </form>
+<?php
+    }
+
+    private function render_block_tab()
+    {
+        $block_fields = [
+            [
+                'id'    => 'block_wp_login',
+                'type'  => 'checkbox',
+                'title' => 'Blokir wp-login.php',
+                'std'   => 0,
+                'label' => 'Aktifkan pemblokiran akses ke file wp-login.php pada situs.',
+            ],
+            [
+                'id'    => 'whitelist_block_wp_login',
+                'type'  => 'text',
+                'title' => 'IP Whitelist',
+                'std'   => '',
+                'label' => 'Daftar IP yang dikecualikan (pisahkan dengan koma).',
+            ],
+            [
+                'id'    => 'redirect_to',
+                'type'  => 'text',
+                'title' => 'Redirect URL',
+                'std'   => 'http://127.0.0.1',
+                'label' => 'Tujuan redirect jika diblokir.',
+            ],
+        ];
+?>
+        <div class="sad-grid">
+            <div class="sad-card">
+                <div class="sad-card-title">Pengaturan Utama</div>
+                <form method="post" action="options.php" class="sad-form">
+                    <?php settings_fields('Sweetaddons_block_group'); ?>
+                    <?php do_settings_sections('Sweetaddons_block_group'); ?>
+                    <table class="form-table">
+                        <?php
+                        foreach ($block_fields as $data) :
+                            echo '<tr>';
+                            echo '<th scope="row">' . $data['title'] . '</th>';
+                            echo '<td>';
+                            $this->field($data);
+                            echo '</td>';
+                            echo '</tr>';
+                        endforeach;
+                        ?>
+                    </table>
+                    <div class="sad-actions-row sad-actions-row--end">
+                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+<?php
     }
 
     public function options_page_callback()
@@ -355,17 +571,17 @@ class Custom_Admin_Option_Page
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Hari Ini</div>
                         <div class="sad-card-value"><?php echo number_format($today ? (int)$today->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan â€¢ Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
                     </div>
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Minggu Ini</div>
                         <div class="sad-card-value"><?php echo number_format($this_week ? (int)$this_week->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan â€¢ Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
                     </div>
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Bulan Ini</div>
                         <div class="sad-card-value"><?php echo number_format($this_month ? (int)$this_month->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan • Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan â€¢ Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
                     </div>
                 </div>
                 <div class="sad-card sad-card--chart">
@@ -437,7 +653,7 @@ class Custom_Admin_Option_Page
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Umum</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Blokir Login</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Proteksi</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect'); ?>" class="button button-secondary">Proteksi</a>
                 </div>
             </div>
         </div>
@@ -554,7 +770,7 @@ class Custom_Admin_Option_Page
 
             <!-- Site Information -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">🌐 Informasi Website</h3>
+                <h3 style="margin-top: 0; color: #23282d;">ðŸŒ Informasi Website</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Nama Website:</strong></td>
@@ -581,7 +797,7 @@ class Custom_Admin_Option_Page
 
             <!-- Content Statistics -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">📝 Statistik Konten</h3>
+                <h3 style="margin-top: 0; color: #23282d;">ðŸ“ Statistik Konten</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Posts Terpublikasi:</strong></td>
@@ -627,7 +843,7 @@ class Custom_Admin_Option_Page
 
             <!-- Server Information -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">🖥️ Server Information</h3>
+                <h3 style="margin-top: 0; color: #23282d;">ðŸ–¥ï¸ Server Information</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>PHP Version:</strong></td>
@@ -654,40 +870,40 @@ class Custom_Admin_Option_Page
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Disable Comments:</strong></td>
-                        <td><?php echo get_option('fully_disable_comment') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                        <td><?php echo get_option('fully_disable_comment') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Hide Admin Notice:</strong></td>
-                        <td><?php echo get_option('hide_admin_notice') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                        <td><?php echo get_option('hide_admin_notice') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Maintenance Mode:</strong></td>
-                        <td><?php echo get_option('maintenance_mode') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                        <td><?php echo get_option('maintenance_mode') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Limit Login Attempts:</strong></td>
-                        <td><?php echo get_option('limit_login_attempts') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                        <td><?php echo get_option('limit_login_attempts') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Block wp-login:</strong></td>
-                        <td><?php echo get_option('block_wp_login') ? '✅ Aktif' : '❌ Nonaktif'; ?></td>
+                        <td><?php echo get_option('block_wp_login') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
                     </tr>
                 </table>
             </div>
 
             <!-- Quick Actions -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">🚀 Quick Actions</h3>
+                <h3 style="margin-top: 0; color: #23282d;">ðŸš€ Quick Actions</h3>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Visitor Statistics</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">🔍 SEO Settings</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">🛡️ reCaptcha</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">🏷️ White Label</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">💬 WhatsApp Chat</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">ðŸ” SEO Settings</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">ðŸ›¡ï¸ reCaptcha</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">ðŸ·ï¸ White Label</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">ðŸ’¬ WhatsApp Chat</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Pengaturan Umum</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance Mode</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Block Login</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_spam'); ?>" class="button button-secondary">Spam Protection</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect'); ?>" class="button button-secondary">Spam Protection</a>
                 </div>
             </div>
         </div>
@@ -1282,7 +1498,7 @@ class Custom_Admin_Option_Page
                         previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
                         buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button><button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>');
                     } else {
-                        previewContainer.html('<div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor=\'#005a87\'; this.style.background=\'#f0f8ff\';" onmouseout="this.style.borderColor=\'#0073aa\'; this.style.background=\'#f9f9f9\';"><div style="text-align: center;"><div style="font-size: 32px; margin-bottom: 8px;">📷</div><div>Click to choose image</div><div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div></div></div>');
+                        previewContainer.html('<div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor=\'#005a87\'; this.style.background=\'#f0f8ff\';" onmouseout="this.style.borderColor=\'#0073aa\'; this.style.background=\'#f9f9f9\';"><div style="text-align: center;"><div style="font-size: 32px; margin-bottom: 8px;">ðŸ“·</div><div>Click to choose image</div><div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div></div></div>');
                         previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
                         buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button>');
                     }
@@ -1335,180 +1551,6 @@ class Custom_Admin_Option_Page
     <?php
     }
 
-    public function recaptcha_page_callback()
-    {
-        if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to access this page.', 'sweetaddons'));
-        }
-
-        // Handle settings save
-        if (isset($_POST['submit'])) {
-            check_admin_referer('sweetaddons_recaptcha_settings');
-
-            $difficulty = isset($_POST['captcha_difficulty']) ? sanitize_key(wp_unslash($_POST['captcha_difficulty'])) : 'medium';
-            if (!in_array($difficulty, array('easy', 'medium', 'hard'), true)) {
-                $difficulty = 'medium';
-            }
-
-            $captcha_data = array(
-                'aktif'      => isset($_POST['captcha_aktif']) ? '1' : '',
-                'login'      => isset($_POST['captcha_login']) ? '1' : '',
-                'comment'    => isset($_POST['captcha_comment']) ? '1' : '',
-                'register'   => isset($_POST['captcha_register']) ? '1' : '',
-                'difficulty' => $difficulty,
-            );
-
-            update_option('captcha_Sweetaddons', $captcha_data);
-        }
-
-        $captcha_settings = get_option('captcha_Sweetaddons', array());
-        $aktif = isset($captcha_settings['aktif']) ? $captcha_settings['aktif'] : '';
-        $login = isset($captcha_settings['login']) ? $captcha_settings['login'] : '';
-        $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
-        $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
-        $difficulty = isset($captcha_settings['difficulty']) ? $captcha_settings['difficulty'] : 'medium';
-
-    ?>
-        <?php
-        $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
-        Sweetaddons_Admin_Layout::open('reCaptcha', 'Sweetaddons_recaptcha', $subnav); ?>
-        <?php
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) {
-            echo '<div class="sad-notice sad-notice-success"><p>Pengaturan CAPTCHA berhasil disimpan.</p></div>';
-        }
-        ?>
-
-        <form method="post" action="" class="sad-form">
-            <?php wp_nonce_field('sweetaddons_recaptcha_settings'); ?>
-
-            <div class="sad-top">
-                <!-- Left Column -->
-                <div class="sad-top-left">
-
-                    <!-- reCaptcha Configuration -->
-                    <div class="sad-card sad-mb-16" id="recaptcha-general-settings">
-                        <div class="sad-card-title">Konfigurasi Utama</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">Status Fitur</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
-                                        Aktifkan CAPTCHA
-                                    </label>
-                                    <p class="description">Aktifkan perlindungan CAPTCHA.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Tingkat Kesulitan</th>
-                                <td>
-                                    <select name="captcha_difficulty" id="captcha_difficulty">
-                                        <option value="easy" <?php selected($difficulty, 'easy'); ?>>Mudah (4 Angka)</option>
-                                        <option value="medium" <?php selected($difficulty, 'medium'); ?>>Sedang (5 Karakter)</option>
-                                        <option value="hard" <?php selected($difficulty, 'hard'); ?>>Sulit (6 Karakter + Noise)</option>
-                                    </select>
-                                    <p class="description">Atur kompleksitas kode dan visual CAPTCHA.</p>
-
-                                    <div id="captcha-preview-container" style="margin-top: 15px;">
-                                        <strong>Preview:</strong><br>
-                                        <img id="captcha-preview-img" src="<?php echo add_query_arg(array('sweetaddons_captcha' => 'preview', 'difficulty' => $difficulty), home_url('/')); ?>" alt="Captcha Preview" style="border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px; margin-top: 5px;">
-                                        <p><a href="#" id="refresh-captcha-preview" class="button button-small">Refresh Preview</a></p>
-                                    </div>
-
-                                    <script>
-                                        jQuery(document).ready(function($) {
-                                            function updateCaptchaPreview() {
-                                                var difficulty = $('#captcha_difficulty').val();
-                                                var src = '<?php echo home_url('/'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
-                                                $('#captcha-preview-img').attr('src', src);
-                                            }
-
-                                            $('#captcha_difficulty').on('change', function() {
-                                                updateCaptchaPreview();
-                                            });
-
-                                            $('#refresh-captcha-preview').on('click', function(e) {
-                                                e.preventDefault();
-                                                updateCaptchaPreview();
-                                            });
-                                        });
-                                    </script>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- Protection Areas -->
-                    <div class="sad-card" id="recaptcha-protection-settings">
-                        <div class="sad-card-title">Area Perlindungan</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">Form Login</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="captcha_login" value="1" <?php checked($login, '1'); ?> />
-                                        Lindungi halaman login (wp-login.php)
-                                    </label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Form Registrasi</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="captcha_register" value="1" <?php checked($register, '1'); ?> />
-                                        Lindungi form registrasi user baru
-                                    </label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Form Komentar</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" name="captcha_comment" value="1" <?php checked($comment, '1'); ?> />
-                                        Lindungi kolom komentar postingan
-                                    </label>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                </div>
-
-                <!-- Right Column -->
-                <div class="sad-top-right">
-
-                    <!-- Save Button Card -->
-                    <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title">Simpan Perubahan</div>
-                        <div class="sad-subtext sad-mb-12">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan kesulitan atau area proteksi.</div>
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('class' => 'sad-btn-block')); ?>
-                    </div>
-
-                    <!-- Setup Instructions -->
-                    <div class="sad-card">
-                        <div class="sad-card-title">Panduan Setup</div>
-                        <h4 style="margin: 10px 0 5px; color: #23282d;">1. Aktivasi</h4>
-                        <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px; margin-bottom: 15px;">
-                            <li>Nyalakan status fitur CAPTCHA</li>
-                            <li>Pilih area proteksi: Login, Registrasi, Komentar</li>
-                            <li>Tidak memerlukan API key</li>
-                        </ul>
-                        <h4 style="margin: 10px 0 5px; color: #23282d;">2. Contact Form 7</h4>
-                        <p style="font-size: 13px; color: #666; margin-bottom: 5px;">Gunakan tag berikut:</p>
-                        <code style="display: block; background: #f0f0f1; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px;">[recaptcha]</code>
-                        <ul style="list-style-type: disc; margin-left: 20px; color: #666; font-size: 13px;">
-                            <li>Logout untuk tes form login</li>
-                            <li>Buka postingan untuk tes komentar</li>
-                            <li>Pastikan gambar CAPTCHA muncul dan input teks bekerja</li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-        </form>
-        <?php Sweetaddons_Admin_Layout::close(); ?>
-    <?php
-    }
 
     public function whitelabel_page_callback()
     {
@@ -2003,23 +2045,23 @@ class Custom_Admin_Option_Page
                         <table class="form-table">
                             <tr>
                                 <th scope="row"><input type="checkbox" name="items[]" value="revisions" checked> Post Revisions</th>
-                                <td><span class="sad-badge sad-badge-warning"><?php echo $stats['revisions']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_revisions'])); ?></span></td>
+                                <td><span class="sad-badge sad-badge-warning"><?php echo $stats['revisions']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_revisions'])); ?></span></td>
                             </tr>
                             <tr>
                                 <th scope="row"><input type="checkbox" name="items[]" value="auto_drafts" checked> Auto Drafts</th>
-                                <td><span class="sad-badge sad-badge-warning"><?php echo $stats['auto_drafts']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_auto_drafts'])); ?></span></td>
+                                <td><span class="sad-badge sad-badge-warning"><?php echo $stats['auto_drafts']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_auto_drafts'])); ?></span></td>
                             </tr>
                             <tr>
                                 <th scope="row"><input type="checkbox" name="items[]" value="spam_comments" checked> Spam Comments</th>
-                                <td><span class="sad-badge sad-badge-danger"><?php echo $stats['spam_comments']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_spam_comments'])); ?></span></td>
+                                <td><span class="sad-badge sad-badge-danger"><?php echo $stats['spam_comments']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_spam_comments'])); ?></span></td>
                             </tr>
                             <tr>
                                 <th scope="row"><input type="checkbox" name="items[]" value="trashed_comments" checked> Trashed Comments</th>
-                                <td><span class="sad-badge sad-badge-danger"><?php echo $stats['trashed_comments']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_trashed_comments'])); ?></span></td>
+                                <td><span class="sad-badge sad-badge-danger"><?php echo $stats['trashed_comments']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_trashed_comments'])); ?></span></td>
                             </tr>
                             <tr>
                                 <th scope="row"><input type="checkbox" name="items[]" value="expired_transients" checked> Expired Transients</th>
-                                <td><span class="sad-badge sad-badge-info"><?php echo $stats['expired_transients']; ?> items · ≈ <?php echo esc_html($cleaner->format_bytes($stats['size_expired_transients'])); ?></span></td>
+                                <td><span class="sad-badge sad-badge-info"><?php echo $stats['expired_transients']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_expired_transients'])); ?></span></td>
                             </tr>
                         </table>
                     </div>
