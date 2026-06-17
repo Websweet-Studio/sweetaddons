@@ -569,12 +569,12 @@
 }
 
 .sad-apple__subnav-tab {
-  padding: 6px 14px;
+  padding: 4px 12px;
   font-size: 13px;
   font-weight: 500;
   color: var(--sad-ink-muted);
   background: transparent;
-  border-radius: 20px;
+  border-radius: 6px;
   text-decoration: none;
   transition: all 0.2s ease;
 }
@@ -810,21 +810,20 @@
   letter-spacing: -0.12px;
 }
 
-.sad-btn-block {
-  width: 100%;
-}
 
 .sad-apple .button.button-primary,
 .sad-apple .button.button-secondary,
 .sad-apple .button {
-  border-radius: 9999px;
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-size: 13px;
+  text-align: center;
 }
 
 .sad-apple .button.button-primary {
   background: var(--sad-primary);
   border-color: var(--sad-primary);
   color: #fff;
-  padding: 6px 16px;
 }
 
 .sad-apple .button.button-primary:focus {
@@ -835,7 +834,14 @@
   background: transparent;
   border-color: var(--sad-primary);
   color: var(--sad-primary);
-  padding: 6px 16px;
+}
+
+.sad-apple .button svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  margin-right: 5px;
+  margin-top: -2px;
 }
 
 .sad-apple .button:active {

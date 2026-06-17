@@ -91,16 +91,6 @@ class Custom_Admin_Option_Page
             array($this, 'seo_page_callback') // Callback function
         );
 
-        // Add White Label submenu
-        add_submenu_page(
-            'custom_admin_options',     // Parent slug
-            'White Label',              // Page title
-            'White Label',              // Menu title
-            'manage_options',           // Capability
-            'Sweetaddons_whitelabel',  // Menu slug
-            array($this, 'whitelabel_page_callback') // Callback function
-        );
-
         // Add WhatsApp submenu
         add_submenu_page(
             'custom_admin_options',     // Parent slug
@@ -119,16 +109,6 @@ class Custom_Admin_Option_Page
             'manage_options',           // Capability
             'Sweetaddons_login_customizer', // Menu slug
             array($this, 'login_customizer_page_callback') // Callback function
-        );
-
-        // Add Database Cleaner submenu
-        add_submenu_page(
-            'custom_admin_options',     // Parent slug
-            'Database Cleaner',         // Page title
-            'DB Cleaner',               // Menu title
-            'manage_options',           // Capability
-            'Sweetaddons_db_cleaner',   // Menu slug
-            array($this, 'db_cleaner_page_callback') // Callback function
         );
     }
 
@@ -190,7 +170,6 @@ class Custom_Admin_Option_Page
 
     public function field($data)
     {
-
         $type   = isset($data['type']) ? $data['type'] : '';
         $id     = isset($data['id']) ? $data['id'] : '';
         $std    = isset($data['std']) ? $data['std'] : '';
@@ -251,6 +230,11 @@ class Custom_Admin_Option_Page
         }
     }
 
+    public function save_button()
+    {
+        echo '<button type="submit" name="submit" class="button button-primary" style="cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;margin-top:-2px;width:14px;height:14px;"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>Simpan Pengaturan</button>';
+    }
+
     public function spam_page_callback()
     {
         $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
@@ -258,17 +242,24 @@ class Custom_Admin_Option_Page
         <?php
         $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
         Sweetaddons_Admin_Layout::open('Proteksi', 'Sweetaddons_protect', $subnav);
-        
-        if ($current_tab === 'maintenance') {
-            $this->render_maintenance_tab();
-        } elseif ($current_tab === 'recaptcha') {
-            $this->render_recaptcha_tab();
-        } elseif ($current_tab === 'block') {
-            $this->render_block_tab();
-        } else {
-            $this->render_protect_tab();
+
+        switch ($current_tab) {
+            case 'maintenance':
+                $this->render_maintenance_tab();
+                break;
+            case 'recaptcha':
+                $this->render_recaptcha_tab();
+                break;
+            case 'block':
+                $this->render_block_tab();
+                break;
+            case 'whitelabel':
+                $this->render_whitelabel_tab();
+                break;
+            default:
+                $this->render_protect_tab();
         }
-        
+
         Sweetaddons_Admin_Layout::close();
     }
 
@@ -297,7 +288,7 @@ class Custom_Admin_Option_Page
                 'label' => 'Nonaktifkan akses ke REST API untuk keperluan keamanan atau privasi.',
             ],
         ];
-?>
+        ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Utama</div>
@@ -319,12 +310,12 @@ class Custom_Admin_Option_Page
                         ?>
                     </table>
                     <div class="sad-actions-row sad-actions-row--end">
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                        <?php $this->save_button(); ?>
                     </div>
                 </form>
             </div>
         </div>
-<?php
+    <?php
     }
 
     private function render_maintenance_tab()
@@ -352,7 +343,7 @@ class Custom_Admin_Option_Page
                 'std'   => 'Kami sedang melakukan perawatan sistem. Silakan kembali lagi nanti.',
             ]
         ];
-?>
+    ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Maintenance</div>
@@ -374,12 +365,12 @@ class Custom_Admin_Option_Page
                         ?>
                     </table>
                     <div class="sad-actions-row sad-actions-row--end">
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                        <?php $this->save_button(); ?>
                     </div>
                 </form>
             </div>
         </div>
-<?php
+    <?php
     }
 
     private function render_recaptcha_tab()
@@ -399,16 +390,18 @@ class Custom_Admin_Option_Page
             );
             update_option('captcha_Sweetaddons', $captcha_data);
         }
-        
+
         $captcha_settings = get_option('captcha_Sweetaddons', array());
         $aktif = isset($captcha_settings['aktif']) ? $captcha_settings['aktif'] : '';
         $login = isset($captcha_settings['login']) ? $captcha_settings['login'] : '';
         $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
         $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
         $difficulty = isset($captcha_settings['difficulty']) ? $captcha_settings['difficulty'] : 'medium';
-?>
+    ?>
         <?php if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) : ?>
-            <div class="sad-notice sad-notice-success"><p>Pengaturan CAPTCHA berhasil disimpan.</p></div>
+            <div class="sad-notice sad-notice-success">
+                <p>Pengaturan CAPTCHA berhasil disimpan.</p>
+            </div>
         <?php endif; ?>
         <form method="post" action="" class="sad-form">
             <?php wp_nonce_field('sweetaddons_recaptcha_settings'); ?>
@@ -448,8 +441,13 @@ class Custom_Admin_Option_Page
                                                 var src = '<?php echo home_url('/'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
                                                 $('#captcha-preview-img').attr('src', src);
                                             }
-                                            $('#captcha_difficulty').on('change', function() { updateCaptchaPreview(); });
-                                            $('#refresh-captcha-preview').on('click', function(e) { e.preventDefault(); updateCaptchaPreview(); });
+                                            $('#captcha_difficulty').on('change', function() {
+                                                updateCaptchaPreview();
+                                            });
+                                            $('#refresh-captcha-preview').on('click', function(e) {
+                                                e.preventDefault();
+                                                updateCaptchaPreview();
+                                            });
                                         });
                                     </script>
                                 </td>
@@ -478,10 +476,10 @@ class Custom_Admin_Option_Page
                 </div>
             </div>
             <div class="sad-actions-row sad-actions-row--end">
-                <input type="submit" name="submit" class="button button-primary" value="Simpan Pengaturan">
+                <?php $this->save_button(); ?>
             </div>
         </form>
-<?php
+    <?php
     }
 
     private function render_block_tab()
@@ -509,7 +507,7 @@ class Custom_Admin_Option_Page
                 'label' => 'Tujuan redirect jika diblokir.',
             ],
         ];
-?>
+    ?>
         <div class="sad-grid">
             <div class="sad-card">
                 <div class="sad-card-title">Pengaturan Utama</div>
@@ -529,12 +527,12 @@ class Custom_Admin_Option_Page
                         ?>
                     </table>
                     <div class="sad-actions-row sad-actions-row--end">
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                        <?php $this->save_button(); ?>
                     </div>
                 </form>
             </div>
         </div>
-<?php
+    <?php
     }
 
     public function options_page_callback()
@@ -571,17 +569,17 @@ class Custom_Admin_Option_Page
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Hari Ini</div>
                         <div class="sad-card-value"><?php echo number_format($today ? (int)$today->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan â€¢ Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan Ã¢â‚¬Â¢ Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
                     </div>
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Minggu Ini</div>
                         <div class="sad-card-value"><?php echo number_format($this_week ? (int)$this_week->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan â€¢ Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan Ã¢â‚¬Â¢ Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
                     </div>
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Bulan Ini</div>
                         <div class="sad-card-value"><?php echo number_format($this_month ? (int)$this_month->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan â€¢ Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan Ã¢â‚¬Â¢ Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
                     </div>
                 </div>
                 <div class="sad-card sad-card--chart">
@@ -648,7 +646,7 @@ class Custom_Admin_Option_Page
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Statistik</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">SEO</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">reCaptcha</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">White Label</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect&tab=whitelabel'); ?>" class="button button-primary">White Label</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">WhatsApp</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Umum</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance</a>
@@ -770,7 +768,7 @@ class Custom_Admin_Option_Page
 
             <!-- Site Information -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">ðŸŒ Informasi Website</h3>
+                <h3 style="margin-top: 0; color: #23282d;">Ã°Å¸Å’Â Informasi Website</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Nama Website:</strong></td>
@@ -797,7 +795,7 @@ class Custom_Admin_Option_Page
 
             <!-- Content Statistics -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">ðŸ“ Statistik Konten</h3>
+                <h3 style="margin-top: 0; color: #23282d;">Ã°Å¸â€œÂ Statistik Konten</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Posts Terpublikasi:</strong></td>
@@ -843,7 +841,7 @@ class Custom_Admin_Option_Page
 
             <!-- Server Information -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">ðŸ–¥ï¸ Server Information</h3>
+                <h3 style="margin-top: 0; color: #23282d;">Ã°Å¸â€“Â¥Ã¯Â¸Â Server Information</h3>
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>PHP Version:</strong></td>
@@ -870,36 +868,36 @@ class Custom_Admin_Option_Page
                 <table class="report-table" style="width: 100%; font-size: 14px;">
                     <tr>
                         <td><strong>Disable Comments:</strong></td>
-                        <td><?php echo get_option('fully_disable_comment') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
+                        <td><?php echo get_option('fully_disable_comment') ? 'Ã¢Å“â€¦ Aktif' : 'Ã¢ÂÅ’ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Hide Admin Notice:</strong></td>
-                        <td><?php echo get_option('hide_admin_notice') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
+                        <td><?php echo get_option('hide_admin_notice') ? 'Ã¢Å“â€¦ Aktif' : 'Ã¢ÂÅ’ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Maintenance Mode:</strong></td>
-                        <td><?php echo get_option('maintenance_mode') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
+                        <td><?php echo get_option('maintenance_mode') ? 'Ã¢Å“â€¦ Aktif' : 'Ã¢ÂÅ’ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Limit Login Attempts:</strong></td>
-                        <td><?php echo get_option('limit_login_attempts') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
+                        <td><?php echo get_option('limit_login_attempts') ? 'Ã¢Å“â€¦ Aktif' : 'Ã¢ÂÅ’ Nonaktif'; ?></td>
                     </tr>
                     <tr>
                         <td><strong>Block wp-login:</strong></td>
-                        <td><?php echo get_option('block_wp_login') ? 'âœ… Aktif' : 'âŒ Nonaktif'; ?></td>
+                        <td><?php echo get_option('block_wp_login') ? 'Ã¢Å“â€¦ Aktif' : 'Ã¢ÂÅ’ Nonaktif'; ?></td>
                     </tr>
                 </table>
             </div>
 
             <!-- Quick Actions -->
             <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">ðŸš€ Quick Actions</h3>
+                <h3 style="margin-top: 0; color: #23282d;">Ã°Å¸Å¡â‚¬ Quick Actions</h3>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Visitor Statistics</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">ðŸ” SEO Settings</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">ðŸ›¡ï¸ reCaptcha</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whitelabel'); ?>" class="button button-primary">ðŸ·ï¸ White Label</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">ðŸ’¬ WhatsApp Chat</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">Ã°Å¸â€Â SEO Settings</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">Ã°Å¸â€ºÂ¡Ã¯Â¸Â reCaptcha</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect&tab=whitelabel'); ?>" class="button button-primary">White Label</a>
+                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">Ã°Å¸â€™Â¬ WhatsApp Chat</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Pengaturan Umum</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance Mode</a>
                     <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Block Login</a>
@@ -1450,7 +1448,7 @@ class Custom_Admin_Option_Page
                     <div class="sad-card">
                         <div class="sad-card-title">Simpan Perubahan</div>
                         <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
+                        <?php $this->save_button(); ?>
                     </div>
 
                 </div>
@@ -1498,7 +1496,7 @@ class Custom_Admin_Option_Page
                         previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
                         buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button><button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>');
                     } else {
-                        previewContainer.html('<div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor=\'#005a87\'; this.style.background=\'#f0f8ff\';" onmouseout="this.style.borderColor=\'#0073aa\'; this.style.background=\'#f9f9f9\';"><div style="text-align: center;"><div style="font-size: 32px; margin-bottom: 8px;">ðŸ“·</div><div>Click to choose image</div><div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div></div></div>');
+                        previewContainer.html('<div style="width: 300px; height: 158px; border: 2px dashed #0073aa; display: flex; align-items: center; justify-content: center; color: #0073aa; font-size: 14px; background: #f9f9f9; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor=\'#005a87\'; this.style.background=\'#f0f8ff\';" onmouseout="this.style.borderColor=\'#0073aa\'; this.style.background=\'#f9f9f9\';"><div style="text-align: center;"><div style="font-size: 32px; margin-bottom: 8px;">Ã°Å¸â€œÂ·</div><div>Click to choose image</div><div style="font-size: 11px; color: #666; margin-top: 4px;">Recommended: 1200x630px</div></div></div>');
                         previewContainer.attr('onclick', 'document.getElementById(\'upload-default-og-image\').click()');
                         buttonsContainer.html('<button type="button" class="button" id="upload-default-og-image">Choose Image</button>');
                     }
@@ -1552,7 +1550,7 @@ class Custom_Admin_Option_Page
     }
 
 
-    public function whitelabel_page_callback()
+    private function render_whitelabel_tab()
     {
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whitelabel_settings')) {
@@ -1570,7 +1568,6 @@ class Custom_Admin_Option_Page
                 if (isset($_POST[$field])) {
                     update_option($field, sanitize_text_field($_POST[$field]));
                 } else {
-                    // Handle checkbox fields
                     if ($field === 'sweetaddons_whitelabel_hide_original') {
                         delete_option($field);
                     }
@@ -1581,7 +1578,6 @@ class Custom_Admin_Option_Page
             delete_option('sweetaddons_whitelabel_accent_color');
         }
 
-        // Get current settings
         $plugin_name = get_option('sweetaddons_whitelabel_plugin_name', 'Sweet Addons');
         $plugin_uri = get_option('sweetaddons_whitelabel_plugin_uri', 'https://websweetstudio.com');
         $description = get_option('sweetaddons_whitelabel_description', 'Addon plugin for WebsweetStudio Client');
@@ -1593,10 +1589,8 @@ class Custom_Admin_Option_Page
         }
         $hide_original = get_option('sweetaddons_whitelabel_hide_original', '');
 
-        // Get current plugin data for reference
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
     ?>
-        <?php Sweetaddons_Admin_Layout::open('White Label', 'Sweetaddons_whitelabel'); ?>
         <?php
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whitelabel_settings')) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan White Label berhasil disimpan.</p></div>';
@@ -1609,81 +1603,42 @@ class Custom_Admin_Option_Page
                 <div class="sad-top-left">
                     <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">Konfigurasi White Label</div>
-
-                        <!-- Plugin Information -->
-                        <h3 style="margin-bottom: 20px;">Informasi Plugin</h3>
-                        <p style="margin-bottom: 20px;">Kustomisasi bagaimana plugin muncul di admin WordPress.</p>
                         <table class="form-table">
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_plugin_name">Nama Plugin</label>
-                                </th>
+                                <th scope="row"><label for="sweetaddons_whitelabel_plugin_name">Nama Plugin</label></th>
                                 <td>
                                     <input type="text" id="sweetaddons_whitelabel_plugin_name" name="sweetaddons_whitelabel_plugin_name" value="<?php echo esc_attr($plugin_name); ?>" class="large-text" />
                                     <p class="description">Nama yang muncul di daftar plugin dan menu admin.</p>
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_description">Deskripsi Plugin</label>
-                                </th>
+                                <th scope="row"><label for="sweetaddons_whitelabel_description">Deskripsi Plugin</label></th>
                                 <td>
                                     <textarea id="sweetaddons_whitelabel_description" name="sweetaddons_whitelabel_description" rows="3" class="large-text"><?php echo esc_textarea($description); ?></textarea>
-                                    <p class="description">Deskripsi yang ditampilkan di daftar plugin.</p>
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label>
-                                </th>
+                                <th scope="row"><label for="sweetaddons_whitelabel_plugin_uri">Plugin URI</label></th>
                                 <td>
                                     <input type="url" id="sweetaddons_whitelabel_plugin_uri" name="sweetaddons_whitelabel_plugin_uri" value="<?php echo esc_url($plugin_uri); ?>" class="large-text" />
-                                    <p class="description">URL yang akan dikunjungi pengguna ketika mengklik nama plugin.</p>
                                 </td>
                             </tr>
-                        </table>
-
-                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-
-                        <!-- Author Information -->
-                        <h3 style="margin-bottom: 20px;">Informasi Penulis</h3>
-                        <p style="margin-bottom: 20px;">Kustomisasi detail penulis yang ditampilkan dalam informasi plugin.</p>
-
-                        <table class="form-table">
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_author">Nama Penulis</label>
-                                </th>
+                                <th scope="row"><label for="sweetaddons_whitelabel_author">Nama Penulis</label></th>
                                 <td>
                                     <input type="text" id="sweetaddons_whitelabel_author" name="sweetaddons_whitelabel_author" value="<?php echo esc_attr($author); ?>" class="large-text" />
-                                    <p class="description">Nama penulis yang ditampilkan di detail plugin.</p>
                                 </td>
                             </tr>
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_author_uri">URI Penulis</label>
-                                </th>
+                                <th scope="row"><label for="sweetaddons_whitelabel_author_uri">URI Penulis</label></th>
                                 <td>
                                     <input type="url" id="sweetaddons_whitelabel_author_uri" name="sweetaddons_whitelabel_author_uri" value="<?php echo esc_url($author_uri); ?>" class="large-text" />
-                                    <p class="description">The URL users will visit when clicking the author name.</p>
                                 </td>
                             </tr>
-                        </table>
-
-                        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-
-                        <!-- Admin Customization -->
-                        <h3 style="margin-bottom: 20px;">Admin Customization</h3>
-                        <p style="margin-bottom: 20px;">Customize the admin interface appearance.</p>
-
-                        <table class="form-table">
                             <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whitelabel_menu_title">Judul Menu Admin</label>
-                                </th>
+                                <th scope="row"><label for="sweetaddons_whitelabel_menu_title">Judul Menu Admin</label></th>
                                 <td>
                                     <input type="text" id="sweetaddons_whitelabel_menu_title" name="sweetaddons_whitelabel_menu_title" value="<?php echo esc_attr($menu_title); ?>" class="large-text" />
-                                    <p class="description">The title shown in the WordPress admin menu.</p>
                                 </td>
                             </tr>
                             <tr>
@@ -1693,75 +1648,20 @@ class Custom_Admin_Option_Page
                                         <input type="checkbox" name="sweetaddons_whitelabel_hide_original" value="1" <?php checked($hide_original, '1'); ?> />
                                         Hide references to WebsweetStudio in admin interface
                                     </label>
-                                    <p class="description">Remove WebsweetStudio branding from admin pages and footers.</p>
                                 </td>
                             </tr>
                         </table>
                     </div>
-
-                    <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title">Perbandingan Branding</div>
-                        <div class="sad-grid" style="gap: 20px;">
-                            <div class="sad-card">
-                                <div class="sad-card-title">Current (Original)</div>
-                                <table class="form-table sad-table-fixed">
-                                    <tr>
-                                        <th>Plugin Name</th>
-                                        <td><?php echo esc_html($plugin_data['Name']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Description</th>
-                                        <td title="<?php echo esc_attr($plugin_data['Description']); ?>"><span class="sad-truncate"><?php echo esc_html($plugin_data['Description']); ?></span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Version</th>
-                                        <td><?php echo esc_html($plugin_data['Version']); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Author</th>
-                                        <td title="<?php echo esc_attr($plugin_data['Author']); ?>"><span class="sad-truncate"><?php echo esc_html($plugin_data['Author']); ?></span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Plugin URI</th>
-                                        <td title="<?php echo esc_attr($plugin_data['PluginURI']); ?>"><span class="sad-truncate"><?php echo esc_attr($plugin_data['PluginURI']); ?></span></td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="sad-card">
-                                <div class="sad-card-title">New (White Labeled)</div>
-                                <table class="form-table sad-table-fixed">
-                                    <tr>
-                                        <th>Plugin Name</th>
-                                        <td><?php echo esc_html($plugin_name); ?></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Description</th>
-                                        <td title="<?php echo esc_attr($description); ?>"><span class="sad-truncate"><?php echo esc_html($description); ?></span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Author</th>
-                                        <td title="<?php echo esc_attr($author); ?>"><span class="sad-truncate"><?php echo esc_attr($author); ?></span></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Plugin URI</th>
-                                        <td title="<?php echo esc_attr($plugin_uri); ?>"><span class="sad-truncate"><?php echo esc_attr($plugin_uri); ?></span></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
                 <div class="sad-top-right">
                     <div class="sad-card">
                         <div class="sad-card-title">Simpan Perubahan</div>
                         <div class="sad-subtext sad-mb-12">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('class' => 'sad-btn-block')); ?>
+                        <?php $this->save_button(); ?>
                     </div>
                 </div>
             </div>
         </form>
-        <?php Sweetaddons_Admin_Layout::close(); ?>
     <?php
     }
 
@@ -1882,7 +1782,7 @@ class Custom_Admin_Option_Page
                 <div class="sad-top-right">
                     <div class="sad-card">
                         <div class="sad-card-title">Simpan Perubahan</div>
-                        <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false, array('style' => 'width: 100%;')); ?>
+                        <?php $this->save_button(); ?>
                     </div>
                 </div>
             </div>
@@ -2013,72 +1913,6 @@ class Custom_Admin_Option_Page
     <?php
     }
 
-    public function db_cleaner_page_callback()
-    {
-        // Handle cleanup
-        if (isset($_POST['submit']) && check_admin_referer('sweetaddons_db_cleaner_action', 'sweetaddons_db_cleaner_nonce')) {
-            $items = isset($_POST['items']) ? $_POST['items'] : array();
-
-            if (!empty($items)) {
-                $cleaner = new Sweetaddons_Database_Cleaner();
-                $cleaned_items = $cleaner->clean_items($items);
-
-                $message = 'Berhasil membersihkan: ' . implode(', ', $cleaned_items);
-                echo '<div class="sad-notice sad-notice-success"><p>' . esc_html($message) . '</p></div>';
-            } else {
-                echo '<div class="sad-notice sad-notice-warning"><p>Tidak ada item yang dipilih untuk dibersihkan.</p></div>';
-            }
-        }
-
-        $cleaner = new Sweetaddons_Database_Cleaner();
-        $stats = $cleaner->get_stats();
-    ?>
-        <?php Sweetaddons_Admin_Layout::open('Database Cleaner', 'Sweetaddons_db_cleaner'); ?>
-
-        <form method="post" action="" class="sad-form">
-            <?php wp_nonce_field('sweetaddons_db_cleaner_action', 'sweetaddons_db_cleaner_nonce'); ?>
-
-            <div class="sad-top">
-                <div class="sad-top-left">
-                    <div class="sad-card">
-                        <div class="sad-card-title">Item yang Dapat Diberishkan</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row"><input type="checkbox" name="items[]" value="revisions" checked> Post Revisions</th>
-                                <td><span class="sad-badge sad-badge-warning"><?php echo $stats['revisions']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_revisions'])); ?></span></td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><input type="checkbox" name="items[]" value="auto_drafts" checked> Auto Drafts</th>
-                                <td><span class="sad-badge sad-badge-warning"><?php echo $stats['auto_drafts']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_auto_drafts'])); ?></span></td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><input type="checkbox" name="items[]" value="spam_comments" checked> Spam Comments</th>
-                                <td><span class="sad-badge sad-badge-danger"><?php echo $stats['spam_comments']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_spam_comments'])); ?></span></td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><input type="checkbox" name="items[]" value="trashed_comments" checked> Trashed Comments</th>
-                                <td><span class="sad-badge sad-badge-danger"><?php echo $stats['trashed_comments']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_trashed_comments'])); ?></span></td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><input type="checkbox" name="items[]" value="expired_transients" checked> Expired Transients</th>
-                                <td><span class="sad-badge sad-badge-info"><?php echo $stats['expired_transients']; ?> items Â· â‰ˆ <?php echo esc_html($cleaner->format_bytes($stats['size_expired_transients'])); ?></span></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="sad-top-right">
-                    <div class="sad-card">
-                        <div class="sad-card-title">Aksi Pembersihan</div>
-                        <p>Klik tombol di bawah untuk membersihkan item yang dipilih dari database. Pastikan Anda telah melakukan backup database sebelum melakukan pembersihan.</p>
-                        <?php submit_button('Bersihkan Database Sekarang', 'primary', 'submit', false, array('class' => 'sad-btn-block', 'onclick' => "return confirm('Apakah Anda yakin ingin membersihkan database? Tindakan ini tidak dapat dibatalkan.');")); ?>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <?php Sweetaddons_Admin_Layout::close(); ?>
-    <?php
-    }
 
     public function whatsapp_page_callback()
     {
@@ -2621,7 +2455,7 @@ class Custom_Admin_Option_Page
                     <div class="sad-card">
                         <div class="sad-card-title">Simpan Perubahan</div>
                         <div class="sad-actions-row sad-actions-row--end">
-                            <?php submit_button('Simpan Pengaturan', 'primary', 'submit', false); ?>
+                            <?php $this->save_button(); ?>
                         </div>
                     </div>
                 </div>
@@ -2787,4 +2621,3 @@ class Custom_Admin_Option_Page
 <?php
     }
 }
-

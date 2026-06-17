@@ -15,67 +15,72 @@ class Sweetaddons_Admin_Layout
   }
 
   public static function get_pages()
-    {
-        return array(
-          array(
-            'page'  => 'custom_admin_options',
-            'label' => 'Dashboard',
-          ),
-          array(
-            'page'  => 'Sweetaddons_umum',
-            'label' => 'Umum',
-          ),
-          array(
-            'page'  => 'Sweetaddons_protect',
-            'label' => 'Proteksi',
-          ),
-          array(
-            'page'  => 'Sweetaddons_visitor_stats',
-            'label' => 'Statistik',
-          ),
-          array(
-            'page'  => 'Sweetaddons_seo',
-            'label' => 'SEO',
-          ),
-          array(
-            'page'  => 'Sweetaddons_whitelabel',
-            'label' => 'White Label',
-          ),
-          array(
-            'page'  => 'Sweetaddons_whatsapp',
-            'label' => 'WhatsApp',
-          ),
-          array(
-            'page'  => 'Sweetaddons_login_customizer',
-            'label' => 'Login',
-          ),
-          array(
-            'page'  => 'Sweetaddons_db_cleaner',
-            'label' => 'DB Cleaner',
-          ),
-        );
-    }
+  {
+    return array(
+      array(
+        'page'  => 'custom_admin_options',
+        'label' => 'Dashboard',
+      ),
+      array(
+        'page'  => 'Sweetaddons_umum',
+        'label' => 'Umum',
+      ),
+      array(
+        'page'  => 'Sweetaddons_protect',
+        'label' => 'Proteksi',
+      ),
+      array(
+        'page'  => 'Sweetaddons_visitor_stats',
+        'label' => 'Statistik',
+      ),
+      array(
+        'page'  => 'Sweetaddons_seo',
+        'label' => 'SEO',
+      ),
+      array(
+        'page'  => 'Sweetaddons_whatsapp',
+        'label' => 'WhatsApp',
+      ),
+      array(
+        'page'  => 'Sweetaddons_login_customizer',
+        'label' => 'Login',
+      ),
+    );
+  }
 
   public static function get_proteksi_subnav()
-    {
-        $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
-        return array(
-          array('tab' => 'protect', 'label' => 'Proteksi'),
-          array('tab' => 'maintenance', 'label' => 'Maintenance'),
-          array('tab' => 'recaptcha', 'label' => 'reCaptcha'),
-          array('tab' => 'block', 'label' => 'Blokir Login'),
-        );
-    }
+  {
+    return array(
+      array('tab' => 'protect', 'label' => 'Proteksi'),
+      array('tab' => 'maintenance', 'label' => 'Maintenance'),
+      array('tab' => 'recaptcha', 'label' => 'reCaptcha'),
+      array('tab' => 'block', 'label' => 'Blokir Login'),
+      array('tab' => 'whitelabel', 'label' => 'White Label'),
+    );
+  }
+
+  public static function get_umum_subnav()
+  {
+    return array(
+      array('tab' => 'general', 'label' => 'Umum'),
+      array('tab' => 'dbcleaner', 'label' => 'DB Cleaner'),
+    );
+  }
 
   public static function get_proteksi_tab_url($tab)
-    {
-        return admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab);
-    }
+  {
+    return admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab);
+  }
+
+  public static function get_umum_tab_url($tab)
+  {
+    return admin_url('admin.php?page=Sweetaddons_umum&tab=' . $tab);
+  }
 
   public static function open($page_title, $active_page, $subnav = array())
-    {
-        $plugin_name = self::get_plugin_name();
-        $pages = self::get_pages();
+  {
+    $plugin_name = self::get_plugin_name();
+    $pages = self::get_pages();
 ?>
     <div class="wrap vd-ons sweetaddons-dashboard sad-apple">
       <div class="sad-apple__globalnav">
@@ -98,9 +103,16 @@ class Sweetaddons_Admin_Layout
           <nav class="sad-apple__subnav-tabs" aria-label="Sub Navigation">
             <?php foreach ($subnav as $tab) : ?>
               <?php
-              $tab_url = self::get_proteksi_tab_url($tab['tab']);
-              $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
-              $tab_active = ($current_tab === $tab['tab']);
+              if (isset($tab['page'])) {
+                $tab_url = admin_url('admin.php?page=' . $tab['page']);
+              } elseif ($active_page === 'Sweetaddons_protect') {
+                $tab_url = self::get_proteksi_tab_url($tab['tab']);
+              } else {
+                $tab_url = self::get_umum_tab_url($tab['tab']);
+              }
+              $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+              $default_tab = $subnav[0]['tab'];
+              $tab_active = ($current_tab === $tab['tab']) || (empty($current_tab) && $tab['tab'] === $default_tab);
               ?>
               <a class="sad-apple__subnav-tab <?php echo $tab_active ? 'is-active' : ''; ?>" href="<?php echo esc_url($tab_url); ?>">
                 <?php echo esc_html($tab['label']); ?>
@@ -126,23 +138,36 @@ class Sweetaddons_Admin_Layout
      */
     public static function redirect_old_pages()
     {
-        global $pagenow;
-        
-        if ($pagenow !== 'admin.php') {
-            return;
-        }
-        
-        $old_pages = array(
-            'Sweetaddons_maintenance' => 'maintenance',
-            'Sweetaddons_recaptcha'   => 'recaptcha',
-            'Sweetaddons_block'       => 'block',
-        );
-        
-        if (isset($_GET['page']) && isset($old_pages[$_GET['page']])) {
-            $tab = $old_pages[$_GET['page']];
-            wp_safe_redirect(admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab));
-            exit;
-        }
+      global $pagenow;
+
+      if ($pagenow !== 'admin.php') {
+        return;
+      }
+
+      // Proteksi tab redirects
+      $proteksi_redirects = array(
+        'Sweetaddons_maintenance' => 'maintenance',
+        'Sweetaddons_recaptcha'   => 'recaptcha',
+        'Sweetaddons_block'       => 'block',
+        'Sweetaddons_whitelabel'  => 'whitelabel',
+      );
+
+      if (isset($_GET['page']) && isset($proteksi_redirects[$_GET['page']])) {
+        $tab = $proteksi_redirects[$_GET['page']];
+        wp_safe_redirect(admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab));
+        exit;
+      }
+
+      // Umum tab redirects
+      $umum_redirects = array(
+        'Sweetaddons_db_cleaner' => 'dbcleaner',
+      );
+
+      if (isset($_GET['page']) && isset($umum_redirects[$_GET['page']])) {
+        $tab = $umum_redirects[$_GET['page']];
+        wp_safe_redirect(admin_url('admin.php?page=Sweetaddons_umum&tab=' . $tab));
+        exit;
+      }
     }
 
     /**
@@ -150,27 +175,33 @@ class Sweetaddons_Admin_Layout
      */
     public static function fix_parent_file($parent_file)
     {
-        global $plugin_page;
-        
-        if ($plugin_page === 'Sweetaddons_protect') {
-            $parent_file = 'custom_admin_options';
-        }
-        
-        return $parent_file;
+      global $plugin_page;
+
+      if ($plugin_page === 'Sweetaddons_protect') {
+        $parent_file = 'custom_admin_options';
+      }
+      if ($plugin_page === 'Sweetaddons_umum') {
+        $parent_file = 'custom_admin_options';
+      }
+
+      return $parent_file;
     }
 
     /**
-     * Fix WordPress admin submenu active state for Proteksi pages
+     * Fix WordPress admin submenu active state
      */
     public static function hide_proteksi_submenu_items($submenu_file)
     {
-        global $plugin_page;
-        
-        if ($plugin_page === 'Sweetaddons_protect') {
-            $submenu_file = 'Sweetaddons_protect';
-        }
-        
-        return $submenu_file;
+      global $plugin_page;
+
+      if ($plugin_page === 'Sweetaddons_protect') {
+        $submenu_file = 'Sweetaddons_protect';
+      }
+      if ($plugin_page === 'Sweetaddons_umum') {
+        $submenu_file = 'Sweetaddons_umum';
+      }
+
+      return $submenu_file;
     }
 
     /**
@@ -178,27 +209,25 @@ class Sweetaddons_Admin_Layout
      */
     public static function remove_admin_submenus()
     {
-        global $submenu;
-        
-        // Remove individual items that are shown as tabs under Proteksi
-        // But keep them accessible (just hidden from sidebar)
-        $hidden_pages = array('Sweetaddons_maintenance', 'Sweetaddons_recaptcha', 'Sweetaddons_block');
-        
-        foreach ($hidden_pages as $page) {
-            if (isset($submenu['custom_admin_options'])) {
-                foreach ($submenu['custom_admin_options'] as $key => $item) {
-                    if (isset($item[2]) && $item[2] === $page) {
-                        unset($submenu['custom_admin_options'][$key]);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-}
+      global $submenu;
 
-// Register actions and filters
-add_action('admin_init', array('Sweetaddons_Admin_Layout', 'redirect_old_pages'));
-add_filter('parent_file', array('Sweetaddons_Admin_Layout', 'fix_parent_file'));
-add_filter('submenu_file', array('Sweetaddons_Admin_Layout', 'hide_proteksi_submenu_items'));
-add_action('admin_menu', array('Sweetaddons_Admin_Layout', 'remove_admin_submenus'), 999);
+      $hidden_pages = array('Sweetaddons_maintenance', 'Sweetaddons_recaptcha', 'Sweetaddons_block', 'Sweetaddons_whitelabel', 'Sweetaddons_db_cleaner');
+
+      foreach ($hidden_pages as $page) {
+        if (isset($submenu['custom_admin_options'])) {
+          foreach ($submenu['custom_admin_options'] as $key => $item) {
+            if (isset($item[2]) && $item[2] === $page) {
+              unset($submenu['custom_admin_options'][$key]);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Register actions and filters
+  add_action('admin_init', array('Sweetaddons_Admin_Layout', 'redirect_old_pages'));
+  add_filter('parent_file', array('Sweetaddons_Admin_Layout', 'fix_parent_file'));
+  add_filter('submenu_file', array('Sweetaddons_Admin_Layout', 'hide_proteksi_submenu_items'));
+  add_action('admin_menu', array('Sweetaddons_Admin_Layout', 'remove_admin_submenus'), 999);
