@@ -310,7 +310,6 @@ class Sweetaddons_Maintenance_Mode
         if (in_array($sub_extension . '.' . $extension, $valid_extensions)) {
             echo '<p>Setting Desain By WebsweetStudio => Open New Tab. Linknya Di Warna Sesuai Background, Rata Kiri (Pojok), Saat Hover Jangan Icon Tangan Tapi Icon Panah Sprti Pada Saat Tanpa Hover.</p>';
         }
-        echo '<p>Pastikan Copy Right Sesuai Tahun!</p>';
 
         return ob_get_clean();
     }
@@ -361,7 +360,7 @@ class Sweetaddons_Maintenance_Mode
     public function check_seo()
     {
         ob_start();
-        $linksetting    = admin_url('admin.php?page=sweet_seo_settings');
+        $linksetting    = admin_url('admin.php?page=Sweetaddons_seo');
         $home_keywords  = get_option('home_keywords');
         $share_image    = get_option('share_image');
 
@@ -378,6 +377,7 @@ class Sweetaddons_Maintenance_Mode
 
         // Mendapatkan semua plugin yang terinstal
         $plugins = get_plugins();
+        $active_plugins = get_option('active_plugins', []);
 
         // Mendapatkan pengaturan auto-update untuk plugin
         $auto_update_plugins = get_site_option('auto_update_plugins', []);
@@ -386,10 +386,12 @@ class Sweetaddons_Maintenance_Mode
         $excluded_plugins = ['bb-ultimate-addon/bb-ultimate-addon.php', 'WebsweetStudio-toko/WebsweetStudio-toko.php'];
 
         foreach ($plugins as $plugin_file => $plugin_data) {
-            // Mengambil slug dari plugin
-            $plugin_slug = $plugin_file; // Contoh: 'plugin-directory/plugin-file.php'
-            if (!in_array($plugin_slug, $excluded_plugins)) {
-                if (!in_array($plugin_slug, $auto_update_plugins)) {
+            // Hanya proses plugin yang aktif
+            if (!in_array($plugin_file, $active_plugins)) {
+                continue;
+            }
+            if (!in_array($plugin_file, $excluded_plugins)) {
+                if (!in_array($plugin_file, $auto_update_plugins)) {
                     echo '<p>' . $plugin_data['Name'] . ' belum diaktifkan untuk pembaruan otomatis.</p>';
                 }
             }

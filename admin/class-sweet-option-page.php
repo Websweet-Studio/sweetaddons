@@ -105,7 +105,7 @@ class Custom_Admin_Option_Page
         add_submenu_page(
             'custom_admin_options',     // Parent slug
             'Login Customizer',         // Page title
-            'Login Page',               // Menu title
+            'Custom Login',               // Menu title
             'manage_options',           // Capability
             'Sweetaddons_login_customizer', // Menu slug
             array($this, 'login_customizer_page_callback') // Callback function
@@ -569,17 +569,17 @@ class Custom_Admin_Option_Page
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Hari Ini</div>
                         <div class="sad-card-value"><?php echo number_format($today ? (int)$today->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan Ã¢â‚¬Â¢ Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan &bull; Pengunjung: <?php echo number_format($today ? (int)$today->uv : 0); ?></div>
                     </div>
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Minggu Ini</div>
                         <div class="sad-card-value"><?php echo number_format($this_week ? (int)$this_week->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan Ã¢â‚¬Â¢ Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan &bull; Pengunjung: <?php echo number_format($this_week ? (int)$this_week->uv : 0); ?></div>
                     </div>
                     <div class="sad-card sad-stat">
                         <div class="sad-card-title">Bulan Ini</div>
                         <div class="sad-card-value"><?php echo number_format($this_month ? (int)$this_month->pv : 0); ?></div>
-                        <div class="sad-subtext">Kunjungan Ã¢â‚¬Â¢ Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
+                        <div class="sad-subtext">Kunjungan &bull; Pengunjung: <?php echo number_format($this_month ? (int)$this_month->uv : 0); ?></div>
                     </div>
                 </div>
                 <div class="sad-card sad-card--chart">
@@ -639,20 +639,6 @@ class Custom_Admin_Option_Page
                 <?php else : ?>
                     <p class="sad-qc-empty">Tidak ada catatan QC saat ini.</p>
                 <?php endif; ?>
-            </div>
-            <div class="sad-card sad-actions">
-                <div class="sad-card-title">Aksi Cepat</div>
-                <div class="sad-actions-row">
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Statistik</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">SEO</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">reCaptcha</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect&tab=whitelabel'); ?>" class="button button-primary">White Label</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">WhatsApp</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Umum</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Blokir Login</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect'); ?>" class="button button-secondary">Proteksi</a>
-                </div>
             </div>
         </div>
         <script>
@@ -888,22 +874,6 @@ class Custom_Admin_Option_Page
                     </tr>
                 </table>
             </div>
-
-            <!-- Quick Actions -->
-            <div class="report-card" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h3 style="margin-top: 0; color: #23282d;">Ã°Å¸Å¡â‚¬ Quick Actions</h3>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_visitor_stats'); ?>" class="button button-primary">Visitor Statistics</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_seo'); ?>" class="button button-primary">Ã°Å¸â€Â SEO Settings</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_recaptcha'); ?>" class="button button-primary">Ã°Å¸â€ºÂ¡Ã¯Â¸Â reCaptcha</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect&tab=whitelabel'); ?>" class="button button-primary">White Label</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_whatsapp'); ?>" class="button button-primary">Ã°Å¸â€™Â¬ WhatsApp Chat</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_umum'); ?>" class="button button-secondary">Pengaturan Umum</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_maintenance'); ?>" class="button button-secondary">Maintenance Mode</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_block'); ?>" class="button button-secondary">Block Login</a>
-                    <a href="<?php echo admin_url('admin.php?page=Sweetaddons_protect'); ?>" class="button button-secondary">Spam Protection</a>
-                </div>
-            </div>
         </div>
 
         <style>
@@ -1082,34 +1052,26 @@ class Custom_Admin_Option_Page
             <div class="sad-card-title">Shortcode Statistik</div>
             <p class="sad-subtext sad-mb-12">Gunakan shortcode berikut untuk menampilkan statistik di halaman atau posting.</p>
 
-            <div class="sad-table">
-                <div>
-                    <span>Default</span>
-                    <span>
-                        <code id="sc-stat-default">[statistic]</code>
-                        <button type="button" class="button" onclick="copyShortcode('#sc-stat-default')">Copy</button>
-                    </span>
+            <div class="sad-shortcode-list">
+                <div class="sad-shortcode-row">
+                    <span class="sad-shortcode-label">Default</span>
+                    <code id="sc-stat-default" class="sad-shortcode-code">[statistic]</code>
+                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-default')">Copy</button>
                 </div>
-                <div>
-                    <span>Hari ini (minimal, 2 kolom)</span>
-                    <span>
-                        <code id="sc-stat-today-min">[statistic show="today" style="minimal" columns="2"]</code>
-                        <button type="button" class="button" onclick="copyShortcode('#sc-stat-today-min')">Copy</button>
-                    </span>
+                <div class="sad-shortcode-row">
+                    <span class="sad-shortcode-label">Hari ini (minimal, 2 kolom)</span>
+                    <code id="sc-stat-today-min" class="sad-shortcode-code">[statistic show="today" style="minimal" columns="2"]</code>
+                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-today-min')">Copy</button>
                 </div>
-                <div>
-                    <span>Total (cards, 4 kolom)</span>
-                    <span>
-                        <code id="sc-stat-total-cards">[statistic show="total" style="cards" columns="4"]</code>
-                        <button type="button" class="button" onclick="copyShortcode('#sc-stat-total-cards')">Copy</button>
-                    </span>
+                <div class="sad-shortcode-row">
+                    <span class="sad-shortcode-label">Total (cards, 4 kolom)</span>
+                    <code id="sc-stat-total-cards" class="sad-shortcode-code">[statistic show="total" style="cards" columns="4"]</code>
+                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-total-cards')">Copy</button>
                 </div>
-                <div>
-                    <span>Semua (cards, 3 kolom)</span>
-                    <span>
-                        <code id="sc-stat-all-cards">[statistic show="all" style="cards" columns="3"]</code>
-                        <button type="button" class="button" onclick="copyShortcode('#sc-stat-all-cards')">Copy</button>
-                    </span>
+                <div class="sad-shortcode-row">
+                    <span class="sad-shortcode-label">Semua (cards, 3 kolom)</span>
+                    <code id="sc-stat-all-cards" class="sad-shortcode-code">[statistic show="all" style="cards" columns="3"]</code>
+                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-all-cards')">Copy</button>
                 </div>
             </div>
 
@@ -1702,7 +1664,7 @@ class Custom_Admin_Option_Page
         $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
     ?>
-        <?php Sweetaddons_Admin_Layout::open('Login Page', 'Sweetaddons_login_customizer'); ?>
+        <?php Sweetaddons_Admin_Layout::open('Custom Login', 'Sweetaddons_login_customizer'); ?>
         <?php
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan Login Page berhasil disimpan.</p></div>';

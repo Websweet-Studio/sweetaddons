@@ -43,7 +43,7 @@ class Sweetaddons_Admin_Layout
       ),
       array(
         'page'  => 'Sweetaddons_login_customizer',
-        'label' => 'Login',
+        'label' => 'Custom Login',
       ),
     );
   }

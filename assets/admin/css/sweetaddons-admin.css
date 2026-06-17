@@ -87,6 +87,9 @@
 }
 .sad-stat .sad-subtext {
   margin-top: auto;
+  font-size: 12px;
+  color: var(--sad-ink-muted);
+  letter-spacing: -0.12px;
 }
 .sad-table {
   display: grid;
@@ -867,6 +870,7 @@
   box-shadow: none;
   min-height: 44px;
   padding: 10px 16px;
+  line-height: 1;
   font-size: 17px;
   letter-spacing: -0.374px;
 }
@@ -891,6 +895,49 @@
 .sad-apple .sad-form input[type="radio"]:checked {
   background-color: var(--sad-primary);
   border-color: var(--sad-primary);
+}
+
+/* Shortcode List */
+.sad-shortcode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sad-shortcode-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--sad-surface-alt);
+  border-radius: 8px;
+  border: 1px solid var(--sad-hairline);
+}
+
+.sad-shortcode-label {
+  min-width: 180px;
+  font-size: 13px;
+  color: var(--sad-ink-muted);
+  white-space: nowrap;
+}
+
+.sad-shortcode-code {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--sad-ink);
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sad-shortcode-row .button {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 3px 10px;
 }
 
 .sad-apple .sad-form input[type="checkbox"]:focus,
