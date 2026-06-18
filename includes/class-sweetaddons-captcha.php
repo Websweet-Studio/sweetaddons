@@ -86,25 +86,28 @@ class Sweetaddons_Captcha
 
     private function render_image($code)
     {
-        $w = 160;
-        $h = 50;
+        $w = 270;
+        $h = 60;
         $img = imagecreatetruecolor($w, $h);
+        imageantialias($img, true);
         $bg = imagecolorallocate($img, 245, 246, 250);
         $fg = imagecolorallocate($img, 30, 30, 30);
         $noise1 = imagecolorallocate($img, 200, 200, 200);
         $noise2 = imagecolorallocate($img, 180, 180, 180);
         imagefilledrectangle($img, 0, 0, $w, $h, $bg);
-        for ($i = 0; $i < 25; $i++) {
+        for ($i = 0; $i < 40; $i++) {
             imageline($img, mt_rand(0, $w), mt_rand(0, $h), mt_rand(0, $w), mt_rand(0, $h), $noise1);
         }
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 150; $i++) {
             imagesetpixel($img, mt_rand(0, $w), mt_rand(0, $h), $noise2);
         }
-        $x = 15;
-        for ($i = 0; $i < strlen($code); $i++) {
-            $y = mt_rand(20, 35);
-            imagestring($img, mt_rand(3, 5), $x, $y - 15, $code[$i], $fg);
-            $x += mt_rand(20, 28);
+        $x = 20;
+        $len = strlen($code);
+        $spacing = ($w - 40) / max($len, 1);
+        for ($i = 0; $i < $len; $i++) {
+            $y = mt_rand(22, 30);
+            imagestring($img, 5, (int) $x, $y, $code[$i], $fg);
+            $x += $spacing;
         }
         header('Content-Type: image/png');
         header('X-Content-Type-Options: nosniff');
@@ -140,7 +143,7 @@ class Sweetaddons_Captcha
         set_transient('sweetaddons_captcha_' . $token, $code, 15 * MINUTE_IN_SECONDS);
         $src = add_query_arg(array('sweetaddons_captcha' => 'image', 'token' => $token, 'v' => time()), home_url('/'));
         $html = '<div class="sweetaddons-captcha" style="margin:10px 0; width:100%;">';
-        $html .= '<img src="' . esc_url($src) . '" alt="Captcha" style="display:block; border:1px solid #d0d4d9; height:50px; width:100%; background:#f5f6fa; border-radius:4px; box-sizing:border-box;" />';
+        $html .= '<img src="' . esc_url($src) . '" alt="Captcha" style="display:block; border:1px solid #d0d4d9; width:100%; height:auto; background:#f5f6fa; border-radius:4px; box-sizing:border-box;" />';
         $html .= '<input type="text" name="sweetaddons_captcha_input" placeholder="Masukkan teks di gambar" required style="margin-top:8px; padding:8px 10px; width:100%; font-size:13px; border:1px solid #d0d4d9; border-radius:4px; box-sizing:border-box;" />';
         $html .= '<input type="hidden" name="sweetaddons_captcha_token" value="' . esc_attr($token) . '" />';
         $html .= '</div>';

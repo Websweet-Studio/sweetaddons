@@ -289,32 +289,38 @@ class Custom_Admin_Option_Page
             ],
         ];
         ?>
-        <div class="sad-grid">
-            <div class="sad-card">
-                <div class="sad-card-title">Pengaturan Utama</div>
-                <form method="post" action="options.php" class="sad-form">
-                    <?php settings_fields('custom_admin_options_group'); ?>
-                    <?php do_settings_sections('custom_admin_options_group'); ?>
-                    <table class="form-table">
-                        <?php
-                        foreach ($spam_fields as $data) :
-                            echo '<tr>';
-                            echo '<th scope="row">';
-                            echo $data['title'];
-                            echo '</th>';
-                            echo '<td>';
-                            $this->field($data);
-                            echo '</td>';
-                            echo '</tr>';
-                        endforeach;
-                        ?>
-                    </table>
-                    <div class="sad-actions-row sad-actions-row--end">
-                        <?php $this->save_button(); ?>
+        <form method="post" action="options.php" class="sad-form">
+            <?php settings_fields('custom_admin_options_group'); ?>
+            <?php do_settings_sections('custom_admin_options_group'); ?>
+            <div class="sad-top">
+                <div class="sad-top-left">
+                    <div class="sad-card sad-mb-16">
+                        <div class="sad-card-title">Pengaturan Utama</div>
+                        <table class="form-table">
+                            <?php
+                            foreach ($spam_fields as $data) :
+                                echo '<tr>';
+                                echo '<th scope="row">';
+                                echo $data['title'];
+                                echo '</th>';
+                                echo '<td>';
+                                $this->field($data);
+                                echo '</td>';
+                                echo '</tr>';
+                            endforeach;
+                            ?>
+                        </table>
                     </div>
-                </form>
+                </div>
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     <?php
     }
 
@@ -344,32 +350,38 @@ class Custom_Admin_Option_Page
             ]
         ];
     ?>
-        <div class="sad-grid">
-            <div class="sad-card">
-                <div class="sad-card-title">Pengaturan Maintenance</div>
-                <form method="post" action="options.php" class="sad-form">
-                    <?php settings_fields('Sweetaddons_maintenance_group'); ?>
-                    <?php do_settings_sections('Sweetaddons_maintenance_group'); ?>
-                    <table class="form-table">
-                        <?php
-                        foreach ($maintenance_fields as $data) :
-                            echo '<tr>';
-                            echo '<th scope="row">';
-                            echo $data['title'];
-                            echo '</th>';
-                            echo '<td>';
-                            $this->field($data);
-                            echo '</td>';
-                            echo '</tr>';
-                        endforeach;
-                        ?>
-                    </table>
-                    <div class="sad-actions-row sad-actions-row--end">
-                        <?php $this->save_button(); ?>
+        <form method="post" action="options.php" class="sad-form">
+            <?php settings_fields('Sweetaddons_maintenance_group'); ?>
+            <?php do_settings_sections('Sweetaddons_maintenance_group'); ?>
+            <div class="sad-top">
+                <div class="sad-top-left">
+                    <div class="sad-card sad-mb-16">
+                        <div class="sad-card-title">Pengaturan Maintenance</div>
+                        <table class="form-table">
+                            <?php
+                            foreach ($maintenance_fields as $data) :
+                                echo '<tr>';
+                                echo '<th scope="row">';
+                                echo $data['title'];
+                                echo '</th>';
+                                echo '<td>';
+                                $this->field($data);
+                                echo '</td>';
+                                echo '</tr>';
+                            endforeach;
+                            ?>
+                        </table>
                     </div>
-                </form>
+                </div>
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     <?php
     }
 
@@ -456,7 +468,7 @@ class Custom_Admin_Option_Page
                     </div>
                 </div>
                 <div class="sad-top-right">
-                    <div class="sad-card">
+                    <div class="sad-card sad-mb-16">
                         <div class="sad-card-title">Lokasi Aktif</div>
                         <table class="form-table">
                             <tr>
@@ -473,10 +485,12 @@ class Custom_Admin_Option_Page
                             </tr>
                         </table>
                     </div>
+                    <div class="sad-card">
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="sad-actions-row sad-actions-row--end">
-                <?php $this->save_button(); ?>
             </div>
         </form>
     <?php
@@ -508,30 +522,36 @@ class Custom_Admin_Option_Page
             ],
         ];
     ?>
-        <div class="sad-grid">
-            <div class="sad-card">
-                <div class="sad-card-title">Pengaturan Utama</div>
-                <form method="post" action="options.php" class="sad-form">
-                    <?php settings_fields('Sweetaddons_block_group'); ?>
-                    <?php do_settings_sections('Sweetaddons_block_group'); ?>
-                    <table class="form-table">
-                        <?php
-                        foreach ($block_fields as $data) :
-                            echo '<tr>';
-                            echo '<th scope="row">' . $data['title'] . '</th>';
-                            echo '<td>';
-                            $this->field($data);
-                            echo '</td>';
-                            echo '</tr>';
-                        endforeach;
-                        ?>
-                    </table>
-                    <div class="sad-actions-row sad-actions-row--end">
-                        <?php $this->save_button(); ?>
+        <form method="post" action="options.php" class="sad-form">
+            <?php settings_fields('Sweetaddons_block_group'); ?>
+            <?php do_settings_sections('Sweetaddons_block_group'); ?>
+            <div class="sad-top">
+                <div class="sad-top-left">
+                    <div class="sad-card sad-mb-16">
+                        <div class="sad-card-title">Pengaturan Utama</div>
+                        <table class="form-table">
+                            <?php
+                            foreach ($block_fields as $data) :
+                                echo '<tr>';
+                                echo '<th scope="row">' . $data['title'] . '</th>';
+                                echo '<td>';
+                                $this->field($data);
+                                echo '</td>';
+                                echo '</tr>';
+                            endforeach;
+                            ?>
+                        </table>
                     </div>
-                </form>
+                </div>
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     <?php
     }
 
@@ -1408,9 +1428,9 @@ class Custom_Admin_Option_Page
 
                     <!-- Save Button Card -->
                     <div class="sad-card">
-                        <div class="sad-card-title">Simpan Perubahan</div>
-                        <div class="sad-subtext" style="margin-bottom: 15px;">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
-                        <?php $this->save_button(); ?>
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
                     </div>
 
                 </div>
@@ -1617,9 +1637,9 @@ class Custom_Admin_Option_Page
                 </div>
                 <div class="sad-top-right">
                     <div class="sad-card">
-                        <div class="sad-card-title">Simpan Perubahan</div>
-                        <div class="sad-subtext sad-mb-12">Pastikan untuk menyimpan pengaturan setelah melakukan perubahan.</div>
-                        <?php $this->save_button(); ?>
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1743,8 +1763,9 @@ class Custom_Admin_Option_Page
 
                 <div class="sad-top-right">
                     <div class="sad-card">
-                        <div class="sad-card-title">Simpan Perubahan</div>
-                        <?php $this->save_button(); ?>
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2415,8 +2436,7 @@ class Custom_Admin_Option_Page
 
                 <div class="sad-top-right">
                     <div class="sad-card">
-                        <div class="sad-card-title">Simpan Perubahan</div>
-                        <div class="sad-actions-row sad-actions-row--end">
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
                             <?php $this->save_button(); ?>
                         </div>
                     </div>
