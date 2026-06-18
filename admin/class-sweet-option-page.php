@@ -1185,19 +1185,21 @@ class Custom_Admin_Option_Page
             </div>
         <?php endif; ?>
 
-        <!-- Rebuild Stats Button -->
-        <div class="sad-card sad-card--spaced sad-mb-16">
-            <form method="post" class="sad-inline" style="display:flex; align-items:center; gap:10px;">
-                <?php wp_nonce_field('rebuild_stats'); ?>
-                <input type="hidden" name="rebuild_stats" value="1">
-                <button type="submit" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease;" onmouseenter="this.style.background='#f1f5f9';this.style.borderColor='#94a3b8';" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0';" onclick="return confirm('Apakah Anda yakin ingin mereset statistik?')">
-                    Reset Statistik
-                </button>
-                <span class="sad-muted" style="font-size:11px;">
-                    Gunakan ini jika hitungan pengunjung tampak tidak benar
-                </span>
-            </form>
-        </div>
+        <?php if ($current_tab !== 'shortcode') : ?>
+            <!-- Rebuild Stats Button -->
+            <div class="sad-card sad-card--spaced sad-mb-16">
+                <form method="post" class="sad-inline" style="display:flex; align-items:center; gap:10px;">
+                    <?php wp_nonce_field('rebuild_stats'); ?>
+                    <input type="hidden" name="rebuild_stats" value="1">
+                    <button type="submit" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease;" onmouseenter="this.style.background='#f1f5f9';this.style.borderColor='#94a3b8';" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0';" onclick="return confirm('Apakah Anda yakin ingin mereset statistik?')">
+                        Reset Statistik
+                    </button>
+                    <span class="sad-muted" style="font-size:11px;">
+                        Gunakan ini jika hitungan pengunjung tampak tidak benar
+                    </span>
+                </form>
+            </div>
+        <?php endif; ?>
 
         <script>
             function copyShortcode(selector) {
