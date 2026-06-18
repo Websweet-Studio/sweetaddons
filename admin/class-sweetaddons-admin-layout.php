@@ -72,6 +72,7 @@ class Sweetaddons_Admin_Layout
     return array(
       array('tab' => 'redis', 'label' => 'Redis'),
       array('tab' => 'dbcleaner', 'label' => 'DB Cleaner'),
+      array('tab' => 'headcleanup', 'label' => 'Head Cleanup'),
     );
   }
 

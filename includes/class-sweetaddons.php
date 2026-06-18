@@ -194,6 +194,7 @@ class sweetaddons
 
         new Sweetaddons_Breadcrumb();
         new Sweetaddons_Login_Customizer();
+        new Sweetaddons_Head_Cleanup();
     }
 
     /**

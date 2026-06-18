@@ -134,6 +134,7 @@ spl_autoload_register(function ($class) {
         'Sweetaddons_Deactivator' => 'includes/class-sweetaddons-deactivator.php',
         'sweetaddons' => 'includes/class-sweetaddons.php',
         'Sweetaddons_Redis_Cache' => 'includes/class-sweetaddons-redis-cache.php',
+        'Sweetaddons_Head_Cleanup' => 'includes/class-sweetaddons-head-cleanup.php',
         'Sweet_Option_Optimasi' => 'admin/class-sweet-option-optimasi.php',
     );
 

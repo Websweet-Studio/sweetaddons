@@ -47,6 +47,30 @@ class Sweet_Option_Optimasi
                 'database' => 0,
             ),
         ));
+
+        register_setting('sweetaddons_optimasi_group', Sweetaddons_Head_Cleanup::OPTION_KEY, array(
+            'type'              => 'array',
+            'sanitize_callback' => array($this, 'sanitize_head_cleanup'),
+            'default'           => Sweetaddons_Head_Cleanup::get_config(),
+        ));
+    }
+
+    public function sanitize_head_cleanup($input)
+    {
+        if (!is_array($input)) {
+            return array();
+        }
+
+        $allowed = array(
+            'remove_emoji', 'remove_rsd', 'remove_wlw', 'remove_shortlink',
+            'remove_rest_link', 'remove_oembed', 'remove_generator', 'disable_pingback',
+        );
+
+        $output = array();
+        foreach ($allowed as $key) {
+            $output[$key] = isset($input[$key]) ? 1 : 0;
+        }
+        return $output;
     }
 
     public function sanitize_config($input)
@@ -107,6 +131,12 @@ class Sweet_Option_Optimasi
 
         if ($current_tab === 'dbcleaner') {
             $this->render_dbcleaner_tab();
+            Sweetaddons_Admin_Layout::close();
+            return;
+        }
+
+        if ($current_tab === 'headcleanup') {
+            $this->render_headcleanup_tab();
             Sweetaddons_Admin_Layout::close();
             return;
         }
@@ -263,6 +293,59 @@ class Sweet_Option_Optimasi
     public function save_button()
     {
         echo '<button type="submit" name="submit" style="border:none; cursor:pointer; padding:8px 16px; border-radius:8px; background:linear-gradient(135deg, #2563eb, #1e40af); color:#fff; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(37,99,235,0.25); transition:all 0.2s ease;" onmouseenter="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(37,99,235,0.4)\';" onmouseleave="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 6px rgba(37,99,235,0.25)\';"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>Simpan Pengaturan</button>';
+    }
+
+    private function render_headcleanup_tab()
+    {
+        $config = Sweetaddons_Head_Cleanup::get_config();
+
+        $fields = array(
+            'remove_emoji'       => array('title' => 'Hapus Emoji Scripts',       'label' => 'Hapus wp-emoji-release.min.js dan inline CSS emoji dari halaman. Mengurangi 1-2 HTTP request.'),
+            'remove_rsd'         => array('title' => 'Hapus RSD Link',            'label' => 'Hapus link Really Simple Discovery dari <head>. Tidak diperlukan kecuali pakai layanan ping eksternal.'),
+            'remove_wlw'         => array('title' => 'Hapus WLW Manifest',        'label' => 'Hapus Windows Live Writer manifest link. Tidak lagi relevan.'),
+            'remove_shortlink'   => array('title' => 'Hapus Shortlink',           'label' => 'Hapus <link rel="shortlink"> dari header HTTP dan HTML. Tidak perlu untuk SEO.'),
+            'remove_rest_link'   => array('title' => 'Hapus REST API Link',       'label' => 'Hapus link REST API URL dari <head>. Halaman tetap bisa akses API — hanya link header yang dihapus.'),
+            'remove_oembed'      => array('title' => 'Hapus oEmbed Links',        'label' => 'Hapus oEmbed discovery links dan rewrite rules. Mencegah embedding konten situs dari platform eksternal.'),
+            'remove_generator'   => array('title' => 'Hapus Generator Meta',      'label' => 'Hapus <meta name="generator"> yang menampilkan versi WordPress. Tambahan keamanan ringan.'),
+            'disable_pingback'   => array('title' => 'Nonaktifkan Self Pingback', 'label' => 'Blokir pingback dari URL sendiri. Kurangi bloat database dan beban XML-RPC.'),
+        );
+?>
+        <form method="post" action="options.php" class="sad-form">
+            <?php settings_fields('sweetaddons_optimasi_group'); ?>
+            <div class="sad-top">
+                <div class="sad-top-left">
+                    <div class="sad-card">
+                        <div class="sad-card-title">Pengaturan Head Cleanup</div>
+                        <p class="description" style="margin-bottom:12px;">Pilih item yang ingin dihapus dari <code>&lt;head&gt;</code>. Semua direkomendasikan aktif untuk performa maksimal.</p>
+                        <table class="form-table">
+                            <?php foreach ($fields as $key => $field) : ?>
+                            <tr>
+                                <th scope="row"><?php echo esc_html($field['title']); ?></th>
+                                <td>
+                                    <label>
+                                        <input type="checkbox"
+                                            name="<?php echo esc_attr(Sweetaddons_Head_Cleanup::OPTION_KEY); ?>[<?php echo esc_attr($key); ?>]"
+                                            value="1"
+                                            <?php checked(1, isset($config[$key]) ? (int) $config[$key] : 1); ?>>
+                                        <?php echo esc_html($field['label']); ?>
+                                    </label>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sad-top-right">
+                    <div class="sad-card">
+                        <div class="sad-actions-row" style="justify-content:center; text-align:center;">
+                            <?php $this->save_button(); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+<?php
     }
 
     private function render_dbcleaner_tab()

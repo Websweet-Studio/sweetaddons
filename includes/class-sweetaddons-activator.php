@@ -125,6 +125,25 @@ class Sweetaddons_Activator
 			wp_schedule_event(time(), 'daily', 'sweetaddons_daily_aggregation');
 		}
 
+		// Set default options jika belum ada (tidak overwrite yang sudah ada)
+		add_option('sweetaddons_redis_config', array(
+			'host'     => '127.0.0.1',
+			'port'     => 6379,
+			'password' => '',
+			'database' => 0,
+		));
+
+		add_option('sweetaddons_head_cleanup', array(
+			'remove_emoji'       => 1,
+			'remove_rsd'         => 1,
+			'remove_wlw'         => 1,
+			'remove_shortlink'   => 1,
+			'remove_rest_link'   => 1,
+			'remove_oembed'      => 0,
+			'remove_generator'   => 1,
+			'disable_pingback'   => 1,
+		));
+
 		// Mengarahkan pengguna ke halaman custom_admin_options saat plugin diaktifkan
 		// wp_redirect(admin_url('options-general.php?page=custom_admin_options'));
 		// exit;
