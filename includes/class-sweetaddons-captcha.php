@@ -36,7 +36,7 @@ class Sweetaddons_Captcha
             add_action('lostpassword_post', array($this, 'lostpassword_post'));
 
             add_filter('query_vars', array($this, 'add_query_vars'));
-            add_action('template_redirect', array($this, 'maybe_render_image'));
+            add_action('init', array($this, 'maybe_render_image'), 1);
 
             if (class_exists('WPCF7')) {
                 add_action('wpcf7_init', array($this, 'wpcf7_form_captcha'));
@@ -56,8 +56,14 @@ class Sweetaddons_Captcha
 
     public function maybe_render_image()
     {
-        $qv = get_query_var('sweetaddons_captcha');
-        $token = get_query_var('token');
+        // Use $_GET directly because this runs on 'init' (priority 1),
+        // before get_query_var() is populated by the main query.
+        if (!isset($_GET['sweetaddons_captcha'])) {
+            return;
+        }
+
+        $qv = sanitize_text_field(wp_unslash($_GET['sweetaddons_captcha']));
+        $token = isset($_GET['token']) ? sanitize_text_field(wp_unslash($_GET['token'])) : '';
 
         // Handle preview mode
         if ($qv === 'preview') {
@@ -65,7 +71,7 @@ class Sweetaddons_Captcha
                 wp_die('Access denied');
             }
 
-            $difficulty = isset($_GET['difficulty']) ? sanitize_text_field($_GET['difficulty']) : 'medium';
+            $difficulty = isset($_GET['difficulty']) ? sanitize_text_field(wp_unslash($_GET['difficulty'])) : 'medium';
             $this->difficulty = $difficulty;
 
             $code = $this->generate_code();

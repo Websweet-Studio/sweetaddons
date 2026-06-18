@@ -945,21 +945,6 @@ class Custom_Admin_Option_Page
 
         <?php echo $rebuild_message; ?>
 
-        <!-- Rebuild Stats Button -->
-        <div class="sad-card sad-card--spaced sad-mb-16">
-            <div class="sad-card-title">Maintenance</div>
-            <form method="post" class="sad-inline">
-                <?php wp_nonce_field('rebuild_stats'); ?>
-                <input type="hidden" name="rebuild_stats" value="1">
-                <button type="submit" class="button button-secondary" onclick="return confirm('Apakah Anda yakin ingin membangun ulang statistik? Ini akan menghitung ulang semua data dari log yang ada.')">
-                    Bangun Ulang Statistik
-                </button>
-                <span class="sad-muted sad-ml-10">
-                    Gunakan ini jika hitungan pengunjung tampak tidak benar
-                </span>
-            </form>
-        </div>
-
         <!-- Summary Cards -->
         <div class="sad-grid stats-summary sad-grid--spaced">
 
@@ -1098,6 +1083,21 @@ class Custom_Admin_Option_Page
             <div id="copy-success" class="sad-copy-success" hidden>Shortcode berhasil disalin</div>
         </div>
 
+        <!-- Rebuild Stats Button -->
+        <div class="sad-card sad-card--spaced sad-mb-16">
+            <div class="sad-card-title">Maintenance</div>
+            <form method="post" class="sad-inline">
+                <?php wp_nonce_field('rebuild_stats'); ?>
+                <input type="hidden" name="rebuild_stats" value="1">
+                <button type="submit" class="button button-secondary" onclick="return confirm('Apakah Anda yakin ingin membangun ulang statistik? Ini akan menghitung ulang semua data dari log yang ada.')">
+                    Reset Statistik
+                </button>
+                <span class="sad-muted sad-ml-10">
+                    Gunakan ini jika hitungan pengunjung tampak tidak benar
+                </span>
+            </form>
+        </div>
+
         <script>
             function copyShortcode(selector) {
                 const el = document.querySelector(selector);
@@ -1146,6 +1146,15 @@ class Custom_Admin_Option_Page
                 console.warn('Sweet Addons: Chart.js gagal dimuat atau elemen canvas tidak ditemukan.');
             } else {
                 const dailyCtx = dailyCanvas.getContext('2d');
+
+                // Daily gradient fills
+                const dGrad1 = dailyCtx.createLinearGradient(0, 0, 0, 280);
+                dGrad1.addColorStop(0, 'rgba(0, 102, 204, 0.35)');
+                dGrad1.addColorStop(1, 'rgba(0, 102, 204, 0.0)');
+                const dGrad2 = dailyCtx.createLinearGradient(0, 0, 0, 280);
+                dGrad2.addColorStop(0, 'rgba(41, 151, 255, 0.25)');
+                dGrad2.addColorStop(1, 'rgba(41, 151, 255, 0.0)');
+
                 new Chart(dailyCtx, {
                     type: 'line',
                     data: {
@@ -1154,37 +1163,117 @@ class Custom_Admin_Option_Page
                                 label: 'Pengunjung Unik',
                                 data: uniqueVisitsData,
                                 borderColor: '#0066cc',
-                                backgroundColor: 'rgba(0, 102, 204, 0.14)',
-                                tension: 0.4,
-                                fill: true
+                                backgroundColor: dGrad1,
+                                borderWidth: 2.5,
+                                tension: 0.35,
+                                fill: true,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#0066cc',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: '#0066cc',
+                                pointHoverBorderWidth: 3,
                             },
                             {
                                 label: 'Total Kunjungan',
                                 data: totalVisitsData,
                                 borderColor: '#2997ff',
-                                backgroundColor: 'rgba(41, 151, 255, 0.10)',
-                                tension: 0.4,
-                                fill: false
+                                backgroundColor: dGrad2,
+                                borderWidth: 2.5,
+                                tension: 0.35,
+                                fill: true,
+                                pointRadius: 3,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#2997ff',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: '#2997ff',
+                                pointHoverBorderWidth: 3,
                             }
                         ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                },
+                                ticks: {
+                                    padding: 10,
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                border: {
+                                    dash: [4, 4],
+                                    display: false
+                                },
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    padding: 8,
+                                    font: {
+                                        size: 10
+                                    },
+                                    maxTicksLimit: 12
+                                },
                             }
                         },
                         plugins: {
                             legend: {
-                                position: 'top'
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 24,
+                                    boxWidth: 8,
+                                    boxHeight: 8,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(20,20,30,0.92)',
+                                titleFont: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 11
+                                },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                boxPadding: 4,
                             }
                         }
                     }
                 });
 
                 // Top Pages Chart
+                const pageCtx = pageCanvas.getContext('2d');
+
+                const pGrad = pageCtx.createLinearGradient(0, 0, 0, 280);
+                pGrad.addColorStop(0, 'rgba(37, 211, 102, 0.75)');
+                pGrad.addColorStop(1, 'rgba(37, 211, 102, 0.25)');
+
+                const pGradHover = pageCtx.createLinearGradient(0, 0, 0, 280);
+                pGradHover.addColorStop(0, 'rgba(37, 211, 102, 0.95)');
+                pGradHover.addColorStop(1, 'rgba(37, 211, 102, 0.40)');
+
                 const pageData = <?php echo json_encode(array_map(function ($page) {
                                         return [
                                             'url' => $page->page_url,
@@ -1195,7 +1284,6 @@ class Custom_Admin_Option_Page
                 const pageLabels = pageData.map(item => item.url);
                 const pageViews = pageData.map(item => item.views);
 
-                const pageCtx = pageCanvas.getContext('2d');
                 new Chart(pageCtx, {
                     type: 'bar',
                     data: {
@@ -1203,9 +1291,12 @@ class Custom_Admin_Option_Page
                         datasets: [{
                             label: 'Page Views',
                             data: pageViews,
-                            backgroundColor: 'rgba(0, 102, 204, 0.18)',
-                            borderColor: '#0066cc',
-                            borderWidth: 1
+                            backgroundColor: pGrad,
+                            hoverBackgroundColor: pGradHover,
+                            borderColor: '#1da851',
+                            borderWidth: 0,
+                            borderRadius: 6,
+                            borderSkipped: false,
                         }]
                     },
                     options: {
@@ -1213,12 +1304,32 @@ class Custom_Admin_Option_Page
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                },
+                                ticks: {
+                                    padding: 10,
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                border: {
+                                    dash: [4, 4],
+                                    display: false
+                                },
                             },
                             x: {
+                                grid: {
+                                    display: false
+                                },
                                 ticks: {
                                     maxRotation: 45,
                                     minRotation: 0,
+                                    padding: 8,
+                                    font: {
+                                        size: 10
+                                    },
                                     callback: function(value, index, values) {
                                         const label = this.getLabelForValue(value);
                                         return label.length > 20 ? label.substring(0, 20) + '...' : label;
@@ -1229,6 +1340,19 @@ class Custom_Admin_Option_Page
                         plugins: {
                             legend: {
                                 display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(20,20,30,0.92)',
+                                titleFont: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 11
+                                },
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: false,
                             }
                         }
                     }
