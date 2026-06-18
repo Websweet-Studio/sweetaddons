@@ -58,7 +58,7 @@
 .sad-card {
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 18px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -194,7 +194,7 @@
 .sweetaddons-dashboard .update-nag {
   background: #fff !important;
   border: 1px solid #e5e7eb !important;
-  border-radius: 14px !important;
+  border-radius: 8px !important;
   padding: 10px 20px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   margin: 15px 0 25px 0 !important;
@@ -261,7 +261,7 @@
   margin: 0;
   padding: 12px 14px;
   border: 1px solid #f4d38c;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #fff9eb;
   color: #7c5a10;
   line-height: 1.55;
@@ -437,7 +437,7 @@
 .sad-notice {
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 14px 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   margin: 15px 0 25px 0;
@@ -497,7 +497,7 @@
   background: #000;
   color: #fff;
   padding: 0 16px;
-  border-radius: 18px;
+  border-radius: 8px;
 }
 
 .sad-apple__brand {
@@ -552,7 +552,7 @@
   align-items: center;
   background: rgba(245, 245, 247, 0.86);
   border: 1px solid var(--sad-hairline);
-  border-radius: 18px;
+  border-radius: 8px;
   padding: 0 18px;
   backdrop-filter: saturate(180%) blur(20px);
 }
@@ -632,7 +632,7 @@
 .sad-apple .sad-card {
   background: var(--sad-canvas);
   border: 1px solid var(--sad-hairline);
-  border-radius: 18px;
+  border-radius: 8px;
   padding: 24px;
   box-shadow: none;
 }
@@ -682,7 +682,7 @@
 
 .sad-apple .sad-notice {
   border-color: var(--sad-hairline);
-  border-radius: 18px;
+  border-radius: 8px;
   box-shadow: none;
 }
 
@@ -736,7 +736,7 @@
 
 .sad-widefat {
   border: 1px solid var(--sad-hairline) !important;
-  border-radius: 18px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: none !important;
 }
@@ -808,7 +808,7 @@
   border: 1px solid rgba(0, 102, 204, 0.18);
   color: var(--sad-ink);
   padding: 10px 12px;
-  border-radius: 11px;
+  border-radius: 8px;
   font-size: 12px;
   letter-spacing: -0.12px;
 }
@@ -876,7 +876,7 @@
 }
 
 .sad-apple .sad-form textarea {
-  border-radius: 11px;
+  border-radius: 8px;
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: none;
   padding: 12px 16px;
@@ -956,7 +956,7 @@
   transition:
     border-color 0.2s,
     background-color 0.2s;
-  border-radius: 18px;
+  border-radius: 8px;
 }
 
 .sad-drop-zone:hover,
@@ -972,7 +972,7 @@
   display: block;
   margin: 0 auto 10px;
   box-shadow: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
-  border-radius: 11px;
+  border-radius: 8px;
 }
 
 .sad-drop-zone .sad-placeholder {
@@ -991,7 +991,7 @@
 
 @media (max-width: 1024px) {
   .sad-apple__globalnav {
-    border-radius: 14px;
+    border-radius: 8px;
   }
   .sad-apple .sad-top--dashboard,
   .sad-grid--charts,

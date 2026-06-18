@@ -232,7 +232,7 @@ class Custom_Admin_Option_Page
 
     public function save_button()
     {
-        echo '<button type="submit" name="submit" class="button button-primary" style="cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;margin-top:-2px;width:14px;height:14px;"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>Simpan Pengaturan</button>';
+        echo '<button type="submit" name="submit" style="border:none; cursor:pointer; padding:8px 16px; border-radius:8px; background:linear-gradient(135deg, #2563eb, #1e40af); color:#fff; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(37,99,235,0.25); transition:all 0.2s ease;" onmouseenter="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 4px 12px rgba(37,99,235,0.4)\';" onmouseleave="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 2px 6px rgba(37,99,235,0.25)\';"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>Simpan Pengaturan</button>';
     }
 
     public function spam_page_callback()
@@ -681,6 +681,15 @@ class Custom_Admin_Option_Page
                 });
                 var ctx = document.getElementById('sadThirtyChart');
                 if (ctx && window.Chart) {
+                    var dCtx = ctx.getContext('2d');
+
+                    var dGrad1 = dCtx.createLinearGradient(0, 0, 0, 280);
+                    dGrad1.addColorStop(0, 'rgba(0, 102, 204, 0.35)');
+                    dGrad1.addColorStop(1, 'rgba(0, 102, 204, 0.0)');
+                    var dGrad2 = dCtx.createLinearGradient(0, 0, 0, 280);
+                    dGrad2.addColorStop(0, 'rgba(41, 151, 255, 0.25)');
+                    dGrad2.addColorStop(1, 'rgba(41, 151, 255, 0.0)');
+
                     new Chart(ctx, {
                         type: 'line',
                         data: {
@@ -689,31 +698,101 @@ class Custom_Admin_Option_Page
                                     label: 'Pengunjung Unik',
                                     data: uniqueData,
                                     borderColor: '#0066cc',
-                                    backgroundColor: 'rgba(0,102,204,0.14)',
+                                    backgroundColor: dGrad1,
+                                    borderWidth: 2.5,
                                     tension: 0.35,
-                                    fill: true
+                                    fill: true,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 6,
+                                    pointBackgroundColor: '#0066cc',
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2,
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: '#0066cc',
+                                    pointHoverBorderWidth: 3,
                                 },
                                 {
                                     label: 'Total Kunjungan',
                                     data: totalData,
                                     borderColor: '#2997ff',
-                                    backgroundColor: 'rgba(41,151,255,0.10)',
+                                    backgroundColor: dGrad2,
+                                    borderWidth: 2.5,
                                     tension: 0.35,
-                                    fill: false
+                                    fill: true,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 6,
+                                    pointBackgroundColor: '#2997ff',
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2,
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: '#2997ff',
+                                    pointHoverBorderWidth: 3,
                                 }
                             ]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
+                            },
                             scales: {
                                 y: {
-                                    beginAtZero: true
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    },
+                                    ticks: {
+                                        padding: 10,
+                                        font: {
+                                            size: 11
+                                        }
+                                    },
+                                    border: {
+                                        dash: [4, 4],
+                                        display: false
+                                    },
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        padding: 8,
+                                        font: {
+                                            size: 10
+                                        },
+                                        maxTicksLimit: 12
+                                    },
                                 }
                             },
                             plugins: {
                                 legend: {
-                                    position: 'top'
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 24,
+                                        boxWidth: 8,
+                                        boxHeight: 8,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(20,20,30,0.92)',
+                                    titleFont: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 11
+                                    },
+                                    padding: 12,
+                                    cornerRadius: 8,
+                                    displayColors: true,
+                                    boxPadding: 4,
                                 }
                             }
                         }
@@ -1002,8 +1081,8 @@ class Custom_Admin_Option_Page
                     <thead>
                         <tr>
                             <th>Page URL</th>
-                            <th>Pengunjung Unik</th>
-                            <th>Total Tampilan</th>
+                            <th>Pengunjung</th>
+                            <th>Views</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1055,28 +1134,55 @@ class Custom_Admin_Option_Page
         <!-- Shortcode Examples -->
         <div class="sad-card sad-card--spaced">
             <div class="sad-card-title">Shortcode Statistik</div>
-            <p class="sad-subtext sad-mb-12">Gunakan shortcode berikut untuk menampilkan statistik di halaman atau posting.</p>
+            <p class="sad-subtext sad-mb-12">Gunakan shortcode di bawah untuk menampilkan statistik di halaman atau posting.</p>
 
-            <div class="sad-shortcode-list">
-                <div class="sad-shortcode-row">
-                    <span class="sad-shortcode-label">Default</span>
-                    <code id="sc-stat-default" class="sad-shortcode-code">[statistic]</code>
-                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-default')">Copy</button>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Default</span>
+                    <code id="sc-stat-default" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic]</code>
+                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-default" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="sad-shortcode-row">
-                    <span class="sad-shortcode-label">Hari ini (minimal, 2 kolom)</span>
-                    <code id="sc-stat-today-min" class="sad-shortcode-code">[statistic show="today" style="minimal" columns="2"]</code>
-                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-today-min')">Copy</button>
+
+                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Hari Ini</span>
+                    <code id="sc-stat-today-min" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="today" style="minimal" columns="2"]</code>
+                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-today-min" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="sad-shortcode-row">
-                    <span class="sad-shortcode-label">Total (cards, 4 kolom)</span>
-                    <code id="sc-stat-total-cards" class="sad-shortcode-code">[statistic show="total" style="cards" columns="4"]</code>
-                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-total-cards')">Copy</button>
+
+                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Total</span>
+                    <code id="sc-stat-total-cards" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="total" style="cards" columns="4"]</code>
+                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-total-cards" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
                 </div>
-                <div class="sad-shortcode-row">
-                    <span class="sad-shortcode-label">Semua (cards, 3 kolom)</span>
-                    <code id="sc-stat-all-cards" class="sad-shortcode-code">[statistic show="all" style="cards" columns="3"]</code>
-                    <button type="button" class="button button-secondary" onclick="copyShortcode('#sc-stat-all-cards')">Copy</button>
+
+                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Semua</span>
+                    <code id="sc-stat-all-cards" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="all" style="cards" columns="3"]</code>
+                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-all-cards" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        Copy
+                    </button>
                 </div>
             </div>
 
@@ -1085,14 +1191,13 @@ class Custom_Admin_Option_Page
 
         <!-- Rebuild Stats Button -->
         <div class="sad-card sad-card--spaced sad-mb-16">
-            <div class="sad-card-title">Maintenance</div>
-            <form method="post" class="sad-inline">
+            <form method="post" class="sad-inline" style="display:flex; align-items:center; gap:10px;">
                 <?php wp_nonce_field('rebuild_stats'); ?>
                 <input type="hidden" name="rebuild_stats" value="1">
-                <button type="submit" class="button button-secondary" onclick="return confirm('Apakah Anda yakin ingin membangun ulang statistik? Ini akan menghitung ulang semua data dari log yang ada.')">
+                <button type="submit" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease;" onmouseenter="this.style.background='#f1f5f9';this.style.borderColor='#94a3b8';" onmouseleave="this.style.background='#fff';this.style.borderColor='#e2e8f0';" onclick="return confirm('Apakah Anda yakin ingin mereset statistik?')">
                     Reset Statistik
                 </button>
-                <span class="sad-muted sad-ml-10">
+                <span class="sad-muted" style="font-size:11px;">
                     Gunakan ini jika hitungan pengunjung tampak tidak benar
                 </span>
             </form>
@@ -1117,6 +1222,39 @@ class Custom_Admin_Option_Page
                     showCopySuccess();
                 }
             }
+
+            // Bind modern copy buttons (data-target)
+            document.querySelectorAll('.sad-sc-copy').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const target = this.getAttribute('data-target');
+                    copyShortcode(target);
+                    const original = this.innerHTML;
+                    this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Tersalin';
+                    setTimeout(() => {
+                        this.innerHTML = original;
+                    }, 1500);
+                });
+                btn.addEventListener('mouseenter', function() {
+                    this.style.background = '#f1f5f9';
+                    this.style.borderColor = '#94a3b8';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.background = '#fff';
+                    this.style.borderColor = '#e2e8f0';
+                });
+            });
+
+            // Item hover
+            document.querySelectorAll('.sad-sc-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.background = '#f1f5f9';
+                    this.style.borderColor = '#cbd5e1';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.background = '#fafbfc';
+                    this.style.borderColor = '#eef0f3';
+                });
+            });
 
             function showCopySuccess() {
                 const box = document.getElementById('copy-success');
@@ -2135,7 +2273,10 @@ class Custom_Admin_Option_Page
 
         $display_position = ucwords(str_replace('-', ' ', $position));
     ?>
-        <?php Sweetaddons_Admin_Layout::open('WhatsApp', 'Sweetaddons_whatsapp'); ?>
+        <?php
+        $wa_subnav = Sweetaddons_Admin_Layout::get_whatsapp_subnav();
+        Sweetaddons_Admin_Layout::open('WhatsApp', 'Sweetaddons_whatsapp', $wa_subnav);
+        ?>
         <?php
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan WhatsApp berhasil disimpan.</p></div>';
@@ -2143,88 +2284,96 @@ class Custom_Admin_Option_Page
         ?>
         <form method="post" action="" class="sad-form">
             <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
+            <?php
+            $wa_active_tab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : 'pengaturan';
+            if (!in_array($wa_active_tab, array('pengaturan', 'style'), true)) {
+                $wa_active_tab = 'pengaturan';
+            }
+            ?>
             <div class="sad-top">
                 <div class="sad-top-left">
-                    <div class="sad-card sad-mb-16">
-                        <div class="sad-card-title">Pengaturan Dasar</div>
+                    <!-- wa-tab-pengaturan -->
+                    <div id="wa-tab-pengaturan" class="wa-tab-content" style="display:<?php echo $wa_active_tab === 'pengaturan' ? 'block' : 'none'; ?>;">
+                        <div class="sad-card sad-mb-16">
+                            <div class="sad-card-title">Pengaturan Dasar</div>
 
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row">Aktifkan Chat WhatsApp</th>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" id="sweetaddons_whatsapp_enable" name="sweetaddons_whatsapp_enable" value="1" <?php checked($enable, '1'); ?> />
-                                        Enable floating WhatsApp chat button
-                                    </label>
-                                    <p class="description">Show WhatsApp chat widget on your website.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Multi Agen</th>
-                                <td>
-                                    <div id="sweetaddons-wa-agents">
-                                        <?php
-                                        $agent_index = 0;
-                                        foreach ($agents as $agent) :
-                                            if (!is_array($agent)) {
-                                                continue;
-                                            }
-                                            $agent_name = isset($agent['name']) ? $agent['name'] : '';
-                                            $agent_phone = isset($agent['phone']) ? $agent['phone'] : '';
-                                            $agent_role = isset($agent['role']) ? $agent['role'] : '';
-                                            $agent_note = isset($agent['note']) ? $agent['note'] : '';
-                                            $agent_status = isset($agent['status']) ? $agent['status'] : 'online';
-                                            $agent_avatar = isset($agent['avatar']) ? $agent['avatar'] : '';
-                                        ?>
-                                            <div class="sweetaddons-wa-agent-row" style="border: 1px solid #e5e5e5; border-radius: 10px; padding: 12px; margin: 0 0 12px; background: #fff;">
-                                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                                    <div style="flex: 1; min-width: 160px;">
-                                                        <label style="display:block; margin: 0 0 6px;">Nama</label>
-                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][name]" value="<?php echo esc_attr($agent_name); ?>" class="regular-text" style="width: 100%;" placeholder="Nama Agen" />
-                                                    </div>
-                                                    <div style="flex: 1; min-width: 160px;">
-                                                        <label style="display:block; margin: 0 0 6px;">Nomor WhatsApp</label>
-                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][phone]" value="<?php echo esc_attr($agent_phone); ?>" class="regular-text" style="width: 100%;" placeholder="62812345678901" />
-                                                    </div>
-                                                    <div style="flex: 1; min-width: 160px;">
-                                                        <label style="display:block; margin: 0 0 6px;">Role</label>
-                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][role]" value="<?php echo esc_attr($agent_role); ?>" class="regular-text" style="width: 100%;" placeholder="Customer Service" />
-                                                    </div>
-                                                    <div style="flex: 1; min-width: 160px;">
-                                                        <label style="display:block; margin: 0 0 6px;">Status</label>
-                                                        <select name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][status]" style="width: 100%;">
-                                                            <option value="online" <?php selected($agent_status, 'online'); ?>>Online</option>
-                                                            <option value="offline" <?php selected($agent_status, 'offline'); ?>>Offline</option>
-                                                        </select>
-                                                    </div>
-                                                    <div style="flex: 1 1 100%; min-width: 160px;">
-                                                        <label style="display:block; margin: 0 0 6px;">Note</label>
-                                                        <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][note]" value="<?php echo esc_attr($agent_note); ?>" class="regular-text" style="width: 100%;" placeholder="Contoh: Saya akan kembali dalam 4 jam" />
-                                                    </div>
-                                                    <div style="flex: 1 1 100%; min-width: 160px;">
-                                                        <label style="display:block; margin: 0 0 6px;">Avatar URL (opsional)</label>
-                                                        <div style="display:flex; gap: 8px; align-items: center;">
-                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][avatar]" value="<?php echo esc_attr($agent_avatar); ?>" class="regular-text sweetaddons-wa-avatar-input" style="width: 100%;" placeholder="https://..." />
-                                                            <button type="button" class="button sweetaddons-wa-upload-avatar">Upload</button>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">Aktifkan Chat WhatsApp</th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" id="sweetaddons_whatsapp_enable" name="sweetaddons_whatsapp_enable" value="1" <?php checked($enable, '1'); ?> />
+                                            Enable floating WhatsApp chat button
+                                        </label>
+                                        <p class="description">Show WhatsApp chat widget on your website.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Multi Agen</th>
+                                    <td>
+                                        <div id="sweetaddons-wa-agents">
+                                            <?php
+                                            $agent_index = 0;
+                                            foreach ($agents as $agent) :
+                                                if (!is_array($agent)) {
+                                                    continue;
+                                                }
+                                                $agent_name = isset($agent['name']) ? $agent['name'] : '';
+                                                $agent_phone = isset($agent['phone']) ? $agent['phone'] : '';
+                                                $agent_role = isset($agent['role']) ? $agent['role'] : '';
+                                                $agent_note = isset($agent['note']) ? $agent['note'] : '';
+                                                $agent_status = isset($agent['status']) ? $agent['status'] : 'online';
+                                                $agent_avatar = isset($agent['avatar']) ? $agent['avatar'] : '';
+                                            ?>
+                                                <div class="sweetaddons-wa-agent-row" style="border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; margin: 0 0 12px; background: #fff;">
+                                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                                        <div style="flex: 1; min-width: 160px;">
+                                                            <label style="display:block; margin: 0 0 6px;">Nama</label>
+                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][name]" value="<?php echo esc_attr($agent_name); ?>" class="regular-text" style="width: 100%;" placeholder="Nama Agen" />
+                                                        </div>
+                                                        <div style="flex: 1; min-width: 160px;">
+                                                            <label style="display:block; margin: 0 0 6px;">Nomor WhatsApp</label>
+                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][phone]" value="<?php echo esc_attr($agent_phone); ?>" class="regular-text" style="width: 100%;" placeholder="62812345678901" />
+                                                        </div>
+                                                        <div style="flex: 1; min-width: 160px;">
+                                                            <label style="display:block; margin: 0 0 6px;">Role</label>
+                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][role]" value="<?php echo esc_attr($agent_role); ?>" class="regular-text" style="width: 100%;" placeholder="Customer Service" />
+                                                        </div>
+                                                        <div style="flex: 1; min-width: 160px;">
+                                                            <label style="display:block; margin: 0 0 6px;">Status</label>
+                                                            <select name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][status]" style="width: 100%;">
+                                                                <option value="online" <?php selected($agent_status, 'online'); ?>>Online</option>
+                                                                <option value="offline" <?php selected($agent_status, 'offline'); ?>>Offline</option>
+                                                            </select>
+                                                        </div>
+                                                        <div style="flex: 1 1 100%; min-width: 160px;">
+                                                            <label style="display:block; margin: 0 0 6px;">Note</label>
+                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][note]" value="<?php echo esc_attr($agent_note); ?>" class="regular-text" style="width: 100%;" placeholder="Contoh: Saya akan kembali dalam 4 jam" />
+                                                        </div>
+                                                        <div style="flex: 1 1 100%; min-width: 160px;">
+                                                            <label style="display:block; margin: 0 0 6px;">Avatar URL (opsional)</label>
+                                                            <div style="display:flex; gap: 8px; align-items: center;">
+                                                                <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][avatar]" value="<?php echo esc_attr($agent_avatar); ?>" class="regular-text sweetaddons-wa-avatar-input" style="width: 100%;" placeholder="https://..." />
+                                                                <button type="button" class="button sweetaddons-wa-upload-avatar">Upload</button>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <div style="margin-top: 8px;">
+                                                        <button type="button" class="button-link-delete sweetaddons-wa-remove-agent">Hapus</button>
+                                                    </div>
                                                 </div>
-                                                <div style="margin-top: 8px;">
-                                                    <button type="button" class="button-link-delete sweetaddons-wa-remove-agent">Hapus</button>
-                                                </div>
-                                            </div>
-                                        <?php
-                                            $agent_index++;
-                                        endforeach;
-                                        ?>
-                                    </div>
-                                    <div style="display:flex; gap: 8px; align-items:center;">
-                                        <button type="button" class="button" id="sweetaddons-wa-add-agent">Tambah Agen</button>
-                                        <p class="description" style="margin: 0;">Agen pertama menjadi default. Jika lebih dari satu agen, widget menampilkan daftar pilihan agen.</p>
-                                    </div>
+                                            <?php
+                                                $agent_index++;
+                                            endforeach;
+                                            ?>
+                                        </div>
+                                        <div style="display:flex; gap: 8px; align-items:center;">
+                                            <button type="button" class="button" id="sweetaddons-wa-add-agent">Tambah Agen</button>
+                                            <p class="description" style="margin: 0;">Agen pertama menjadi default. Jika lebih dari satu agen, widget menampilkan daftar pilihan agen.</p>
+                                        </div>
 
-                                    <script type="text/template" id="sweetaddons-wa-agent-template">
-                                        <div class="sweetaddons-wa-agent-row" style="border: 1px solid #e5e5e5; border-radius: 10px; padding: 12px; margin: 0 0 12px; background: #fff;">
+                                        <script type="text/template" id="sweetaddons-wa-agent-template">
+                                            <div class="sweetaddons-wa-agent-row" style="border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; margin: 0 0 12px; background: #fff;">
                                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                                 <div style="flex: 1; min-width: 160px;">
                                                     <label style="display:block; margin: 0 0 6px;">Nama</label>
@@ -2262,301 +2411,294 @@ class Custom_Admin_Option_Page
                                             </div>
                                         </div>
                                     </script>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_message">Pesan Default</label>
-                                </th>
-                                <td>
-                                    <textarea id="sweetaddons_whatsapp_message" name="sweetaddons_whatsapp_message" rows="3" class="large-text"><?php echo esc_textarea($message); ?></textarea>
-                                    <p class="description">Default message that will be pre-filled when users click the chat button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_button_text">Teks Tombol</label>
-                                </th>
-                                <td>
-                                    <input type="text" id="sweetaddons_whatsapp_button_text" name="sweetaddons_whatsapp_button_text" value="<?php echo esc_attr($button_text); ?>" class="large-text" />
-                                    <p class="description">Text shown on the button (for extended style) and tooltip.</p>
-                                </td>
-                            </tr>
-                            <!-- Appearance Section Header -->
-                            <tr>
-                                <td colspan="2">
-                                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;"> Pengaturan Tampilan</h3>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_bubble_style">Button Style</label>
-                                </th>
-                                <td>
-                                    <select id="sweetaddons_whatsapp_bubble_style" name="sweetaddons_whatsapp_bubble_style">
-                                        <option value="circle" <?php selected($bubble_style, 'circle'); ?>>Circle (Icon Only)</option>
-                                        <option value="extended" <?php selected($bubble_style, 'extended'); ?>>Extended (Icon + Text)</option>
-                                    </select>
-                                    <p class="description">Choose between circle icon or extended button with text.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_color">Warna Tombol</label>
-                                </th>
-                                <td>
-                                    <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
-                                    <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly />
-                                    <p class="description">Background color of the WhatsApp button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-                                    <label for="sweetaddons_whatsapp_animation">Animasi</label>
-                                </th>
-                                <td>
-                                    <select id="sweetaddons_whatsapp_animation" name="sweetaddons_whatsapp_animation">
-                                        <option value="none" <?php selected($animation, 'none'); ?>>Tanpa Animasi</option>
-                                        <option value="pulse" <?php selected($animation, 'pulse'); ?>>Pulse</option>
-                                        <option value="bounce" <?php selected($animation, 'bounce'); ?>>Bounce</option>
-                                        <option value="shake" <?php selected($animation, 'shake'); ?>>Shake</option>
-                                    </select>
-                                    <p class="description">Efek animasi untuk tombol chat.</p>
-                                </td>
-                            </tr>
-                            <!-- Position Section Header -->
-                            <tr>
-                                <td colspan="2">
-                                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;">Pengaturan Posisi</h3>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th scope="row">
-
-                                    <label for="sweetaddons_whatsapp_position">Posisi Tombol</label>
-                                </th>
-                                <td>
-                                    <select id="sweetaddons_whatsapp_position" name="sweetaddons_whatsapp_position">
-                                        <option value="bottom-right" <?php selected($position, 'bottom-right'); ?>>Kanan Bawah</option>
-                                        <option value="bottom-left" <?php selected($position, 'bottom-left'); ?>>Kiri Bawah</option>
-                                        <option value="top-right" <?php selected($position, 'top-right'); ?>>Kanan Atas</option>
-                                        <option value="top-left" <?php selected($position, 'top-left'); ?>>Kiri Atas</option>
-                                        <option value="center-right" <?php selected($position, 'center-right'); ?>>Center Right</option>
-                                        <option value="center-left" <?php selected($position, 'center-left'); ?>>Center Left</option>
-                                    </select>
-                                    <p class="description">Where to position the chat button on your website.</p>
-                                </td>
-                            </tr>
-                            <!-- Visibility Section Header -->
-                            <tr>
-                                <td colspan="2">
-                                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th colspan="2" style="padding-left: 0;">
-                                    <h3 style="margin: 0;">Visibility Settings</h3>
-                                </th>
-                            </tr>
-                            <tr>
-                                <th scope="row">Device Visibility</th>
-                                <td>
-                                    <label class="sad-form-checkbox">
-                                        <input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> />
-                                        Tampilkan di perangkat Mobile
-                                    </label><br>
-                                    <label class="sad-form-checkbox">
-                                        <input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> />
-                                        Tampilkan di perangkat Desktop
-                                    </label>
-                                    <p class="description">Choose on which devices to display the chat button.</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Tooltip</th>
-                                <td>
-                                    <label class="sad-form-checkbox">
-                                        <input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> />
-                                        Show tooltip on hover
-                                    </label>
-                                    <p class="description">Display tooltip text when hovering over the chat button.</p>
-                                </td>
-                            </tr>
-                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_message">Pesan Default</label>
+                                    </th>
+                                    <td>
+                                        <textarea id="sweetaddons_whatsapp_message" name="sweetaddons_whatsapp_message" rows="3" class="large-text"><?php echo esc_textarea($message); ?></textarea>
+                                        <p class="description">Default message that will be pre-filled when users click the chat button.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_button_text">Teks Tombol</label>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_whatsapp_button_text" name="sweetaddons_whatsapp_button_text" value="<?php echo esc_attr($button_text); ?>" class="large-text" />
+                                        <p class="description">Text shown on the button (for extended style) and tooltip.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
+                    <!-- /wa-tab-pengaturan -->
 
-                    <div class="sad-card">
-                        <div class="sad-card-title">Live Preview</div>
-                        <style>
-                            #whatsapp-preview-stage .sweetaddons-wa-widget {
-                                position: absolute;
-                                z-index: 1;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-bubble {
-                                position: relative;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-link {
-                                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                                position: relative;
-                                overflow: hidden;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-icon,
-                            #whatsapp-preview-stage .sweetaddons-wa-text {
-                                position: relative;
-                                z-index: 1;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-tooltip {
-                                position: absolute;
-                                background: #333;
-                                color: #fff;
-                                padding: 8px 12px;
-                                border-radius: 6px;
-                                font-size: 12px;
-                                white-space: nowrap;
-                                opacity: 0;
-                                visibility: hidden;
-                                transition: all 0.3s ease;
-                                pointer-events: none;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-widget:hover .sweetaddons-wa-tooltip {
-                                opacity: 1;
-                                visibility: visible;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-bottom-right .sweetaddons-wa-tooltip,
-                            #whatsapp-preview-stage .sweetaddons-wa-bottom-left .sweetaddons-wa-tooltip {
-                                bottom: calc(100% + 10px);
-                                left: 50%;
-                                transform: translateX(-50%);
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-top-right .sweetaddons-wa-tooltip,
-                            #whatsapp-preview-stage .sweetaddons-wa-top-left .sweetaddons-wa-tooltip {
-                                top: calc(100% + 10px);
-                                left: 50%;
-                                transform: translateX(-50%);
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-center-right .sweetaddons-wa-tooltip {
-                                right: calc(100% + 10px);
-                                top: 50%;
-                                transform: translateY(-50%);
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-center-left .sweetaddons-wa-tooltip {
-                                left: calc(100% + 10px);
-                                top: 50%;
-                                transform: translateY(-50%);
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='pulse'] .sweetaddons-wa-link {
-                                animation: sweetaddons-wa-pulse 2s infinite;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='bounce'] .sweetaddons-wa-link {
-                                animation: sweetaddons-wa-bounce 2s infinite;
-                            }
-
-                            #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='shake'] .sweetaddons-wa-link {
-                                animation: sweetaddons-wa-shake 3s infinite;
-                            }
-
-                            @keyframes sweetaddons-wa-pulse {
-                                0% {
-                                    transform: scale(1);
-                                }
-
-                                50% {
-                                    transform: scale(1.02);
-                                }
-
-                                100% {
-                                    transform: scale(1);
-                                }
-                            }
-
-                            @keyframes sweetaddons-wa-bounce {
-
-                                0%,
-                                20%,
-                                50%,
-                                80%,
-                                100% {
-                                    transform: translateY(0);
-                                }
-
-                                40% {
-                                    transform: translateY(-10px);
-                                }
-
-                                60% {
-                                    transform: translateY(-5px);
-                                }
-                            }
-
-                            @keyframes sweetaddons-wa-shake {
-
-                                0%,
-                                100% {
-                                    transform: translateX(0);
-                                }
-
-                                10%,
-                                30%,
-                                50%,
-                                70%,
-                                90% {
-                                    transform: translateX(-2px);
-                                }
-
-                                20%,
-                                40%,
-                                60%,
-                                80% {
-                                    transform: translateX(2px);
-                                }
-                            }
-                        </style>
-                        <div id="whatsapp-preview-stage" style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
-                            <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $has_agents) ? 'block' : 'none'; ?>;">
-                                <div id="whatsapp-preview-bubble" class="sweetaddons-wa-widget sweetaddons-wa-preview sweetaddons-wa-<?php echo esc_attr($position); ?>" data-animation="<?php echo esc_attr($animation); ?>" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
-                                    <div id="whatsapp-preview-shell" class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
-                                        <div id="whatsapp-preview-inner" class="sweetaddons-wa-link" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
-                                            <div class="sweetaddons-wa-icon">
-                                                <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
-                                                    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                                                </svg>
-                                            </div>
-                                            <span id="whatsapp-preview-text" class="sweetaddons-wa-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                    <!-- wa-tab-style -->
+                    <div id="wa-tab-style" class="wa-tab-content" style="display:<?php echo $wa_active_tab === 'style' ? 'block' : 'none'; ?>;">
+                        <div class="sad-card sad-mb-16">
+                            <div class="sad-card-title">Pengaturan Tampilan</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_bubble_style">Button Style</label>
+                                    </th>
+                                    <td>
+                                        <select id="sweetaddons_whatsapp_bubble_style" name="sweetaddons_whatsapp_bubble_style">
+                                            <option value="circle" <?php selected($bubble_style, 'circle'); ?>>Circle (Icon Only)</option>
+                                            <option value="extended" <?php selected($bubble_style, 'extended'); ?>>Extended (Icon + Text)</option>
+                                        </select>
+                                        <p class="description">Choose between circle icon or extended button with text.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_color">Warna Tombol</label>
+                                    </th>
+                                    <td>
+                                        <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
+                                        <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly />
+                                        <p class="description">Background color of the WhatsApp button.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_whatsapp_animation">Animasi</label>
+                                    </th>
+                                    <td>
+                                        <select id="sweetaddons_whatsapp_animation" name="sweetaddons_whatsapp_animation">
+                                            <option value="none" <?php selected($animation, 'none'); ?>>Tanpa Animasi</option>
+                                            <option value="pulse" <?php selected($animation, 'pulse'); ?>>Pulse</option>
+                                            <option value="bounce" <?php selected($animation, 'bounce'); ?>>Bounce</option>
+                                            <option value="shake" <?php selected($animation, 'shake'); ?>>Shake</option>
+                                        </select>
+                                        <p class="description">Efek animasi untuk tombol chat.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding:0;">
+                                        <div class="sad-subsection" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee;">
+                                            <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 10px 0; color: #334155;">Pengaturan Posisi</h3>
                                         </div>
-                                        <div id="whatsapp-preview-tooltip" class="sweetaddons-wa-tooltip" style="display: <?php echo ($show_tooltip === '1') ? 'block' : 'none'; ?>;">
-                                            <?php echo esc_html($button_text); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+
+                                        <label for="sweetaddons_whatsapp_position">Posisi Tombol</label>
+                                    </th>
+                                    <td>
+                                        <select id="sweetaddons_whatsapp_position" name="sweetaddons_whatsapp_position">
+                                            <option value="bottom-right" <?php selected($position, 'bottom-right'); ?>>Kanan Bawah</option>
+                                            <option value="bottom-left" <?php selected($position, 'bottom-left'); ?>>Kiri Bawah</option>
+                                            <option value="top-right" <?php selected($position, 'top-right'); ?>>Kanan Atas</option>
+                                            <option value="top-left" <?php selected($position, 'top-left'); ?>>Kiri Atas</option>
+                                            <option value="center-right" <?php selected($position, 'center-right'); ?>>Center Right</option>
+                                            <option value="center-left" <?php selected($position, 'center-left'); ?>>Center Left</option>
+                                        </select>
+                                        <p class="description">Where to position the chat button on your website.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding:0;">
+                                        <div class="sad-subsection" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee;">
+                                            <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 10px 0; color: #334155;">Visibility Settings</h3>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Device Visibility</th>
+                                    <td>
+                                        <label class="sad-form-checkbox">
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> />
+                                            Tampilkan di perangkat Mobile
+                                        </label><br>
+                                        <label class="sad-form-checkbox">
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> />
+                                            Tampilkan di perangkat Desktop
+                                        </label>
+                                        <p class="description">Choose on which devices to display the chat button.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Tooltip</th>
+                                    <td>
+                                        <label class="sad-form-checkbox">
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> />
+                                            Show tooltip on hover
+                                        </label>
+                                        <p class="description">Display tooltip text when hovering over the chat button.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="sad-card">
+                            <div class="sad-card-title">Live Preview</div>
+                            <style>
+                                #whatsapp-preview-stage .sweetaddons-wa-widget {
+                                    position: absolute;
+                                    z-index: 1;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-bubble {
+                                    position: relative;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-link {
+                                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                                    position: relative;
+                                    overflow: hidden;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-icon,
+                                #whatsapp-preview-stage .sweetaddons-wa-text {
+                                    position: relative;
+                                    z-index: 1;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-tooltip {
+                                    position: absolute;
+                                    background: #333;
+                                    color: #fff;
+                                    padding: 8px 12px;
+                                    border-radius: 6px;
+                                    font-size: 12px;
+                                    white-space: nowrap;
+                                    opacity: 0;
+                                    visibility: hidden;
+                                    transition: all 0.3s ease;
+                                    pointer-events: none;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-widget:hover .sweetaddons-wa-tooltip {
+                                    opacity: 1;
+                                    visibility: visible;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-bottom-right .sweetaddons-wa-tooltip,
+                                #whatsapp-preview-stage .sweetaddons-wa-bottom-left .sweetaddons-wa-tooltip {
+                                    bottom: calc(100% + 10px);
+                                    left: 50%;
+                                    transform: translateX(-50%);
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-top-right .sweetaddons-wa-tooltip,
+                                #whatsapp-preview-stage .sweetaddons-wa-top-left .sweetaddons-wa-tooltip {
+                                    top: calc(100% + 10px);
+                                    left: 50%;
+                                    transform: translateX(-50%);
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-center-right .sweetaddons-wa-tooltip {
+                                    right: calc(100% + 10px);
+                                    top: 50%;
+                                    transform: translateY(-50%);
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-center-left .sweetaddons-wa-tooltip {
+                                    left: calc(100% + 10px);
+                                    top: 50%;
+                                    transform: translateY(-50%);
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='pulse'] .sweetaddons-wa-link {
+                                    animation: sweetaddons-wa-pulse 2s infinite;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='bounce'] .sweetaddons-wa-link {
+                                    animation: sweetaddons-wa-bounce 2s infinite;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-widget[data-animation='shake'] .sweetaddons-wa-link {
+                                    animation: sweetaddons-wa-shake 3s infinite;
+                                }
+
+                                @keyframes sweetaddons-wa-pulse {
+                                    0% {
+                                        transform: scale(1);
+                                    }
+
+                                    50% {
+                                        transform: scale(1.02);
+                                    }
+
+                                    100% {
+                                        transform: scale(1);
+                                    }
+                                }
+
+                                @keyframes sweetaddons-wa-bounce {
+
+                                    0%,
+                                    20%,
+                                    50%,
+                                    80%,
+                                    100% {
+                                        transform: translateY(0);
+                                    }
+
+                                    40% {
+                                        transform: translateY(-10px);
+                                    }
+
+                                    60% {
+                                        transform: translateY(-5px);
+                                    }
+                                }
+
+                                @keyframes sweetaddons-wa-shake {
+
+                                    0%,
+                                    100% {
+                                        transform: translateX(0);
+                                    }
+
+                                    10%,
+                                    30%,
+                                    50%,
+                                    70%,
+                                    90% {
+                                        transform: translateX(-2px);
+                                    }
+
+                                    20%,
+                                    40%,
+                                    60%,
+                                    80% {
+                                        transform: translateX(2px);
+                                    }
+                                }
+                            </style>
+                            <div id="whatsapp-preview-stage" style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
+                                <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $has_agents) ? 'block' : 'none'; ?>;">
+                                    <div id="whatsapp-preview-bubble" class="sweetaddons-wa-widget sweetaddons-wa-preview sweetaddons-wa-<?php echo esc_attr($position); ?>" data-animation="<?php echo esc_attr($animation); ?>" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
+                                        <div id="whatsapp-preview-shell" class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
+                                            <div id="whatsapp-preview-inner" class="sweetaddons-wa-link" style="display: flex; align-items: center; <?php echo ($bubble_style === 'extended') ? 'padding: 12px 20px;' : 'width: 60px; height: 60px; justify-content: center;'; ?> background: <?php echo esc_attr($color); ?>; border-radius: <?php echo ($bubble_style === 'extended') ? '25px' : '50%'; ?>; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                                                <div class="sweetaddons-wa-icon">
+                                                    <svg viewBox="0 0 24 24" width="24" height="24" style="<?php echo ($bubble_style === 'extended') ? 'margin-right: 8px;' : ''; ?>">
+                                                        <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                                                    </svg>
+                                                </div>
+                                                <span id="whatsapp-preview-text" class="sweetaddons-wa-text" style="font-size: 14px; font-weight: 500; display: <?php echo ($bubble_style === 'extended') ? 'inline' : 'none'; ?>;"><?php echo esc_html($button_text); ?></span>
+                                            </div>
+                                            <div id="whatsapp-preview-tooltip" class="sweetaddons-wa-tooltip" style="display: <?php echo ($show_tooltip === '1') ? 'block' : 'none'; ?>;">
+                                                <?php echo esc_html($button_text); ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $has_agents) ? 'none' : 'block'; ?>;">
-                                <p>Aktifkan WhatsApp dan tambahkan agen untuk melihat preview</p>
+                                <div id="whatsapp-preview-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #666; display: <?php echo ($enable && $has_agents) ? 'none' : 'block'; ?>;">
+                                    <p>Aktifkan WhatsApp dan tambahkan agen untuk melihat preview</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- /wa-tab-style -->
 
                 <div class="sad-top-right">
                     <div class="sad-card">
