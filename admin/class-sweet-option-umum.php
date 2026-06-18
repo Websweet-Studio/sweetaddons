@@ -105,8 +105,8 @@ class Sweet_Option_Umum
         $subnav = Sweetaddons_Admin_Layout::get_umum_subnav();
         Sweetaddons_Admin_Layout::open('Umum', 'Sweetaddons_umum', $subnav);
 
-        if ($current_tab === 'dbcleaner') {
-            $this->render_dbcleaner_tab();
+        if ($current_tab === 'customlogin') {
+            $this->render_customlogin_tab();
         } else {
             $this->render_general_tab();
         }
@@ -217,69 +217,251 @@ class Sweet_Option_Umum
     <?php
     }
 
-    private function render_dbcleaner_tab()
+    private function render_customlogin_tab()
     {
-        require_once dirname(plugin_dir_path(__FILE__)) . '/includes/class-sweetaddons-database-cleaner.php';
-    ?>
+        // Enqueue media scripts
+        wp_enqueue_media();
+        $upload_nonce = wp_create_nonce('media-form');
+
+        // Handle settings save
+        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
+            $login_data = array();
+
+            if (isset($_POST['login_logo_url'])) {
+                $login_data['logo_url'] = sanitize_text_field($_POST['login_logo_url']);
+            }
+            if (isset($_POST['login_bg_color'])) {
+                $login_data['bg_color'] = sanitize_text_field($_POST['login_bg_color']);
+            }
+            if (isset($_POST['login_bg_image'])) {
+                $login_data['bg_image'] = sanitize_text_field($_POST['login_bg_image']);
+            }
+            if (isset($_POST['login_btn_color'])) {
+                $login_data['btn_color'] = sanitize_text_field($_POST['login_btn_color']);
+            }
+            if (isset($_POST['login_btn_text_color'])) {
+                $login_data['btn_text_color'] = sanitize_text_field($_POST['login_btn_text_color']);
+            }
+
+            update_option('sweetaddons_login_customizer', $login_data);
+        }
+
+        // Get current settings
+        $login_settings = get_option('sweetaddons_login_customizer', array());
+        $logo_url = isset($login_settings['logo_url']) ? $login_settings['logo_url'] : '';
+        if (empty($logo_url) && function_exists('get_site_icon_url')) {
+            $site_icon = get_site_icon_url(270);
+            if ($site_icon) {
+                $logo_url = $site_icon;
+            }
+        }
+        $bg_color = isset($login_settings['bg_color']) ? $login_settings['bg_color'] : '#f1f1f1';
+        $bg_image = isset($login_settings['bg_image']) ? $login_settings['bg_image'] : '';
+        $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
+        $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
+?>
+        <?php
+        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
+            echo '<div class="sad-notice sad-notice-success"><p>Pengaturan Login Page berhasil disimpan.</p></div>';
+        }
+        ?>
+
         <form method="post" action="" class="sad-form">
-            <?php wp_nonce_field('sweetaddons_db_cleaner_action', 'sweetaddons_db_cleaner_nonce'); ?>
+            <?php wp_nonce_field('sweetaddons_login_customizer_settings'); ?>
+
             <div class="sad-top">
                 <div class="sad-top-left">
                     <div class="sad-card">
-                        <div class="sad-card-title">Item yang Dapat Diberishkan</div>
-                        <?php
-                        $cleaner = new Sweetaddons_Database_Cleaner();
-                        $stats = $cleaner->get_stats();
-                        foreach ($stats as $key => $value) :
-                            if ($value === 0) {
-                                continue;
-                            }
-                            $labels = array(
-                                'revisions'   => 'Revisi Postingan',
-                                'auto_drafts' => 'Draft Otomatis',
-                                'trash_posts' => 'Postingan di Trash',
-                                'spam_comments' => 'Komentar Spam',
-                                'trash_comments' => 'Komentar di Trash',
-                                'transients'  => 'Transien',
-                            );
-                        ?>
-                            <div class="sad-checkbox" style="margin-bottom: 12px;">
-                                <input type="checkbox" id="clean_<?php echo esc_attr($key); ?>" name="clean_items[]" value="<?php echo esc_attr($key); ?>">
-                                <label for="clean_<?php echo esc_attr($key); ?>">
-                                    <?php echo esc_html($labels[$key] ?? $key); ?>
-                                    <span class="sad-count">(<?php echo esc_html($value); ?>)</span>
-                                </label>
-                            </div>
-                        <?php endforeach; ?>
+                        <div class="sad-card-title">Konfigurasi Tampilan</div>
+                        <table class="form-table">
+                            <tr>
+                                <th scope="row">Logo URL</th>
+                                <td>
+                                    <div class="sad-drop-zone" id="logo-drop-zone">
+                                        <input type="hidden" name="login_logo_url" id="login_logo_url" value="<?php echo esc_attr($logo_url); ?>">
+                                        <div class="sad-preview">
+                                            <?php if ($logo_url): ?>
+                                                <img src="<?php echo esc_url($logo_url); ?>">
+                                                <span class="sad-remove">Hapus Logo</span>
+                                            <?php else: ?>
+                                                <div class="sad-placeholder">
+                                                    <span class="dashicons dashicons-upload" style="font-size: 32px; width: 32px; height: 32px;"></span><br>
+                                                    <strong>Drag & Drop Logo</strong><br>atau klik untuk memilih
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <p class="description">Upload atau masukkan URL logo untuk halaman login.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Warna Background</th>
+                                <td>
+                                    <input type="color" name="login_bg_color" value="<?php echo esc_attr($bg_color); ?>" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Gambar Background</th>
+                                <td>
+                                    <div class="sad-drop-zone" id="bg-drop-zone">
+                                        <input type="hidden" name="login_bg_image" id="login_bg_image" value="<?php echo esc_attr($bg_image); ?>">
+                                        <div class="sad-preview">
+                                            <?php if ($bg_image): ?>
+                                                <img src="<?php echo esc_url($bg_image); ?>">
+                                                <span class="sad-remove">Hapus Background</span>
+                                            <?php else: ?>
+                                                <div class="sad-placeholder">
+                                                    <span class="dashicons dashicons-upload" style="font-size: 32px; width: 32px; height: 32px;"></span><br>
+                                                    <strong>Drag & Drop Background</strong><br>atau klik untuk memilih
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <p class="description">Upload atau masukkan URL gambar background.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Warna Tombol</th>
+                                <td>
+                                    <input type="color" name="login_btn_color" value="<?php echo esc_attr($btn_color); ?>" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Warna Teks Tombol</th>
+                                <td>
+                                    <input type="color" name="login_btn_text_color" value="<?php echo esc_attr($btn_text_color); ?>" />
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
+
                 <div class="sad-top-right">
                     <div class="sad-card">
                         <div class="sad-actions-row" style="justify-content:center; text-align:center;">
-                            <button type="submit" name="sweetaddons_db_cleaner_clean" style="border:none; cursor:pointer; padding:8px 16px; border-radius:8px; background:linear-gradient(135deg, #2563eb, #1e40af); color:#fff; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(37,99,235,0.25); transition:all 0.2s ease;" onmouseenter="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(37,99,235,0.4)';" onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 6px rgba(37,99,235,0.25)';">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 22-1-4"/><path d="M19 14a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2v1a1 1 0 0 0 1 1"/><path d="M19 14H5l-1.973 6.767A1 1 0 0 0 4 22h16a1 1 0 0 0 .973-1.233z"/><path d="m8 22 1-4"/></svg>
-                                Bersihkan Sekarang
-                            </button>
+                            <?php $this->save_button(); ?>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-<?php
-        if (isset($_POST['sweetaddons_db_cleaner_clean']) && wp_verify_nonce($_POST['sweetaddons_db_cleaner_nonce'], 'sweetaddons_db_cleaner_action')) {
-            $items_to_clean = isset($_POST['clean_items']) ? array_map('sanitize_text_field', $_POST['clean_items']) : array();
-            if (!empty($items_to_clean)) {
-                $cleaner = new Sweetaddons_Database_Cleaner();
-                $cleaned = $cleaner->clean($items_to_clean);
-                if (!empty($cleaned)) {
-                    $total_cleaned = array_sum($cleaned);
-                    echo '<div class="sad-notice sad-notice-success"><p>Database berhasil dibersihkan. Total ' . $total_cleaned . ' item dihapus.</p></div>';
-                } else {
-                    echo '<div class="sad-notice sad-notice-warning"><p>Tidak ada item yang berhasil dibersihkan.</p></div>';
+
+        <script>
+            jQuery(document).ready(function($) {
+
+                function initDropZone(zoneId, inputId) {
+                    var $zone = $('#' + zoneId);
+                    var $input = $('#' + inputId);
+
+                    $zone.on('click', function(e) {
+                        if ($(e.target).hasClass('sad-remove')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            $input.val('');
+                            renderPreview($zone, '');
+                            return;
+                        }
+
+                        e.preventDefault();
+
+                        var frame = wp.media({
+                            title: 'Pilih Gambar',
+                            button: {
+                                text: 'Gunakan Gambar Ini'
+                            },
+                            multiple: false
+                        });
+
+                        frame.on('select', function() {
+                            var attachment = frame.state().get('selection').first().toJSON();
+                            $input.val(attachment.url);
+                            renderPreview($zone, attachment.url);
+                        });
+
+                        frame.open();
+                    });
+
+                    $zone.on('dragover dragenter', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $zone.addClass('drag-over');
+                    });
+
+                    $zone.on('dragleave dragend drop', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $zone.removeClass('drag-over');
+                    });
+
+                    $zone.on('drop', function(e) {
+                        var files = e.originalEvent.dataTransfer.files;
+                        if (files.length > 0) {
+                            uploadFile(files[0], $zone, $input);
+                        }
+                    });
                 }
-            } else {
-                echo '<div class="sad-notice sad-notice-warning"><p>Tidak ada item yang dipilih untuk dibersihkan.</p></div>';
-            }
-        }
+
+                function renderPreview($zone, url) {
+                    var html = '';
+                    if (url) {
+                        html = '<img src="' + url + '"><span class="sad-remove">Hapus Gambar</span>';
+                    } else {
+                        html = '<div class="sad-placeholder"><span class="dashicons dashicons-upload" style="font-size: 32px; width: 32px; height: 32px;"></span><br><strong>Drag & Drop Gambar</strong><br>atau klik untuk memilih</div>';
+                    }
+                    $zone.find('.sad-preview').html(html);
+                }
+
+                function uploadFile(file, $zone, $input) {
+                    $zone.find('.sad-preview').html('<div class="sad-placeholder">Mengupload...</div>');
+
+                    var formData = new FormData();
+                    formData.append('action', 'upload-attachment');
+                    formData.append('async-upload', file);
+                    formData.append('name', file.name);
+                    formData.append('_wpnonce', '<?php echo $upload_nonce; ?>');
+
+                    $.ajax({
+                        url: ajaxurl,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            try {
+                                var res = typeof response === 'string' ? JSON.parse(response) : response;
+
+                                if (res.success) {
+                                    var attachment = res.data;
+                                    var url = attachment.url;
+                                    $input.val(url);
+                                    renderPreview($zone, url);
+                                } else {
+                                    if (res.data && res.data.url) {
+                                        $input.val(res.data.url);
+                                        renderPreview($zone, res.data.url);
+                                    } else {
+                                        alert('Upload gagal: ' + (res.data.message || 'Unknown error'));
+                                        renderPreview($zone, $input.val());
+                                    }
+                                }
+                            } catch (e) {
+                                console.error('Upload Error:', e);
+                                alert('Terjadi kesalahan saat upload.');
+                                renderPreview($zone, $input.val());
+                            }
+                        },
+                        error: function() {
+                            alert('Upload gagal. Silakan coba lagi.');
+                            renderPreview($zone, $input.val());
+                        }
+                    });
+                }
+
+                initDropZone('logo-drop-zone', 'login_logo_url');
+                initDropZone('bg-drop-zone', 'login_bg_image');
+            });
+        </script>
+<?php
     }
+
 }
