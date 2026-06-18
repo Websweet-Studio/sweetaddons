@@ -1004,180 +1004,186 @@ class Custom_Admin_Option_Page
             $rebuild_message = "<div class='sad-notice sad-notice-success'><p>Statistik berhasil dibangun ulang. Memproses {$daily_count} data harian dan {$page_count} data halaman.</p></div>";
         }
 
+        $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : 'statistic';
         $summary_stats = $stats_handler->get_summary_stats();
         $daily_stats = $stats_handler->get_daily_stats(30);
         $page_stats = $stats_handler->get_page_stats(30);
         $referer_stats = $stats_handler->get_referer_stats(30);
 
     ?>
-        <?php Sweetaddons_Admin_Layout::open('Statistik Pengunjung', 'Sweetaddons_visitor_stats'); ?>
+        <?php Sweetaddons_Admin_Layout::open('Statistik Pengunjung', 'Sweetaddons_visitor_stats', Sweetaddons_Admin_Layout::get_visitor_subnav()); ?>
 
         <?php echo $rebuild_message; ?>
 
-        <!-- Summary Cards -->
-        <div class="sad-grid stats-summary sad-grid--spaced">
+        <?php if ($current_tab === 'statistic') : ?>
+            <!-- Summary Cards -->
+            <div class="sad-grid stats-summary sad-grid--spaced">
 
-            <div class="sad-card sad-stat">
-                <div class="sad-card-title">Hari Ini</div>
-                <div class="sad-card-value"><?php echo $summary_stats['today']->unique_visitors ?: 0; ?></div>
-                <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['today']->total_visits ?: 0; ?></div>
-            </div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Hari Ini</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['today']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['today']->total_visits ?: 0; ?></div>
+                </div>
 
-            <div class="sad-card sad-stat">
-                <div class="sad-card-title">Minggu Ini</div>
-                <div class="sad-card-value"><?php echo $summary_stats['this_week']->unique_visitors ?: 0; ?></div>
-                <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['this_week']->total_visits ?: 0; ?></div>
-            </div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Minggu Ini</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['this_week']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['this_week']->total_visits ?: 0; ?></div>
+                </div>
 
-            <div class="sad-card sad-stat">
-                <div class="sad-card-title">Bulan Ini</div>
-                <div class="sad-card-value"><?php echo $summary_stats['this_month']->unique_visitors ?: 0; ?></div>
-                <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['this_month']->total_visits ?: 0; ?></div>
-            </div>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">Bulan Ini</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['this_month']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['this_month']->total_visits ?: 0; ?></div>
+                </div>
 
-            <div class="sad-card sad-stat">
-                <div class="sad-card-title">All Time</div>
-                <div class="sad-card-value"><?php echo $summary_stats['all_time']->unique_visitors ?: 0; ?></div>
-                <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['all_time']->total_visits ?: 0; ?></div>
-            </div>
-        </div>
-
-        <div class="sad-grid charts-section sad-grid--spaced sad-grid--charts">
-
-            <!-- Daily Visits Chart -->
-            <div class="sad-card">
-                <div class="sad-card-title">Kunjungan Harian (30 Hari Terakhir)</div>
-                <div class="sad-chartbox">
-                    <canvas id="dailyVisitsChart"></canvas>
+                <div class="sad-card sad-stat">
+                    <div class="sad-card-title">All Time</div>
+                    <div class="sad-card-value"><?php echo $summary_stats['all_time']->unique_visitors ?: 0; ?></div>
+                    <div class="sad-subtext">Kunjungan: <?php echo $summary_stats['all_time']->total_visits ?: 0; ?></div>
                 </div>
             </div>
 
-            <!-- Top Pages Chart -->
-            <div class="sad-card">
-                <div class="sad-card-title">Halaman Teratas</div>
-                <div class="sad-chartbox">
-                    <canvas id="topPagesChart"></canvas>
+            <div class="sad-grid charts-section sad-grid--spaced sad-grid--charts">
+
+                <!-- Daily Visits Chart -->
+                <div class="sad-card">
+                    <div class="sad-card-title">Kunjungan Harian (30 Hari Terakhir)</div>
+                    <div class="sad-chartbox">
+                        <canvas id="dailyVisitsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Pages Chart -->
+                <div class="sad-card">
+                    <div class="sad-card-title">Halaman Teratas</div>
+                    <div class="sad-chartbox">
+                        <canvas id="topPagesChart"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Data Tables Section -->
-        <div class="sad-grid tables-section sad-grid--tables">
+            <!-- Data Tables Section -->
+            <div class="sad-grid tables-section sad-grid--tables">
 
-            <!-- Top Pages Table -->
-            <div class="sad-card">
-                <div class="sad-card-title">Halaman Teratas (30 Hari Terakhir)</div>
-                <table class="widefat striped sad-widefat">
-                    <thead>
-                        <tr>
-                            <th>Page URL</th>
-                            <th>Pengunjung</th>
-                            <th>Views</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($page_stats)): ?>
+                <!-- Top Pages Table -->
+                <div class="sad-card">
+                    <div class="sad-card-title">Halaman Teratas (30 Hari Terakhir)</div>
+                    <table class="widefat striped sad-widefat">
+                        <thead>
                             <tr>
-                                <td colspan="3" class="sad-empty">No data available</td>
+                                <th>Page URL</th>
+                                <th>Pengunjung</th>
+                                <th>Views</th>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($page_stats as $page): ?>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($page_stats)): ?>
                                 <tr>
-                                    <td><code><?php echo esc_html($page->page_url); ?></code></td>
-                                    <td><?php echo esc_html($page->unique_visitors); ?></td>
-                                    <td><?php echo esc_html($page->total_views); ?></td>
+                                    <td colspan="3" class="sad-empty">No data available</td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                            <?php else: ?>
+                                <?php foreach ($page_stats as $page): ?>
+                                    <tr>
+                                        <td><code><?php echo esc_html($page->page_url); ?></code></td>
+                                        <td><?php echo esc_html($page->unique_visitors); ?></td>
+                                        <td><?php echo esc_html($page->total_views); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
 
-            <!-- Top Referrers Table -->
-            <div class="sad-card">
-                <div class="sad-card-title">Rujukan Teratas (30 Hari Terakhir)</div>
-                <table class="widefat striped sad-widefat">
-                    <thead>
-                        <tr>
-                            <th>Referrer</th>
-                            <th>Visits</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (empty($referer_stats)): ?>
+                <!-- Top Referrers Table -->
+                <div class="sad-card">
+                    <div class="sad-card-title">Rujukan Teratas (30 Hari Terakhir)</div>
+                    <table class="widefat striped sad-widefat">
+                        <thead>
                             <tr>
-                                <td colspan="2" class="sad-empty">No data available</td>
+                                <th>Referrer</th>
+                                <th>Visits</th>
                             </tr>
-                        <?php else: ?>
-                            <?php foreach ($referer_stats as $referer): ?>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($referer_stats)): ?>
                                 <tr>
-                                    <td><code><?php echo esc_html(parse_url($referer->referer, PHP_URL_HOST) ?: $referer->referer); ?></code></td>
-                                    <td><?php echo esc_html($referer->visits); ?></td>
+                                    <td colspan="2" class="sad-empty">No data available</td>
                                 </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Shortcode Examples -->
-        <div class="sad-card sad-card--spaced">
-            <div class="sad-card-title">Shortcode Statistik</div>
-            <p class="sad-subtext sad-mb-12">Gunakan shortcode di bawah untuk menampilkan statistik di halaman atau posting.</p>
-
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
-                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Default</span>
-                    <code id="sc-stat-default" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic]</code>
-                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-default" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-
-                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
-                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Hari Ini</span>
-                    <code id="sc-stat-today-min" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="today" style="minimal" columns="2"]</code>
-                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-today-min" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-
-                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
-                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Total</span>
-                    <code id="sc-stat-total-cards" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="total" style="cards" columns="4"]</code>
-                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-total-cards" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        Copy
-                    </button>
-                </div>
-
-                <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
-                    <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Semua</span>
-                    <code id="sc-stat-all-cards" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="all" style="cards" columns="3"]</code>
-                    <button type="button" class="sad-sc-copy" data-target="#sc-stat-all-cards" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        Copy
-                    </button>
+                            <?php else: ?>
+                                <?php foreach ($referer_stats as $referer): ?>
+                                    <tr>
+                                        <td><code><?php echo esc_html(parse_url($referer->referer, PHP_URL_HOST) ?: $referer->referer); ?></code></td>
+                                        <td><?php echo esc_html($referer->visits); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div id="copy-success" class="sad-copy-success" hidden>Shortcode berhasil disalin</div>
-        </div>
+        <?php endif; ?>
+
+        <?php if ($current_tab === 'shortcode') : ?>
+            <!-- Shortcode Examples -->
+            <div class="sad-card sad-card--spaced">
+                <div class="sad-card-title">Shortcode Statistik</div>
+                <p class="sad-subtext sad-mb-12">Gunakan shortcode di bawah untuk menampilkan statistik di halaman atau posting.</p>
+
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                        <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Default</span>
+                        <code id="sc-stat-default" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic]</code>
+                        <button type="button" class="sad-sc-copy" data-target="#sc-stat-default" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+
+                    <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                        <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Hari Ini</span>
+                        <code id="sc-stat-today-min" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="today" style="minimal" columns="2"]</code>
+                        <button type="button" class="sad-sc-copy" data-target="#sc-stat-today-min" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+
+                    <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                        <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Total</span>
+                        <code id="sc-stat-total-cards" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="total" style="cards" columns="4"]</code>
+                        <button type="button" class="sad-sc-copy" data-target="#sc-stat-total-cards" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+
+                    <div class="sad-sc-item" style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fafbfc; border:1px solid #eef0f3; border-radius:8px; transition:all 0.2s ease;">
+                        <span style="font-size:12px; font-weight:600; color:#475569; min-width:34px;">Semua</span>
+                        <code id="sc-stat-all-cards" style="font-family:monospace; font-size:12px; color:#1e293b; background:#fff; border:1px solid #e2e8f0; padding:5px 10px; border-radius:5px; flex:1; min-width:0; overflow-x:auto; white-space:nowrap;">[statistic show="all" style="cards" columns="3"]</code>
+                        <button type="button" class="sad-sc-copy" data-target="#sc-stat-all-cards" style="border:1px solid #e2e8f0; cursor:pointer; padding:6px 12px; border-radius:6px; background:#fff; color:#475569; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s ease; flex-shrink:0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                </div>
+
+                <div id="copy-success" class="sad-copy-success" hidden>Shortcode berhasil disalin</div>
+            </div>
+        <?php endif; ?>
 
         <!-- Rebuild Stats Button -->
         <div class="sad-card sad-card--spaced sad-mb-16">

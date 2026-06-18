@@ -102,6 +102,19 @@ class Sweetaddons_Admin_Layout
     return admin_url('admin.php?page=Sweetaddons_seo&subtab=' . $tab);
   }
 
+  public static function get_visitor_subnav()
+  {
+    return array(
+      array('tab' => 'statistic', 'label' => 'Statistik'),
+      array('tab' => 'shortcode', 'label' => 'Shortcode'),
+    );
+  }
+
+  public static function get_visitor_tab_url($tab)
+  {
+    return admin_url('admin.php?page=Sweetaddons_visitor_stats&subtab=' . $tab);
+  }
+
   public static function get_proteksi_tab_url($tab)
   {
     return admin_url('admin.php?page=Sweetaddons_protect&tab=' . $tab);
@@ -164,6 +177,9 @@ class Sweetaddons_Admin_Layout
                 $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
               } elseif ($active_page === 'Sweetaddons_seo') {
                 $tab_url = self::get_seo_tab_url($tab['tab']);
+                $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
+              } elseif ($active_page === 'Sweetaddons_visitor_stats') {
+                $tab_url = self::get_visitor_tab_url($tab['tab']);
                 $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
               } elseif ($active_page === 'Sweetaddons_optimasi') {
                 $tab_url = self::get_optimasi_tab_url($tab['tab']);

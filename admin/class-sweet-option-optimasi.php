@@ -315,7 +315,12 @@ class Sweet_Option_Optimasi
             <div class="sad-top">
                 <div class="sad-top-left">
                     <div class="sad-card">
-                        <div class="sad-card-title">Pengaturan Head Cleanup</div>
+                        <div class="sad-card-title" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                            <span>Pengaturan Head Cleanup</span>
+                            <button type="button" id="sweetaddons-hc-toggle" class="button" style="margin:0;">
+                                <span class="sweetaddons-hc-toggle-label">Pilih Semua</span>
+                            </button>
+                        </div>
                         <p class="description" style="margin-bottom:12px;">Pilih item yang ingin dihapus dari <code>&lt;head&gt;</code>. Semua direkomendasikan aktif untuk performa maksimal.</p>
                         <table class="form-table">
                             <?php foreach ($fields as $key => $field) : ?>
@@ -345,6 +350,32 @@ class Sweet_Option_Optimasi
                 </div>
             </div>
         </form>
+        <script>
+        (function() {
+            var btn = document.getElementById('sweetaddons-hc-toggle');
+            var form = btn.closest('form');
+            var checkboxes = form.querySelectorAll('input[type="checkbox"]');
+            var labelEl = btn.querySelector('.sweetaddons-hc-toggle-label');
+            var allOn = true;
+
+            function updateLabel() {
+                allOn = true;
+                checkboxes.forEach(function(cb) { if (!cb.checked) allOn = false; });
+                labelEl.textContent = allOn ? 'Batal Pilih Semua' : 'Pilih Semua';
+            }
+
+            btn.addEventListener('click', function() {
+                allOn = !allOn;
+                checkboxes.forEach(function(cb) { cb.checked = allOn; });
+                labelEl.textContent = allOn ? 'Batal Pilih Semua' : 'Pilih Semua';
+            });
+
+            checkboxes.forEach(function(cb) {
+                cb.addEventListener('change', updateLabel);
+            });
+            updateLabel();
+        })();
+        </script>
 <?php
     }
 
@@ -357,28 +388,34 @@ class Sweet_Option_Optimasi
             <div class="sad-top">
                 <div class="sad-top-left">
                     <div class="sad-card">
-                        <div class="sad-card-title">Item yang Dapat Diberishkan</div>
+                        <div class="sad-card-title" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                            <span>Item yang Dapat Diberishkan</span>
+                            <button type="button" id="sweetaddons-dbc-toggle" class="button" style="margin:0;">
+                                <span class="sweetaddons-dbc-toggle-label">Pilih Semua</span>
+                            </button>
+                        </div>
                         <?php
                         $cleaner = new Sweetaddons_Database_Cleaner();
                         $stats = $cleaner->get_stats();
-                        foreach ($stats as $key => $value) :
-                            if ($value === 0) {
+                        $items = array(
+                            'revisions'          => 'Revisi Postingan',
+                            'auto_drafts'        => 'Draft Otomatis',
+                            'spam_comments'      => 'Komentar Spam',
+                            'trashed_comments'   => 'Komentar di Trash',
+                            'expired_transients' => 'Transien Kadaluarsa',
+                        );
+                        foreach ($items as $key => $label) :
+                            $count = (int) ($stats[$key] ?? 0);
+                            $size  = (int) ($stats['size_' . $key] ?? 0);
+                            if ($count === 0) {
                                 continue;
                             }
-                            $labels = array(
-                                'revisions'   => 'Revisi Postingan',
-                                'auto_drafts' => 'Draft Otomatis',
-                                'trash_posts' => 'Postingan di Trash',
-                                'spam_comments' => 'Komentar Spam',
-                                'trash_comments' => 'Komentar di Trash',
-                                'transients'  => 'Transien',
-                            );
                         ?>
                             <div class="sad-checkbox" style="margin-bottom: 12px;">
                                 <input type="checkbox" id="clean_<?php echo esc_attr($key); ?>" name="clean_items[]" value="<?php echo esc_attr($key); ?>">
                                 <label for="clean_<?php echo esc_attr($key); ?>">
-                                    <?php echo esc_html($labels[$key] ?? $key); ?>
-                                    <span class="sad-count">(<?php echo esc_html($value); ?>)</span>
+                                    <?php echo esc_html($label); ?>
+                                    <span class="sad-count">(<?php echo esc_html(number_format($count)); ?><?php if ($size > 0) : ?> · <?php echo esc_html($cleaner->format_bytes($size)); ?><?php endif; ?>)</span>
                                 </label>
                             </div>
                         <?php endforeach; ?>
@@ -396,6 +433,32 @@ class Sweet_Option_Optimasi
                 </div>
             </div>
         </form>
+        <script>
+        (function() {
+            var btn = document.getElementById('sweetaddons-dbc-toggle');
+            var form = btn.closest('form');
+            var checkboxes = form.querySelectorAll('input[name="clean_items[]"]');
+            var labelEl = btn.querySelector('.sweetaddons-dbc-toggle-label');
+            var allOn = true;
+
+            function updateLabel() {
+                allOn = true;
+                checkboxes.forEach(function(cb) { if (!cb.checked) allOn = false; });
+                labelEl.textContent = allOn ? 'Batal Pilih Semua' : 'Pilih Semua';
+            }
+
+            btn.addEventListener('click', function() {
+                allOn = !allOn;
+                checkboxes.forEach(function(cb) { cb.checked = allOn; });
+                labelEl.textContent = allOn ? 'Batal Pilih Semua' : 'Pilih Semua';
+            });
+
+            checkboxes.forEach(function(cb) {
+                cb.addEventListener('change', updateLabel);
+            });
+            updateLabel();
+        })();
+        </script>
 <?php
         if (isset($_POST['sweetaddons_db_cleaner_clean']) && wp_verify_nonce($_POST['sweetaddons_db_cleaner_nonce'], 'sweetaddons_db_cleaner_action')) {
             $items_to_clean = isset($_POST['clean_items']) ? array_map('sanitize_text_field', $_POST['clean_items']) : array();
