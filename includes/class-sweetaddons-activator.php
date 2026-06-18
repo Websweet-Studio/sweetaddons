@@ -125,7 +125,81 @@ class Sweetaddons_Activator
 			wp_schedule_event(time(), 'daily', 'sweetaddons_daily_aggregation');
 		}
 
-		// Set default options jika belum ada (tidak overwrite yang sudah ada)
+		// ================================================================
+		// Auto-save semua default option saat aktivasi (tidak overwrite)
+		// ================================================================
+
+		// Umum
+		add_option('fully_disable_comment', 1);
+		add_option('hide_admin_notice', 0);
+		add_option('disable_gutenberg', 0);
+		add_option('classic_widget_Sweetaddons', 1);
+		add_option('remove_slug_category_Sweetaddons', 0);
+
+		// Proteksi / Security
+		add_option('limit_login_attempts', 1);
+		add_option('disable_xmlrpc', 1);
+		add_option('disable_rest_api', 0);
+		add_option('captcha_Sweetaddons', 1);
+
+		// Maintenance
+		add_option('maintenance_mode', 0);
+		add_option('maintenance_mode_data', array(
+			'title' => 'Segera Kembali',
+			'body'  => 'Kami sedang melakukan perawatan sistem. Silakan kembali lagi nanti.',
+		));
+
+		// Block wp-login
+		add_option('block_wp_login', 0);
+		add_option('whitelist_block_wp_login', '');
+		add_option('redirect_to', 'http://127.0.0.1');
+
+		// Auto resize image
+		add_option('auto_resize_mode', 0);
+		add_option('auto_resize_mode_data', array());
+
+		// License / News
+		add_option('license_key', '');
+		add_option('news_generate', 0);
+
+		// SEO
+		add_option('sweetaddons_seo_home_title', '');
+		add_option('sweetaddons_seo_home_description', '');
+		add_option('sweetaddons_seo_default_og_image', '');
+		add_option('sweetaddons_seo_twitter_site', '');
+
+		// White Label
+		add_option('sweetaddons_whitelabel_plugin_name', '');
+		add_option('sweetaddons_whitelabel_plugin_uri', '');
+		add_option('sweetaddons_whitelabel_description', '');
+		add_option('sweetaddons_whitelabel_author', '');
+		add_option('sweetaddons_whitelabel_author_uri', '');
+		add_option('sweetaddons_whitelabel_menu_title', '');
+		add_option('sweetaddons_whitelabel_hide_original', 0);
+
+		// WhatsApp
+		add_option('sweetaddons_whatsapp_enable', '');
+		add_option('sweetaddons_whatsapp_message', 'Halo! Saya butuh bantuan.');
+		add_option('sweetaddons_whatsapp_button_text', 'Chat dengan kami');
+		add_option('sweetaddons_whatsapp_position', 'bottom-right');
+		add_option('sweetaddons_whatsapp_color', '#25D366');
+		add_option('sweetaddons_whatsapp_show_mobile', '1');
+		add_option('sweetaddons_whatsapp_show_desktop', '1');
+		add_option('sweetaddons_whatsapp_animation', 'none');
+		add_option('sweetaddons_whatsapp_bubble_style', 'circle');
+		add_option('sweetaddons_whatsapp_show_tooltip', '1');
+		add_option('sweetaddons_whatsapp_agents', array());
+
+		// Login Customizer
+		add_option('sweetaddons_login_customizer', array(
+			'logo_url'       => '',
+			'bg_color'       => '#f1f1f1',
+			'bg_image'       => '',
+			'btn_color'      => '#2271b1',
+			'btn_text_color' => '#ffffff',
+		));
+
+		// Optimasi — Redis
 		add_option('sweetaddons_redis_config', array(
 			'host'     => '127.0.0.1',
 			'port'     => 6379,
@@ -133,6 +207,7 @@ class Sweetaddons_Activator
 			'database' => 0,
 		));
 
+		// Optimasi — Head Cleanup
 		add_option('sweetaddons_head_cleanup', array(
 			'remove_emoji'       => 1,
 			'remove_rsd'         => 1,

@@ -122,25 +122,36 @@ class Sweetaddons_Admin_Layout
     $plugin_name = self::get_plugin_name();
     $pages = self::get_pages();
 ?>
-    <div class="wrap vd-ons sweetaddons-dashboard sad-apple">
-      <div class="sad-apple__globalnav">
-        <div class="sad-apple__brand"><?php echo esc_html($plugin_name); ?></div>
-        <nav class="sad-apple__nav" aria-label="Sweet Addons Navigation">
+    <div class="wrap vd-ons sweetaddons-dashboard sweetaddons">
+      <div class="sweetaddons__globalnav">
+        <div class="sweetaddons__brand">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cable">
+            <path d="M17 19a1 1 0 0 1-1-1v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1z" />
+            <path d="M17 21v-2" />
+            <path d="M19 14V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V10" />
+            <path d="M21 21v-2" />
+            <path d="M3 5V3" />
+            <path d="M4 10a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a2 2 0 0 1-2 2z" />
+            <path d="M7 5V3" />
+          </svg>
+          <span><?php echo esc_html($plugin_name); ?></span>
+        </div>
+        <nav class="sweetaddons__nav" aria-label="Sweet Addons Navigation">
           <?php foreach ($pages as $item) : ?>
             <?php
             $url = admin_url('admin.php?page=' . $item['page']);
             $is_active = ($active_page === $item['page']);
             ?>
-            <a class="sad-apple__navlink <?php echo $is_active ? 'is-active' : ''; ?>" href="<?php echo esc_url($url); ?>">
+            <a class="sweetaddons__navlink <?php echo $is_active ? 'is-active' : ''; ?>" href="<?php echo esc_url($url); ?>">
               <?php echo esc_html($item['label']); ?>
             </a>
           <?php endforeach; ?>
         </nav>
       </div>
-      <div class="sad-apple__subnav">
-        <div class="sad-apple__subnav-title"><?php echo esc_html($page_title); ?></div>
+      <div class="sweetaddons__subnav">
+        <div class="sweetaddons__subnav-title"><?php echo esc_html($page_title); ?></div>
         <?php if (!empty($subnav)) : ?>
-          <nav class="sad-apple__subnav-tabs" aria-label="Sub Navigation">
+          <nav class="sweetaddons__subnav-tabs" aria-label="Sub Navigation">
             <?php foreach ($subnav as $tab) : ?>
               <?php
               if (isset($tab['page'])) {
@@ -167,14 +178,14 @@ class Sweetaddons_Admin_Layout
               $default_tab = $subnav[0]['tab'];
               $tab_active = ($current_tab === $tab['tab']) || (empty($current_tab) && $tab['tab'] === $default_tab);
               ?>
-              <a class="sad-apple__subnav-tab <?php echo $tab_active ? 'is-active' : ''; ?>" href="<?php echo esc_url($tab_url); ?>">
+              <a class="sweetaddons__subnav-tab <?php echo $tab_active ? 'is-active' : ''; ?>" href="<?php echo esc_url($tab_url); ?>">
                 <?php echo esc_html($tab['label']); ?>
               </a>
             <?php endforeach; ?>
           </nav>
         <?php endif; ?>
       </div>
-      <div class="sad-apple__content">
+      <div class="sweetaddons__content">
       <?php
     }
 

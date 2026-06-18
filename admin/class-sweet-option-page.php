@@ -57,8 +57,8 @@ class Custom_Admin_Option_Page
             'manage_options',           // Hak akses yang dibutuhkan
             'custom_admin_options',     // Slug menu
             array($this, 'options_page_callback'), // Callback untuk halaman pengaturan
-            'dashicons-chart-pie',                         // URL icon (biarkan kosong atau tambahkan URL icon)
-            70                         // Posisi menu (semakin kecil angkanya semakin tinggi posisinya)
+            'dashicons-admin-plugins',                    // URL icon (biarkan kosong atau tambahkan URL icon)
+            30                         // Posisi menu (semakin kecil angkanya semakin tinggi posisinya)
         );
 
         // Add Proteksi submenu (main)
