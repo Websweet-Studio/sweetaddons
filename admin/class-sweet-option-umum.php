@@ -243,7 +243,7 @@ class Sweet_Option_Umum
                                 'transients'  => 'Transien',
                             );
                         ?>
-                            <div class="sad-checkbox">
+                            <div class="sad-checkbox" style="margin-bottom: 12px;">
                                 <input type="checkbox" id="clean_<?php echo esc_attr($key); ?>" name="clean_items[]" value="<?php echo esc_attr($key); ?>">
                                 <label for="clean_<?php echo esc_attr($key); ?>">
                                     <?php echo esc_html($labels[$key] ?? $key); ?>

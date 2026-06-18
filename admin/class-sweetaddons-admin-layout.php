@@ -45,6 +45,10 @@ class Sweetaddons_Admin_Layout
         'page'  => 'Sweetaddons_login_customizer',
         'label' => 'Custom Login',
       ),
+      array(
+        'page'  => 'Sweetaddons_optimasi',
+        'label' => 'Optimasi',
+      ),
     );
   }
 
@@ -78,6 +82,19 @@ class Sweetaddons_Admin_Layout
   public static function get_whatsapp_tab_url($tab)
   {
     return admin_url('admin.php?page=Sweetaddons_whatsapp&subtab=' . $tab);
+  }
+
+  public static function get_seo_subnav()
+  {
+    return array(
+      array('tab' => 'general', 'label' => 'General'),
+      array('tab' => 'social', 'label' => 'Social Media'),
+    );
+  }
+
+  public static function get_seo_tab_url($tab)
+  {
+    return admin_url('admin.php?page=Sweetaddons_seo&subtab=' . $tab);
   }
 
   public static function get_proteksi_tab_url($tab)
@@ -120,8 +137,12 @@ class Sweetaddons_Admin_Layout
                 $tab_url = admin_url('admin.php?page=' . $tab['page']);
               } elseif ($active_page === 'Sweetaddons_protect') {
                 $tab_url = self::get_proteksi_tab_url($tab['tab']);
+                $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
               } elseif ($active_page === 'Sweetaddons_whatsapp') {
                 $tab_url = self::get_whatsapp_tab_url($tab['tab']);
+                $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
+              } elseif ($active_page === 'Sweetaddons_seo') {
+                $tab_url = self::get_seo_tab_url($tab['tab']);
                 $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
               } else {
                 $tab_url = self::get_umum_tab_url($tab['tab']);

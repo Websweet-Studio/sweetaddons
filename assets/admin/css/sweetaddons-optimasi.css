@@ -1,0 +1,48 @@
+/* ---------- Status badge ---------- */
+.sad-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.6;
+    vertical-align: middle;
+}
+.sad-badge--success {
+    background: #d4edda;
+    color: #155724;
+}
+.sad-badge--warning {
+    background: #fff3cd;
+    color: #856404;
+}
+.sad-badge--error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ---------- Feedback inline ---------- */
+.sad-feedback {
+    margin-top: 12px;
+}
+.sad-feedback.notice {
+    margin: 12px 0 0;
+}
+
+/* ---------- Spacing (optional, fallback if main CSS missing) ---------- */
+.sad-mb-16 {
+    margin-bottom: 16px;
+}
+.sad-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 20px;
+}
+.sad-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+}

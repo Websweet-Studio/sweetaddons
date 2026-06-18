@@ -133,6 +133,8 @@ spl_autoload_register(function ($class) {
         'Sweetaddons_Activator' => 'includes/class-sweetaddons-activator.php',
         'Sweetaddons_Deactivator' => 'includes/class-sweetaddons-deactivator.php',
         'sweetaddons' => 'includes/class-sweetaddons.php',
+        'Sweetaddons_Redis_Cache' => 'includes/class-sweetaddons-redis-cache.php',
+        'Sweet_Option_Optimasi' => 'admin/class-sweet-option-optimasi.php',
     );
 
     $rel = isset($classmap[$class]) ? $classmap[$class] : (isset($fallback[$class]) ? $fallback[$class] : '');

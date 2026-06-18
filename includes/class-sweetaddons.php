@@ -153,6 +153,8 @@ class sweetaddons
         new Sweet_Option_Umum();
         new Sweet_Option_Maintenance();
         new Sweet_Option_Block();
+        new Sweet_Option_Optimasi();
+        new Sweetaddons_Redis_Cache();
     }
 
     /**

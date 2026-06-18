@@ -429,7 +429,7 @@ class Custom_Admin_Option_Page
                                         <input type="checkbox" name="captcha_aktif" value="1" <?php checked($aktif, '1'); ?> />
                                         Aktifkan CAPTCHA
                                     </label>
-                                    <p class="description">Aktifkan perlindungan CAPTCHA.</p>
+
                                 </td>
                             </tr>
                             <tr>
@@ -1533,6 +1533,12 @@ class Custom_Admin_Option_Page
         $home_title = get_option('sweetaddons_seo_home_title', '');
         $home_description = get_option('sweetaddons_seo_home_description', '');
         $default_og_image = get_option('sweetaddons_seo_default_og_image', '');
+        if (empty($default_og_image) && function_exists('get_site_icon_url')) {
+            $site_icon_og = get_site_icon_url(1200);
+            if ($site_icon_og) {
+                $default_og_image = $site_icon_og;
+            }
+        }
         $twitter_site = get_option('sweetaddons_seo_twitter_site', '');
         $tpl_single_title = get_option('sweetaddons_seo_template_single_title', '{post_title} | {site_name}');
         $tpl_single_desc = get_option('sweetaddons_seo_template_single_description', '{excerpt}');
@@ -1544,7 +1550,14 @@ class Custom_Admin_Option_Page
         $tpl_tag_desc = get_option('sweetaddons_seo_template_tag_description', '{tag_description}');
 
     ?>
-        <?php Sweetaddons_Admin_Layout::open('Pengaturan SEO', 'Sweetaddons_seo'); ?>
+        <?php
+        $seo_subnav = Sweetaddons_Admin_Layout::get_seo_subnav();
+        Sweetaddons_Admin_Layout::open('Pengaturan SEO', 'Sweetaddons_seo', $seo_subnav);
+        $seo_active_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : 'general';
+        if (!in_array($seo_active_tab, array('general', 'social'), true)) {
+            $seo_active_tab = 'general';
+        }
+        ?>
         <?php
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_seo_settings')) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan SEO berhasil disimpan.</p></div>';
@@ -1559,129 +1572,143 @@ class Custom_Admin_Option_Page
                 <!-- Left Column (Main Settings) -->
                 <div class="sad-top-left">
 
-                    <!-- General SEO Settings -->
-                    <div class="sad-card sad-mb-16" id="seo-general-settings">
-                        <div class="sad-card-title">SEO Halaman Utama</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_home_title">Judul Halaman Utama</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_home_title" name="sweetaddons_seo_home_title" value="<?php echo esc_attr($home_title); ?>" class="large-text" />
-                                    <p class="description">Kosongkan untuk menggunakan nama situs dan tagline.</p>
-                                    <div id="home-title-counter" class="sad-counter"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_home_description">Deskripsi Halaman Utama</label></th>
-                                <td>
-                                    <textarea id="sweetaddons_seo_home_description" name="sweetaddons_seo_home_description" rows="3" class="large-text"><?php echo esc_textarea($home_description); ?></textarea>
-                                    <p class="description">Kosongkan untuk menggunakan tagline situs.</p>
-                                    <div id="home-desc-counter" class="sad-counter"></div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <div id="seo-tab-general" class="seo-tab-content" style="display:<?php echo $seo_active_tab === 'general' ? 'block' : 'none'; ?>;">
 
-                    <div class="sad-card sad-mb-16" id="seo-templates-settings">
-                        <div class="sad-card-title">Template Judul & Deskripsi</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_single_title">Template Title (Single)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_single_title" name="sweetaddons_seo_template_single_title" value="<?php echo esc_attr($tpl_single_title); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {post_title}, {site_name}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_single_description">Template Description (Single)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_single_description" name="sweetaddons_seo_template_single_description" value="<?php echo esc_attr($tpl_single_desc); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {excerpt}, {site_tagline}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_page_title">Template Title (Page)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_page_title" name="sweetaddons_seo_template_page_title" value="<?php echo esc_attr($tpl_page_title); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {page_title}, {site_name}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_page_description">Template Description (Page)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_page_description" name="sweetaddons_seo_template_page_description" value="<?php echo esc_attr($tpl_page_desc); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {excerpt}, {site_tagline}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_category_title">Template Title (Category)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_category_title" name="sweetaddons_seo_template_category_title" value="<?php echo esc_attr($tpl_cat_title); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {category_name}, {site_name}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_category_description">Template Description (Category)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_category_description" name="sweetaddons_seo_template_category_description" value="<?php echo esc_attr($tpl_cat_desc); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {category_description}, {site_tagline}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_tag_title">Template Title (Tag)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_tag_title" name="sweetaddons_seo_template_tag_title" value="<?php echo esc_attr($tpl_tag_title); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {tag_name}, {site_name}</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_template_tag_description">Template Description (Tag)</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_template_tag_description" name="sweetaddons_seo_template_tag_description" value="<?php echo esc_attr($tpl_tag_desc); ?>" class="large-text" />
-                                    <p class="description">Placeholders: {tag_description}, {site_tagline}</p>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                        <!-- General SEO Settings -->
+                        <div class="sad-card sad-mb-16" id="seo-general-settings">
+                            <div class="sad-card-title">SEO Halaman Utama</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_home_title">Judul Halaman Utama</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_home_title" name="sweetaddons_seo_home_title" value="<?php echo esc_attr($home_title); ?>" class="large-text" />
+                                        <p class="description">Kosongkan untuk menggunakan nama situs dan tagline.</p>
+                                        <div id="home-title-counter" class="sad-counter"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_home_description">Deskripsi Halaman Utama</label></th>
+                                    <td>
+                                        <textarea id="sweetaddons_seo_home_description" name="sweetaddons_seo_home_description" rows="3" class="large-text"><?php echo esc_textarea($home_description); ?></textarea>
+                                        <p class="description">Kosongkan untuk menggunakan tagline situs.</p>
+                                        <div id="home-desc-counter" class="sad-counter"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
-                    <!-- Social Media Settings -->
-                    <div class="sad-card sad-mb-16" id="seo-social-settings">
-                        <div class="sad-card-title">Social Media</div>
-                        <table class="form-table">
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_default_og_image">Default OG Image</label></th>
-                                <td>
-                                    <div class="og-image-container">
-                                        <input type="url" id="sweetaddons_seo_default_og_image" name="sweetaddons_seo_default_og_image" value="<?php echo esc_url($default_og_image); ?>" style="display: none;" />
-                                        <div class="og-image-preview" style="margin: 10px 0; cursor: pointer;" onclick="document.getElementById('upload-default-og-image').click()">
-                                            <?php if ($default_og_image): ?>
-                                                <div style="position: relative; display: inline-block;">
-                                                    <img src="<?php echo esc_url($default_og_image); ?>" alt="Preview" style="max-width: 100%; height: auto; border-radius: 4px;" />
-                                                    <div style="position: absolute; top: 5px; right: 5px; background: #23282d; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; opacity: 0.8;">Click to change</div>
-                                                </div>
-                                            <?php else: ?>
-                                                <div style="width: 100%; height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; color: #999; background: #f9f9f9; border-radius: 4px;">
-                                                    <span>Select Image</span>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="og-image-buttons" style="margin-top: 10px;">
-                                            <button type="button" class="button" id="upload-default-og-image">Choose Image</button>
-                                            <?php if ($default_og_image): ?>
-                                                <button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label for="sweetaddons_seo_twitter_site">Twitter Username</label></th>
-                                <td>
-                                    <input type="text" id="sweetaddons_seo_twitter_site" name="sweetaddons_seo_twitter_site" value="<?php echo esc_attr($twitter_site); ?>" class="regular-text" placeholder="username" />
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="sad-card sad-mb-16" id="seo-templates-settings">
+                            <div class="sad-card-title">Template Judul & Deskripsi</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_single_title">Template Title (Single)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_single_title" name="sweetaddons_seo_template_single_title" value="<?php echo esc_attr($tpl_single_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {post_title}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_single_description">Template Description (Single)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_single_description" name="sweetaddons_seo_template_single_description" value="<?php echo esc_attr($tpl_single_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {excerpt}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_page_title">Template Title (Page)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_page_title" name="sweetaddons_seo_template_page_title" value="<?php echo esc_attr($tpl_page_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {page_title}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_page_description">Template Description (Page)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_page_description" name="sweetaddons_seo_template_page_description" value="<?php echo esc_attr($tpl_page_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {excerpt}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_category_title">Template Title (Category)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_category_title" name="sweetaddons_seo_template_category_title" value="<?php echo esc_attr($tpl_cat_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {category_name}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_category_description">Template Description (Category)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_category_description" name="sweetaddons_seo_template_category_description" value="<?php echo esc_attr($tpl_cat_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {category_description}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_tag_title">Template Title (Tag)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_tag_title" name="sweetaddons_seo_template_tag_title" value="<?php echo esc_attr($tpl_tag_title); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {tag_name}, {site_name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_template_tag_description">Template Description (Tag)</label></th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_template_tag_description" name="sweetaddons_seo_template_tag_description" value="<?php echo esc_attr($tpl_tag_desc); ?>" class="large-text" />
+                                        <p class="description">Placeholders: {tag_description}, {site_tagline}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
                     </div>
+                    <!-- /seo-tab-general -->
+
+                    <!-- seo-tab-social -->
+                    <div id="seo-tab-social" class="seo-tab-content" style="display:<?php echo $seo_active_tab === 'social' ? 'block' : 'none'; ?>;">
+
+                        <!-- Social Media Settings -->
+                        <div class="sad-card sad-mb-16" id="seo-social-settings">
+                            <div class="sad-card-title">Social Media</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_default_og_image">Default OG Image</label></th>
+                                    <td>
+                                        <div class="og-image-container">
+                                            <input type="url" id="sweetaddons_seo_default_og_image" name="sweetaddons_seo_default_og_image" value="<?php echo esc_url($default_og_image); ?>" style="display: none;" />
+                                            <div class="og-image-preview" style="margin: 10px 0; cursor: pointer;" onclick="document.getElementById('upload-default-og-image').click()">
+                                                <?php if ($default_og_image): ?>
+                                                    <div style="position: relative; display: inline-block;">
+                                                        <img src="<?php echo esc_url($default_og_image); ?>" alt="Preview" style="max-width: 100%; height: auto; border-radius: 4px;" />
+                                                        <div style="position: absolute; top: 5px; right: 5px; background: #23282d; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; opacity: 0.8;">Click to change</div>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div style="width: 100%; height: 150px; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; color: #999; background: #f9f9f9; border-radius: 4px;">
+                                                        <span>Select Image</span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="og-image-buttons" style="margin-top: 10px;">
+                                                <button type="button" class="button" id="upload-default-og-image">Choose Image</button>
+                                                <?php if ($default_og_image): ?>
+                                                    <button type="button" class="button" id="remove-default-og-image" style="margin-left: 8px;">Remove Image</button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="sweetaddons_seo_twitter_site">Twitter Username</label>
+                                        <p class="description" style="font-weight:400; margin-top:4px;">Akun Twitter resmi untuk Twitter Card attribution. Isi dengan format <code>@username</code>. Biarkan kosong jika tidak punya akun Twitter.</p>
+                                    </th>
+                                    <td>
+                                        <input type="text" id="sweetaddons_seo_twitter_site" name="sweetaddons_seo_twitter_site" value="<?php echo esc_attr($twitter_site); ?>" class="regular-text" placeholder="username" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                    <!-- /seo-tab-social -->
 
                 </div>
 
@@ -1941,6 +1968,12 @@ class Custom_Admin_Option_Page
         // Get current settings
         $login_settings = get_option('sweetaddons_login_customizer', array());
         $logo_url = isset($login_settings['logo_url']) ? $login_settings['logo_url'] : '';
+        if (empty($logo_url) && function_exists('get_site_icon_url')) {
+            $site_icon = get_site_icon_url(270);
+            if ($site_icon) {
+                $logo_url = $site_icon;
+            }
+        }
         $bg_color = isset($login_settings['bg_color']) ? $login_settings['bg_color'] : '#f1f1f1';
         $bg_image = isset($login_settings['bg_image']) ? $login_settings['bg_image'] : '';
         $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
@@ -2348,11 +2381,21 @@ class Custom_Admin_Option_Page
                                                         </div>
                                                         <div style="flex: 1 1 100%; min-width: 160px;">
                                                             <label style="display:block; margin: 0 0 6px;">Note</label>
-                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][note]" value="<?php echo esc_attr($agent_note); ?>" class="regular-text" style="width: 100%;" placeholder="Contoh: Saya akan kembali dalam 4 jam" />
+                                                            <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][note]" value="<?php echo esc_attr($agent_note); ?>" class="regular-text" style="width: 100%;" placeholder="Contoh: Pesan akan dibalas pada jam kerja 08.00 - 15.00" />
                                                         </div>
                                                         <div style="flex: 1 1 100%; min-width: 160px;">
                                                             <label style="display:block; margin: 0 0 6px;">Avatar URL (opsional)</label>
                                                             <div style="display:flex; gap: 8px; align-items: center;">
+                                                                <div class="sweetaddons-wa-avatar-preview" style="width:36px; height:36px; border-radius:50%; overflow:hidden; border:2px solid #e5e7eb; flex-shrink:0; background:#f1f5f9; display:flex; align-items:center; justify-content:center;">
+                                                                    <?php if (!empty($agent_avatar)) : ?>
+                                                                        <img src="<?php echo esc_url($agent_avatar); ?>" alt="Preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'18\' height=\'18\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#94a3b8\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\'/><circle cx=\'12\' cy=\'7\' r=\'4\'/></svg>';" />
+                                                                    <?php else : ?>
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                                            <circle cx="12" cy="7" r="4" />
+                                                                        </svg>
+                                                                    <?php endif; ?>
+                                                                </div>
                                                                 <input type="text" name="sweetaddons_whatsapp_agents[<?php echo esc_attr($agent_index); ?>][avatar]" value="<?php echo esc_attr($agent_avatar); ?>" class="regular-text sweetaddons-wa-avatar-input" style="width: 100%;" placeholder="https://..." />
                                                                 <button type="button" class="button sweetaddons-wa-upload-avatar">Upload</button>
                                                             </div>
@@ -2367,9 +2410,9 @@ class Custom_Admin_Option_Page
                                             endforeach;
                                             ?>
                                         </div>
-                                        <div style="display:flex; gap: 8px; align-items:center;">
+                                        <div style="margin-top: 8px;">
                                             <button type="button" class="button" id="sweetaddons-wa-add-agent">Tambah Agen</button>
-                                            <p class="description" style="margin: 0;">Agen pertama menjadi default. Jika lebih dari satu agen, widget menampilkan daftar pilihan agen.</p>
+                                            <p class="description" style="margin: 4px 0 0 0;">Agen pertama menjadi default. Jika lebih dari satu agen, widget menampilkan daftar pilihan agen.</p>
                                         </div>
 
                                         <script type="text/template" id="sweetaddons-wa-agent-template">
@@ -2396,11 +2439,14 @@ class Custom_Admin_Option_Page
                                                 </div>
                                                 <div style="flex: 1 1 100%; min-width: 160px;">
                                                     <label style="display:block; margin: 0 0 6px;">Note</label>
-                                                    <input type="text" name="sweetaddons_whatsapp_agents[__i__][note]" value="" class="regular-text" style="width: 100%;" placeholder="Contoh: Saya akan kembali dalam 4 jam" />
+                                                    <input type="text" name="sweetaddons_whatsapp_agents[__i__][note]" value="" class="regular-text" style="width: 100%;" placeholder="Contoh: Pesan akan dibalas pada jam kerja 08.00 - 15.00" />
                                                 </div>
                                                 <div style="flex: 1 1 100%; min-width: 160px;">
                                                     <label style="display:block; margin: 0 0 6px;">Avatar URL (opsional)</label>
                                                     <div style="display:flex; gap: 8px; align-items: center;">
+                                                        <div class="sweetaddons-wa-avatar-preview" style="width:36px; height:36px; border-radius:50%; overflow:hidden; border:2px solid #e5e7eb; flex-shrink:0; background:#f1f5f9; display:flex; align-items:center; justify-content:center;">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                                        </div>
                                                         <input type="text" name="sweetaddons_whatsapp_agents[__i__][avatar]" value="" class="regular-text sweetaddons-wa-avatar-input" style="width: 100%;" placeholder="https://..." />
                                                         <button type="button" class="button sweetaddons-wa-upload-avatar">Upload</button>
                                                     </div>
@@ -2458,8 +2504,10 @@ class Custom_Admin_Option_Page
                                         <label for="sweetaddons_whatsapp_color">Warna Tombol</label>
                                     </th>
                                     <td>
-                                        <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
-                                        <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly />
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <input type="color" id="sweetaddons_whatsapp_color" name="sweetaddons_whatsapp_color" value="<?php echo esc_attr($color); ?>" />
+                                            <input type="text" value="<?php echo esc_attr($color); ?>" class="regular-text" readonly style="width:auto;" />
+                                        </div>
                                         <p class="description">Background color of the WhatsApp button.</p>
                                     </td>
                                 </tr>
@@ -2760,10 +2808,28 @@ class Custom_Admin_Option_Page
                         var attachment = frame.state().get('selection').first().toJSON();
                         if (attachment && attachment.url) {
                             $input.val(attachment.url).trigger('input');
+                            updateAvatarPreview($row, attachment.url);
                         }
                     });
 
                     frame.open();
+                });
+
+                function updateAvatarPreview($row, url) {
+                    var $preview = $row.find('.sweetaddons-wa-avatar-preview');
+                    if (!$preview.length) return;
+                    if (url) {
+                        $preview.html('<img src="' + url + '" alt="Preview" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display=\'none\'; this.parentElement.innerHTML=\'<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'18\\\' height=\\\'18\\\' viewBox=\\\'0 0 24 24\\\' fill=\\\'none\\\' stroke=\\\'#94a3b8\\\' stroke-width=\\\'1.5\\\' stroke-linecap=\\\'round\\\' stroke-linejoin=\\\'round\\\'><path d=\\\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\\\'/><circle cx=\\\'12\\\' cy=\\\'7\\\' r=\\\'4\\\'/></svg>\';" />');
+                    } else {
+                        $preview.html('<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>');
+                    }
+                }
+
+                // Live preview avatar when URL is typed
+                $(document).on('input', '.sweetaddons-wa-avatar-input', function() {
+                    var url = $(this).val().trim();
+                    var $row = $(this).closest('.sweetaddons-wa-agent-row');
+                    updateAvatarPreview($row, url);
                 });
 
                 // Color picker sync
