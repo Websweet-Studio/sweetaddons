@@ -21,7 +21,6 @@ class Sweetaddons_Captcha
         if ($this->active) {
             if ($this->areas['login'] === '1') {
                 add_action('login_form', array($this, 'display'));
-                add_action('login_form_middle', array($this, 'display'));
                 add_filter('wp_authenticate_user', array($this, 'verify_login_form'), 10, 2);
             }
             if ($this->areas['comment'] === '1') {
@@ -147,7 +146,7 @@ class Sweetaddons_Captcha
         $token = wp_generate_password(16, false, false);
         $code = $this->generate_code();
         set_transient('sweetaddons_captcha_' . $token, $code, 15 * MINUTE_IN_SECONDS);
-        $src = add_query_arg(array('sweetaddons_captcha' => 'image', 'token' => $token, 'v' => time()), home_url('/'));
+        $src = add_query_arg(array('sweetaddons_captcha' => 'image', 'token' => $token, 'v' => time()), home_url('/index.php'));
         $html = '<div class="sweetaddons-captcha" style="margin:10px 0; width:100%;">';
         $html .= '<img src="' . esc_url($src) . '" alt="Captcha" style="display:block; border:1px solid #d0d4d9; width:100%; height:auto; background:#f5f6fa; border-radius:4px; box-sizing:border-box;" />';
         $html .= '<input type="text" name="sweetaddons_captcha_input" placeholder="Masukkan teks di gambar" required style="margin-top:8px; padding:8px 10px; width:100%; font-size:13px; border:1px solid #d0d4d9; border-radius:4px; box-sizing:border-box;" />';

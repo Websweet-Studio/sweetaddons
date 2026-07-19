@@ -434,14 +434,14 @@ class Custom_Admin_Option_Page
                                     <p class="description">Atur kompleksitas kode dan visual CAPTCHA.</p>
                                     <div id="captcha-preview-container" style="margin-top: 15px;">
                                         <strong>Preview:</strong><br>
-                                        <img id="captcha-preview-img" src="<?php echo add_query_arg(array('sweetaddons_captcha' => 'preview', 'difficulty' => $difficulty), home_url('/')); ?>" alt="Captcha Preview" style="border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px; margin-top: 5px;">
+                                        <img id="captcha-preview-img" src="<?php echo add_query_arg(array('sweetaddons_captcha' => 'preview', 'difficulty' => $difficulty), home_url('/index.php')); ?>" alt="Captcha Preview" style="border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px; margin-top: 5px;">
                                         <p><a href="#" id="refresh-captcha-preview" class="button button-small">Refresh Preview</a></p>
                                     </div>
                                     <script>
                                         jQuery(document).ready(function($) {
                                             function updateCaptchaPreview() {
                                                 var difficulty = $('#captcha_difficulty').val();
-                                                var src = '<?php echo home_url('/'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
+                                                var src = '<?php echo home_url('/index.php'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
                                                 $('#captcha-preview-img').attr('src', src);
                                             }
                                             $('#captcha_difficulty').on('change', function() {
