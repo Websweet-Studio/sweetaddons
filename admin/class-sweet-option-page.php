@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * The admin-specific functionality of the plugin.
@@ -155,6 +155,7 @@ class Custom_Admin_Option_Page
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_animation');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_bubble_style');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_tooltip');
+        register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_show_text_mobile');
         register_setting('sweetaddons_whatsapp_group', 'sweetaddons_whatsapp_agents');
     }
 
@@ -1994,7 +1995,8 @@ class Custom_Admin_Option_Page
                 'sweetaddons_whatsapp_show_desktop',
                 'sweetaddons_whatsapp_animation',
                 'sweetaddons_whatsapp_bubble_style',
-                'sweetaddons_whatsapp_show_tooltip'
+                'sweetaddons_whatsapp_show_tooltip',
+                'sweetaddons_whatsapp_show_text_mobile'
             );
 
             foreach ($fields as $field) {
@@ -2002,7 +2004,7 @@ class Custom_Admin_Option_Page
                     update_option($field, sanitize_text_field($_POST[$field]));
                 } else {
                     // Handle checkbox fields
-                    if (in_array($field, ['sweetaddons_whatsapp_enable', 'sweetaddons_whatsapp_show_mobile', 'sweetaddons_whatsapp_show_desktop', 'sweetaddons_whatsapp_show_tooltip'])) {
+                    if (in_array($field, ['sweetaddons_whatsapp_enable', 'sweetaddons_whatsapp_show_mobile', 'sweetaddons_whatsapp_show_desktop', 'sweetaddons_whatsapp_show_tooltip', 'sweetaddons_whatsapp_show_text_mobile'])) {
                         delete_option($field);
                     }
                 }
@@ -2020,7 +2022,8 @@ class Custom_Admin_Option_Page
         $show_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
         $animation = get_option('sweetaddons_whatsapp_animation', 'none');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
-        $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '1');
+        $show_tooltip = get_option('sweetaddons_whatsapp_show_tooltip', '');
+        $show_text_mobile = get_option('sweetaddons_whatsapp_show_text_mobile', '');
         $agents = get_option('sweetaddons_whatsapp_agents', array());
         if (!is_array($agents)) {
             $agents = array();
@@ -2311,6 +2314,11 @@ class Custom_Admin_Option_Page
                                             Tampilkan di perangkat Desktop
                                         </label>
                                         <p class="description">Choose on which devices to display the chat button.</p>
+                                        <label class="sad-form-checkbox" style="margin-top:8px;display:block;">
+                                            <input type="checkbox" name="sweetaddons_whatsapp_show_text_mobile" value="1" <?php checked($show_text_mobile, '1'); ?> />
+                                            Tampilkan teks di perangkat Mobile
+                                        </label>
+                                        <p class="description" style="margin-left:24px;">Jika diaktifkan, teks tombol tetap terlihat di layar mobile pada mode <strong>Extended</strong>.</p>
                                     </td>
                                 </tr>
                                 <tr>

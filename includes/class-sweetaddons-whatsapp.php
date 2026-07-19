@@ -54,6 +54,7 @@ class Sweetaddons_WhatsApp
         $position = get_option('sweetaddons_whatsapp_position', 'bottom-right');
         $show_on_mobile = get_option('sweetaddons_whatsapp_show_mobile', '1');
         $show_on_desktop = get_option('sweetaddons_whatsapp_show_desktop', '1');
+        $show_text_mobile = get_option('sweetaddons_whatsapp_show_text_mobile', '');
         $animation = get_option('sweetaddons_whatsapp_animation', 'none');
         $bubble_style = get_option('sweetaddons_whatsapp_bubble_style', 'circle');
         $device_classes = '';
@@ -63,6 +64,9 @@ class Sweetaddons_WhatsApp
         }
         if (!$show_on_desktop) {
             $device_classes .= ' sweetaddons-wa-hide-desktop';
+        }
+        if ($show_text_mobile) {
+            $device_classes .= ' sweetaddons-wa-show-text-mobile';
         }
 
         $agents_normalized = array();
@@ -115,7 +119,7 @@ class Sweetaddons_WhatsApp
                     </a>
                 </div>
 
-                <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '1')): ?>
+                <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '')): ?>
                     <div class="sweetaddons-wa-tooltip">
                         <?php echo esc_html($button_text); ?>
                     </div>
@@ -144,7 +148,7 @@ class Sweetaddons_WhatsApp
                     </a>
                 </div>
 
-                <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '1')): ?>
+                <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '')): ?>
                     <div class="sweetaddons-wa-tooltip">
                         <?php echo esc_html($button_text); ?>
                     </div>
@@ -220,7 +224,7 @@ class Sweetaddons_WhatsApp
                 </button>
             </div>
 
-            <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '1')): ?>
+            <?php if (get_option('sweetaddons_whatsapp_show_tooltip', '')): ?>
                 <div class="sweetaddons-wa-tooltip">
                     <?php echo esc_html($button_text); ?>
                 </div>
@@ -718,6 +722,22 @@ class Sweetaddons_WhatsApp
             
             .sweetaddons-wa-extended .sweetaddons-wa-icon {
                 margin-right: 0;
+            }
+
+            .sweetaddons-wa-show-text-mobile.sweetaddons-wa-widget .sweetaddons-wa-extended .sweetaddons-wa-text {
+                display: inline;
+            }
+            
+            .sweetaddons-wa-show-text-mobile.sweetaddons-wa-widget .sweetaddons-wa-extended .sweetaddons-wa-link {
+                width: auto;
+                height: auto;
+                border-radius: 25px;
+                padding: 12px 20px;
+                justify-content: center;
+            }
+            
+            .sweetaddons-wa-show-text-mobile.sweetaddons-wa-widget .sweetaddons-wa-extended .sweetaddons-wa-icon {
+                margin-right: 8px;
             }
 
             .sweetaddons-wa-panel {

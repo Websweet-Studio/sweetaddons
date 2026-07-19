@@ -188,6 +188,7 @@ class Sweetaddons_Activator
 		add_option('sweetaddons_whatsapp_animation', 'none');
 		add_option('sweetaddons_whatsapp_bubble_style', 'circle');
 		add_option('sweetaddons_whatsapp_show_tooltip', '1');
+		add_option('sweetaddons_whatsapp_show_text_mobile', '');
 		add_option('sweetaddons_whatsapp_agents', array());
 
 		// Login Customizer
