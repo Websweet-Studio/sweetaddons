@@ -379,8 +379,7 @@ class Sweetaddons_WhatsApp
             text-decoration: none;
             border: none !important;
             outline: none !important;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease;
             position: relative;
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
@@ -394,8 +393,7 @@ class Sweetaddons_WhatsApp
             border-radius: 25px;
             color: white;
             text-decoration: none;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease;
             white-space: nowrap;
             position: relative;
             overflow: hidden;
@@ -414,10 +412,6 @@ class Sweetaddons_WhatsApp
         .sweetaddons-wa-extended .sweetaddons-wa-text {
             font-size: 14px;
             font-weight: 500;
-        }
-
-        .sweetaddons-wa-link:hover {
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
         }
 
         .sweetaddons-wa-icon svg {
@@ -768,7 +762,7 @@ class Sweetaddons_WhatsApp
             }
 
             .sweetaddons-wa-circle .sweetaddons-wa-link:focus-visible {
-                box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.92), 0 4px 12px rgba(37, 211, 102, 0.4);
+                box-shadow: none;
             }
         }
 
