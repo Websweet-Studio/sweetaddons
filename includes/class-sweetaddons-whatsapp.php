@@ -321,6 +321,7 @@ class Sweetaddons_WhatsApp
     {
         $primary_color = get_option('sweetaddons_whatsapp_color', '#25D366');
         $split_text_bg = get_option('sweetaddons_whatsapp_split_text_bg', '#ffffff');
+        $split_text_color = get_option('sweetaddons_whatsapp_split_text_color', '#111111');
         $size = '60';
         $offset_x = '20';
         $offset_y = '20';
@@ -452,6 +453,7 @@ class Sweetaddons_WhatsApp
             align-items: center;
             padding: 12px 18px 12px 20px;
             background: {$split_text_bg};
+            color: {$split_text_color};
             border-radius: 999px;
         }
 
