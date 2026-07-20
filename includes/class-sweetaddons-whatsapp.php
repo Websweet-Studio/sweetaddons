@@ -454,6 +454,19 @@ class Sweetaddons_WhatsApp
             border-radius: 999px;
         }
 
+        .sweetaddons-wa-split .sweetaddons-wa-text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -6px;
+            width: 14px;
+            height: 12px;
+            background: {$split_text_bg};
+            clip-path: polygon(0 0, 100% 50%, 0 100%);
+            transform: translateY(-50%);
+            z-index: -1;
+        }
+
         .sweetaddons-wa-icon svg {
             width: 24px;
             height: 24px;

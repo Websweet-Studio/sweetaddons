@@ -2262,6 +2262,18 @@ class Custom_Admin_Option_Page
                                 </tr>
                                 <tr>
                                     <th scope="row">
+                                        <label for="sweetaddons_whatsapp_split_text_bg">Warna Pill Text Split</label>
+                                    </th>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <input type="color" id="sweetaddons_whatsapp_split_text_bg" name="sweetaddons_whatsapp_split_text_bg" value="<?php echo esc_attr($split_text_bg); ?>" />
+                                            <input type="text" value="<?php echo esc_attr($split_text_bg); ?>" class="regular-text" readonly style="width:auto;" />
+                                        </div>
+                                        <p class="description">Hanya untuk background pill kiri pada style Split.</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
                                         <label for="sweetaddons_whatsapp_animation">Animasi</label>
                                     </th>
                                     <td>
@@ -2359,6 +2371,19 @@ class Custom_Admin_Option_Page
                                 #whatsapp-preview-stage .sweetaddons-wa-text {
                                     position: relative;
                                     z-index: 1;
+                                }
+
+                                #whatsapp-preview-stage .sweetaddons-wa-split .sweetaddons-wa-text::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: 50%;
+                                    right: -6px;
+                                    width: 14px;
+                                    height: 12px;
+                                    background: var(--sweetaddons-wa-split-text-bg, #ffffff);
+                                    clip-path: polygon(0 0, 100% 50%, 0 100%);
+                                    transform: translateY(-50%);
+                                    z-index: -1;
                                 }
 
                                 #whatsapp-preview-stage .sweetaddons-wa-tooltip {
@@ -2476,7 +2501,7 @@ class Custom_Admin_Option_Page
                             </style>
                             <div id="whatsapp-preview-stage" style="position: relative; height: 200px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; overflow: hidden;">
                                 <div id="whatsapp-preview-container" style="display: <?php echo ($enable && $has_agents) ? 'block' : 'none'; ?>;">
-                                    <div id="whatsapp-preview-bubble" class="sweetaddons-wa-widget sweetaddons-wa-preview sweetaddons-wa-<?php echo esc_attr($position); ?>" data-animation="<?php echo esc_attr($animation); ?>" style="position: absolute; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
+                                    <div id="whatsapp-preview-bubble" class="sweetaddons-wa-widget sweetaddons-wa-preview sweetaddons-wa-<?php echo esc_attr($position); ?>" data-animation="<?php echo esc_attr($animation); ?>" style="position: absolute; --sweetaddons-wa-split-text-bg: <?php echo esc_attr($split_text_bg); ?>; <?php echo ($position === 'bottom-right') ? 'bottom: 20px; right: 20px;' : 'bottom: 20px; left: 20px;'; ?>">
                                         <div id="whatsapp-preview-shell" class="sweetaddons-wa-bubble sweetaddons-wa-<?php echo esc_attr($bubble_style); ?>">
                                             <div id="whatsapp-preview-inner" class="sweetaddons-wa-link" style="<?php echo ($bubble_style === 'extended') ? 'display:flex; align-items:center; padding:12px 20px; background:' . esc_attr($color) . '; border-radius:25px; color:white; text-decoration:none;' : (($bubble_style === 'split') ? 'display:inline-flex; flex-direction:row-reverse; align-items:center; gap:8px; padding:0; background:transparent; border-radius:999px; color:#111; text-decoration:none; box-shadow:none;' : 'width:60px; height:60px; display:flex; align-items:center; justify-content:center; background:' . esc_attr($color) . '; border-radius:50%; color:white; text-decoration:none;'); ?>">
                                                 <div class="sweetaddons-wa-icon" style="<?php echo ($bubble_style === 'split') ? 'display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; background:' . esc_attr($color) . '; color:#fff; flex:0 0 44px;' : ''; ?>">
@@ -2587,7 +2612,7 @@ class Custom_Admin_Option_Page
                 });
 
                 // Color picker sync
-                $('#sweetaddons_whatsapp_color').on('change', function() {
+                $('#sweetaddons_whatsapp_color, #sweetaddons_whatsapp_split_text_bg').on('change', function() {
                     $(this).next('input[type="text"]').val($(this).val());
                     updateWhatsAppPreview();
                 });
@@ -2647,7 +2672,7 @@ class Custom_Admin_Option_Page
                                 positionStyle = `top: 50%; transform: translateY(-50%); left: ${offset_x}px;`;
                                 break;
                         }
-                        $bubble.attr('style', 'position: absolute; ' + positionStyle);
+                        $bubble.attr('style', `position: absolute; --sweetaddons-wa-split-text-bg: ${split_text_bg}; ${positionStyle}`);
                         $bubble.attr('data-animation', animation);
                         $bubble
                             .removeClass('sweetaddons-wa-bottom-right sweetaddons-wa-bottom-left sweetaddons-wa-top-right sweetaddons-wa-top-left sweetaddons-wa-center-right sweetaddons-wa-center-left')
