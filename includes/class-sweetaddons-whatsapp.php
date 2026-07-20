@@ -448,6 +448,7 @@ class Sweetaddons_WhatsApp
 
         .sweetaddons-wa-split .sweetaddons-wa-text {
             display: inline-flex;
+            position: relative;
             align-items: center;
             padding: 12px 18px 12px 20px;
             background: {$split_text_bg};
@@ -458,12 +459,12 @@ class Sweetaddons_WhatsApp
             content: '';
             position: absolute;
             top: 50%;
-            right: -6px;
-            width: 14px;
+            right: -5px;
+            width: 12px;
             height: 12px;
             background: {$split_text_bg};
-            clip-path: polygon(0 0, 100% 50%, 0 100%);
-            transform: translateY(-50%);
+            border-radius: 0 0 0 12px;
+            transform: translateY(-50%) rotate(-45deg);
             z-index: -1;
         }
 
