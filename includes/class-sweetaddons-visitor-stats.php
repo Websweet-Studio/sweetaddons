@@ -41,63 +41,93 @@ class Sweetaddons_Visitor_Stats
             return;
         }
 
+        if ($this->should_skip_tracking()) {
+            return;
+        }
+
         $this->ensure_tables_exist();
 
         global $wpdb;
 
         $visitor_ip = $this->get_visitor_ip();
-        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field($_SERVER['HTTP_USER_AGENT']) : '';
-        $page_url = sanitize_url($_SERVER['REQUEST_URI']);
-        $referer = isset($_SERVER['HTTP_REFERER']) ? sanitize_url($_SERVER['HTTP_REFERER']) : '';
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+        $page_url = isset($_SERVER['REQUEST_URI']) ? sanitize_url(wp_unslash($_SERVER['REQUEST_URI'])) : '';
+        $referer = isset($_SERVER['HTTP_REFERER']) ? sanitize_url(wp_unslash($_SERVER['HTTP_REFERER'])) : '';
         $visit_date = current_time('Y-m-d');
         $visit_time = current_time('H:i:s');
 
-        // Check if this visitor has already been recorded today for this page
-        $existing = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM {$this->logs_table}
-             WHERE visitor_ip = %s AND page_url = %s AND visit_date = %s",
-            $visitor_ip,
-            $page_url,
-            $visit_date
-        ));
-
-        // Check if this is a unique visitor for today (before inserting)
-        $is_unique_today = !$wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM {$this->logs_table}
-             WHERE visitor_ip = %s AND visit_date = %s",
-            $visitor_ip,
-            $visit_date
-        ));
-
-        // Check if this is a unique visitor for this page today (before inserting)
-        $is_unique_page_today = !$wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM {$this->logs_table}
-             WHERE visitor_ip = %s AND page_url = %s AND visit_date = %s",
-            $visitor_ip,
-            $page_url,
-            $visit_date
-        ));
-
-        if (!$existing) {
-            // Insert into logs table
-            $wpdb->insert(
-                $this->logs_table,
-                array(
-                    'visitor_ip' => $visitor_ip,
-                    'user_agent' => $user_agent,
-                    'page_url' => $page_url,
-                    'referer' => $referer,
-                    'visit_date' => $visit_date,
-                    'visit_time' => $visit_time
-                ),
-                array('%s', '%s', '%s', '%s', '%s', '%s')
-            );
-
-            // Real-time update aggregation tables (untuk hari ini)
-            $this->update_daily_stats($visit_date, $is_unique_today);
-            $this->update_page_stats($page_url, $visit_date, $is_unique_page_today);
-            $this->update_referrer_stats($referer, $visit_date);
+        if ($visitor_ip === '0.0.0.0' || $page_url === '') {
+            return;
         }
+
+        $existing_rows = $wpdb->get_results($wpdb->prepare(
+            "SELECT page_url FROM {$this->logs_table} WHERE visitor_ip = %s AND visit_date = %s",
+            $visitor_ip,
+            $visit_date
+        ));
+
+        $is_unique_today = empty($existing_rows);
+        $already_tracked_page = false;
+
+        foreach ($existing_rows as $existing_row) {
+            if (isset($existing_row->page_url) && $existing_row->page_url === $page_url) {
+                $already_tracked_page = true;
+                break;
+            }
+        }
+
+        if ($already_tracked_page) {
+            return;
+        }
+
+        $wpdb->insert(
+            $this->logs_table,
+            array(
+                'visitor_ip' => $visitor_ip,
+                'user_agent' => $user_agent,
+                'page_url' => $page_url,
+                'referer' => $referer,
+                'visit_date' => $visit_date,
+                'visit_time' => $visit_time,
+            ),
+            array('%s', '%s', '%s', '%s', '%s', '%s')
+        );
+
+        $this->update_daily_stats($visit_date, $is_unique_today);
+        $this->update_page_stats($page_url, $visit_date, true);
+        $this->update_referrer_stats($referer, $visit_date);
+    }
+
+    private function should_skip_tracking()
+    {
+        if (is_user_logged_in()) {
+            $user = wp_get_current_user();
+            if ($user instanceof WP_User && array_intersect(array('administrator', 'editor'), (array) $user->roles)) {
+                return true;
+            }
+        }
+
+        if (defined('REST_REQUEST') && REST_REQUEST) {
+            return true;
+        }
+
+        if (is_feed() || is_trackback() || is_preview()) {
+            return true;
+        }
+
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? strtolower((string) wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+        if ($user_agent === '') {
+            return true;
+        }
+
+        $bot_signatures = array('bot', 'crawl', 'slurp', 'spider', 'facebookexternalhit', 'whatsapp', 'telegrambot', 'pingdom', 'uptime');
+        foreach ($bot_signatures as $signature) {
+            if (strpos($user_agent, $signature) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function get_visitor_ip()
@@ -106,7 +136,7 @@ class Sweetaddons_Visitor_Stats
 
         foreach ($ip_keys as $key) {
             if (array_key_exists($key, $_SERVER) === true) {
-                foreach (explode(',', $_SERVER[$key]) as $ip) {
+                foreach (explode(',', (string) $_SERVER[$key]) as $ip) {
                     $ip = trim($ip);
                     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
                         return $ip;
@@ -115,7 +145,7 @@ class Sweetaddons_Visitor_Stats
             }
         }
 
-        return isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field($_SERVER['REMOTE_ADDR']) : '0.0.0.0';
+        return isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '0.0.0.0';
     }
 
     private function update_daily_stats($visit_date, $is_unique_visitor)
@@ -124,7 +154,6 @@ class Sweetaddons_Visitor_Stats
 
         $is_unique_today = $is_unique_visitor ? 1 : 0;
 
-        // Update or insert daily stats
         $wpdb->query($wpdb->prepare(
             "INSERT INTO {$this->daily_stats_table} (stat_date, unique_visitors, total_pageviews)
              VALUES (%s, %d, 1)
@@ -164,7 +193,9 @@ class Sweetaddons_Visitor_Stats
 
     private function update_referrer_stats($referer, $visit_date)
     {
-        if (empty($referer)) return;
+        if (empty($referer)) {
+            return;
+        }
 
         global $wpdb;
 
@@ -194,7 +225,6 @@ class Sweetaddons_Visitor_Stats
         $current_month = date('n');
         $current_year = date('Y');
 
-        // Aggregate current month data
         $monthly_data = $wpdb->get_row($wpdb->prepare(
             "SELECT 
                 SUM(unique_visitors) as unique_visitors,
@@ -230,14 +260,12 @@ class Sweetaddons_Visitor_Stats
     {
         global $wpdb;
 
-        // Keep only last 90 days of raw logs (untuk performance)
         $wpdb->query(
             "DELETE FROM {$this->logs_table} 
              WHERE visit_date < DATE_SUB(CURDATE(), INTERVAL 90 DAY)"
         );
     }
 
-    // Optimized methods using aggregated tables
     public function get_daily_stats($days = 30)
     {
         $this->ensure_tables_exist();
@@ -297,7 +325,6 @@ class Sweetaddons_Visitor_Stats
         $this->ensure_tables_exist();
         global $wpdb;
 
-        // Today's stats from daily aggregation
         $today = $wpdb->get_row(
             "SELECT 
                 unique_visitors,
@@ -306,7 +333,6 @@ class Sweetaddons_Visitor_Stats
              WHERE stat_date = CURDATE()"
         );
 
-        // This week's stats
         $this_week = $wpdb->get_row(
             "SELECT 
                 SUM(unique_visitors) as unique_visitors,
@@ -315,7 +341,6 @@ class Sweetaddons_Visitor_Stats
              WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"
         );
 
-        // This month's stats
         $this_month = $wpdb->get_row(
             "SELECT 
                 SUM(unique_visitors) as unique_visitors,
@@ -324,7 +349,6 @@ class Sweetaddons_Visitor_Stats
              WHERE stat_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)"
         );
 
-        // All time stats from monthly aggregation + current month daily
         $all_time = $wpdb->get_row(
             "SELECT 
                 (SELECT COALESCE(SUM(unique_visitors), 0) FROM {$this->monthly_stats_table}) +
@@ -336,10 +360,10 @@ class Sweetaddons_Visitor_Stats
         );
 
         return array(
-            'today' => $today ?: (object)['unique_visitors' => 0, 'total_visits' => 0],
-            'this_week' => $this_week ?: (object)['unique_visitors' => 0, 'total_visits' => 0],
-            'this_month' => $this_month ?: (object)['unique_visitors' => 0, 'total_visits' => 0],
-            'all_time' => $all_time ?: (object)['unique_visitors' => 0, 'total_visits' => 0]
+            'today' => $today ?: (object) array('unique_visitors' => 0, 'total_visits' => 0),
+            'this_week' => $this_week ?: (object) array('unique_visitors' => 0, 'total_visits' => 0),
+            'this_month' => $this_month ?: (object) array('unique_visitors' => 0, 'total_visits' => 0),
+            'all_time' => $all_time ?: (object) array('unique_visitors' => 0, 'total_visits' => 0),
         );
     }
 
@@ -348,10 +372,8 @@ class Sweetaddons_Visitor_Stats
         $this->ensure_tables_exist();
         global $wpdb;
 
-        // Clear existing daily stats
         $wpdb->query("TRUNCATE TABLE {$this->daily_stats_table}");
 
-        // Rebuild from logs
         $daily_data = $wpdb->get_results(
             "SELECT 
                 visit_date,
@@ -368,7 +390,7 @@ class Sweetaddons_Visitor_Stats
                 array(
                     'stat_date' => $data->visit_date,
                     'unique_visitors' => $data->unique_visitors,
-                    'total_pageviews' => $data->total_pageviews
+                    'total_pageviews' => $data->total_pageviews,
                 ),
                 array('%s', '%d', '%d')
             );
@@ -382,10 +404,8 @@ class Sweetaddons_Visitor_Stats
         $this->ensure_tables_exist();
         global $wpdb;
 
-        // Clear existing page stats
         $wpdb->query("TRUNCATE TABLE {$this->page_stats_table}");
 
-        // Rebuild from logs
         $page_data = $wpdb->get_results(
             "SELECT 
                 page_url,
@@ -404,7 +424,7 @@ class Sweetaddons_Visitor_Stats
                     'page_url' => $data->page_url,
                     'stat_date' => $data->visit_date,
                     'unique_visitors' => $data->unique_visitors,
-                    'total_views' => $data->total_views
+                    'total_views' => $data->total_views,
                 ),
                 array('%s', '%s', '%d', '%d')
             );
@@ -417,50 +437,53 @@ class Sweetaddons_Visitor_Stats
     {
         $this->ensure_tables_exist();
         $atts = shortcode_atts(array(
-            'style' => 'default', // default, minimal, cards
-            'show' => 'all', // all, today, total
-            'columns' => '4' // 1, 2, 3, 4
-        ), $atts, 'statistic');
+            'style' => 'default',
+            'period' => '30',
+            'show_chart' => 'true',
+            'show_summary' => 'true',
+            'show_pages' => 'false'
+        ), $atts);
 
-        $stats = $this->get_summary_stats();
+        $style = sanitize_text_field($atts['style']);
+        $days = intval($atts['period']);
+        $show_chart = filter_var($atts['show_chart'], FILTER_VALIDATE_BOOLEAN);
+        $show_summary = filter_var($atts['show_summary'], FILTER_VALIDATE_BOOLEAN);
+        $show_pages = filter_var($atts['show_pages'], FILTER_VALIDATE_BOOLEAN);
+
+        $daily_stats = $this->get_daily_stats($days);
+        $page_stats = $show_pages ? $this->get_page_stats($days) : array();
+        $summary = $show_summary ? $this->get_summary_stats() : array();
 
         ob_start();
 
-        $style_class = 'sweetaddons-stats-' . sanitize_html_class($atts['style']);
-        $columns_class = 'sweetaddons-stats-cols-' . sanitize_html_class($atts['columns']);
+        $this->add_shortcode_styles();
 
-        echo '<div class="sweetaddons-statistics-widget ' . $style_class . ' ' . $columns_class . '">';
+        echo '<div class="sweetaddons-statistics-widget sweetaddons-statistics-' . esc_attr($style) . '">';
 
-        if ($atts['show'] === 'all' || $atts['show'] === 'today') {
-            echo '<div class="stat-item">';
-            echo '<div class="stat-number">' . number_format($stats['today']->total_visits) . '</div>';
-            echo '<div class="stat-label">Kunjungan Hari Ini</div>';
-            echo '</div>';
-
-            echo '<div class="stat-item">';
-            echo '<div class="stat-number">' . number_format($stats['today']->unique_visitors) . '</div>';
-            echo '<div class="stat-label">Pengunjung Hari Ini</div>';
+        if ($show_summary && !empty($summary)) {
+            echo '<div class="sweetaddons-summary-grid">';
+            echo '<div class="stat-card"><h4>Hari Ini</h4><div class="stat-number">' . number_format((int) $summary['today']->total_visits) . '</div><div class="stat-label">Kunjungan</div></div>';
+            echo '<div class="stat-card"><h4>7 Hari</h4><div class="stat-number">' . number_format((int) $summary['this_week']->total_visits) . '</div><div class="stat-label">Kunjungan</div></div>';
+            echo '<div class="stat-card"><h4>30 Hari</h4><div class="stat-number">' . number_format((int) $summary['this_month']->total_visits) . '</div><div class="stat-label">Kunjungan</div></div>';
+            echo '<div class="stat-card"><h4>Total</h4><div class="stat-number">' . number_format((int) $summary['all_time']->total_visits) . '</div><div class="stat-label">Kunjungan</div></div>';
             echo '</div>';
         }
 
-        if ($atts['show'] === 'all' || $atts['show'] === 'total') {
-            echo '<div class="stat-item">';
-            echo '<div class="stat-number">' . number_format($stats['all_time']->total_visits) . '</div>';
-            echo '<div class="stat-label">Total Kunjungan</div>';
+        if ($show_chart && !empty($daily_stats)) {
+            echo '<div class="chart-container">';
+            echo '<canvas id="sweetaddons-chart-' . wp_rand(1000, 9999) . '" width="400" height="200"></canvas>';
             echo '</div>';
+        }
 
-            echo '<div class="stat-item">';
-            echo '<div class="stat-number">' . number_format($stats['all_time']->unique_visitors) . '</div>';
-            echo '<div class="stat-label">Total Pengunjung</div>';
-            echo '</div>';
+        if ($show_pages && !empty($page_stats)) {
+            echo '<div class="page-stats"><h4>Halaman Terpopuler</h4><ul>';
+            foreach ($page_stats as $page) {
+                echo '<li><span class="page-url">' . esc_html($page->page_url) . '</span><span class="page-views">' . number_format((int) $page->total_views) . ' views</span></li>';
+            }
+            echo '</ul></div>';
         }
 
         echo '</div>';
-
-        // Add CSS if not already added
-        if (!wp_style_is('sweetaddons-stats-shortcode', 'enqueued')) {
-            $this->add_shortcode_styles();
-        }
 
         return ob_get_clean();
     }
@@ -585,113 +608,6 @@ class Sweetaddons_Visitor_Stats
             .sweetaddons-statistics-widget {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 15px;
-                margin: 20px 0;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            }
-
-            .sweetaddons-statistics-widget .stat-item {
-                flex: 1;
-                min-width: 150px;
-                text-align: center;
-                padding: 20px;
-                background: #f8f9fa;
-                border-radius: 8px;
-                border: 1px solid #e9ecef;
-                transition: all 0.3s ease;
-            }
-
-            .sweetaddons-statistics-widget .stat-item:hover {
-                background: #e9ecef;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            }
-
-            .sweetaddons-statistics-widget .stat-number {
-                font-size: 28px;
-                font-weight: bold;
-                color: #0073aa;
-                margin-bottom: 8px;
-                line-height: 1;
-            }
-
-            .sweetaddons-statistics-widget .stat-label {
-                font-size: 14px;
-                color: #666;
-                font-weight: 500;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            /* Style variations */
-            .sweetaddons-stats-minimal .stat-item {
-                background: transparent;
-                border: none;
-                padding: 10px;
-            }
-
-            .sweetaddons-stats-minimal .stat-item:hover {
-                background: #f8f9fa;
-                transform: none;
-                box-shadow: none;
-            }
-
-            .sweetaddons-stats-cards .stat-item {
-                background: #fff;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                border: none;
-            }
-
-            .sweetaddons-stats-cards .stat-item:hover {
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            }
-
-            /* Column variations */
-            .sweetaddons-stats-cols-1 {
-                flex-direction: column;
-                max-width: 200px;
-            }
-
-            .sweetaddons-stats-cols-2 .stat-item {
-                flex-basis: calc(50% - 7.5px);
-            }
-
-            .sweetaddons-stats-cols-3 .stat-item {
-                flex-basis: calc(33.333% - 10px);
-            }
-
-            .sweetaddons-stats-cols-4 .stat-item {
-                flex-basis: calc(25% - 11.25px);
-            }
-
-            /* Responsive */
-            @media (max-width: 768px) {
-                .sweetaddons-statistics-widget {
-                    flex-direction: column;
-                }
-
-                .sweetaddons-statistics-widget .stat-item {
-                    flex-basis: auto !important;
-                }
-
-                .sweetaddons-statistics-widget .stat-number {
-                    font-size: 24px;
-                }
-            }
-
-            @media (max-width: 480px) {
-                .sweetaddons-statistics-widget .stat-item {
-                    padding: 15px;
-                    min-width: auto;
-                }
-
-                .sweetaddons-statistics-widget .stat-number {
-                    font-size: 20px;
-                }
-
-                .sweetaddons-statistics-widget .stat-label {
-                    font-size: 12px;
-                }
             }
         </style>
 <?php

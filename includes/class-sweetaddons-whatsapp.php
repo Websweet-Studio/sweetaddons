@@ -15,10 +15,10 @@ class Sweetaddons_WhatsApp
     public function __construct()
     {
         add_action('wp_footer', array($this, 'output_whatsapp_widget'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_whatsapp_styles'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_whatsapp_assets'));
     }
 
-    public function enqueue_whatsapp_styles()
+    public function enqueue_whatsapp_assets()
     {
         $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
         $phone_number = get_option('sweetaddons_whatsapp_phone');
@@ -29,6 +29,16 @@ class Sweetaddons_WhatsApp
             wp_register_style('sweetaddons-whatsapp-css', false);
             wp_enqueue_style('sweetaddons-whatsapp-css');
             wp_add_inline_style('sweetaddons-whatsapp-css', $this->get_whatsapp_css());
+
+            if (count($agents) > 1) {
+                wp_enqueue_script(
+                    'sweetaddons-whatsapp-js',
+                    plugin_dir_url(dirname(__FILE__)) . 'assets/public/js/sweetaddons-whatsapp.js',
+                    array(),
+                    defined('SWEETADDONS_VERSION') ? SWEETADDONS_VERSION : null,
+                    true
+                );
+            }
         }
     }
 
@@ -230,57 +240,6 @@ class Sweetaddons_WhatsApp
                 </div>
             <?php endif; ?>
         </div>
-        <script>
-            (function() {
-                var widget = document.getElementById('sweetaddons-whatsapp-widget');
-                if (!widget) {
-                    return;
-                }
-                var panel = document.getElementById('sweetaddons-wa-panel');
-                var trigger = widget.querySelector('.sweetaddons-wa-trigger');
-                if (!panel || !trigger) {
-                    return;
-                }
-
-                function openPanel() {
-                    panel.hidden = false;
-                    panel.classList.add('is-open');
-                    widget.classList.add('sweetaddons-wa-panel-open');
-                    trigger.setAttribute('aria-expanded', 'true');
-                }
-
-                function closePanel() {
-                    panel.classList.remove('is-open');
-                    panel.hidden = true;
-                    widget.classList.remove('sweetaddons-wa-panel-open');
-                    trigger.setAttribute('aria-expanded', 'false');
-                }
-
-                trigger.addEventListener('click', function() {
-                    if (panel.hidden) {
-                        openPanel();
-                    } else {
-                        closePanel();
-                    }
-                });
-
-                document.addEventListener('click', function(e) {
-                    if (panel.hidden) {
-                        return;
-                    }
-                    if (widget.contains(e.target)) {
-                        return;
-                    }
-                    closePanel();
-                });
-
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape' && !panel.hidden) {
-                        closePanel();
-                    }
-                });
-            })();
-        </script>
 <?php
     }
 

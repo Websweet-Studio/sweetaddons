@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://websweetstudio.com
- * @since             3.0.27
+ * @since             3.0.28
  * @package           sweetaddons
  *
  * @wordpress-plugin
  * Plugin Name:       Sweet Addons
  * Plugin URI:        https://websweetstudio.com
  * Description:       Addon plugin for WebsweetStudio Client
- * Version:           3.0.27
+ * Version:           3.0.28
  * Author:            WebsweetStudio
  * Author URI:        https://websweetstudio.com
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('SWEETADDONS_VERSION', '3.0.27');
+define('SWEETADDONS_VERSION', '3.0.28');
 define('PLUGIN_DIR', plugin_dir_path(__DIR__));
 define('PLUGIN_FILE', plugin_basename(__FILE__));
 define('PLUGIN_BASE_NAME', plugin_basename(__DIR__));
@@ -197,12 +197,8 @@ register_deactivation_hook(__FILE__, 'deactivate_Sweetaddons');
  */
 function run_sweetaddons()
 {
-    $root = plugin_dir_path(__FILE__);
-    $dirs = array('includes', 'admin', 'public');
-    foreach ($dirs as $dir) {
-        foreach (glob($root . $dir . '/*.php') as $file) {
-            require_once $file;
-        }
+    if (!class_exists('sweetaddons', false)) {
+        require_once plugin_dir_path(__FILE__) . 'includes/class-sweetaddons.php';
     }
 
     $plugin = new sweetaddons();

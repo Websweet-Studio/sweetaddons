@@ -161,62 +161,60 @@ class Custom_Admin_Option_Page
 
     public function field($data)
     {
-        $type   = isset($data['type']) ? $data['type'] : '';
-        $id     = isset($data['id']) ? $data['id'] : '';
-        $std    = isset($data['std']) ? $data['std'] : '';
-        $step   = isset($data['step']) ? $data['step'] : '';
-        $value  = get_option($id, $std);
-        $name   = $id;
+        $type = isset($data['type']) ? (string) $data['type'] : '';
+        $id = isset($data['id']) ? (string) $data['id'] : '';
+        $std = isset($data['std']) ? $data['std'] : '';
+        $step = isset($data['step']) ? $data['step'] : '';
+        $value = get_option($id, $std);
+        $name = $id;
 
-        // jika ada sub, sub array dari Value
         if (isset($data['sub']) && !empty($data['sub'])) {
-            $sub    = $data['sub'];
-            $value  = isset($value[$sub]) ? $value[$sub] : '';
-            $name   = $id . '[' . $sub . ']';
+            $sub = (string) $data['sub'];
+            $value = (is_array($value) && isset($value[$sub])) ? $value[$sub] : '';
+            $name = $id . '[' . $sub . ']';
         }
 
-        if ($std && empty($value) && $type != 'checkbox') {
+        if ($std && empty($value) && $type !== 'checkbox') {
             $value = $std;
         }
 
-        //jika field checkbox
-        if ($type == 'checkbox') {
-            $checked = ($value == 1) ? 'checked' : '';
-            echo '<input type="checkbox" id="' . $id . '" name="' . $name . '" value="1" ' . $checked . '> ';
-        }
-        //jika field text
-        if ($type == 'text') {
-            echo '<div><input type="text" id="' . $id . '" name="' . $name . '" value="' . $value . '" class="regular-text"></div>';
+        $field_id = esc_attr($id);
+        $field_name = esc_attr($name);
+        $field_step = esc_attr((string) $step);
+
+        if ($type === 'checkbox') {
+            echo '<input type="checkbox" id="' . $field_id . '" name="' . $field_name . '" value="1" ' . checked($value, 1, false) . '> ';
         }
 
-        if ($type == 'password') {
-            echo '<div><input type="password" id="' . $id . '" name="' . $name . '" value="' . $value . '" class="regular-text"></div>';
+        if ($type === 'text') {
+            echo '<div><input type="text" id="' . $field_id . '" name="' . $field_name . '" value="' . esc_attr((string) $value) . '" class="regular-text"></div>';
         }
 
-        //jika field number
-        if ($type == 'number') {
-            echo '<div><input type="number" step="' . $step . '" min="0" id="' . $id . '" name="' . $name . '" value="' . $value . '" class="small-text"></div>';
+        if ($type === 'password') {
+            echo '<div><input type="password" id="' . $field_id . '" name="' . $field_name . '" value="' . esc_attr((string) $value) . '" class="regular-text"></div>';
         }
-        //jika field textarea
-        if ($type == 'textarea') {
+
+        if ($type === 'number') {
+            echo '<div><input type="number" step="' . $field_step . '" min="0" id="' . $field_id . '" name="' . $field_name . '" value="' . esc_attr((string) $value) . '" class="small-text"></div>';
+        }
+
+        if ($type === 'textarea') {
             echo '<div>';
-            echo '<textarea id="' . $id . '" name="' . $name . '" rows="6" cols="50" class="large-text">';
-            echo $value;
+            echo '<textarea id="' . $field_id . '" name="' . $field_name . '" rows="6" cols="50" class="large-text">';
+            echo esc_textarea((string) $value);
             echo '</textarea>';
             echo '</div>';
         }
 
-        ///tampil label
         if (isset($data['label']) && !empty($data['label'])) {
-            echo '<label for="' . $id . '">';
-            echo '<small>' . $data['label'] . '</small>';
+            echo '<label for="' . $field_id . '">';
+            echo '<small>' . esc_html((string) $data['label']) . '</small>';
             echo '</label>';
         }
 
-        ///tampil deskripsi
         if (isset($data['desc']) && !empty($data['desc'])) {
             echo '<div>';
-            echo '<small>' . $data['desc'] . '</small>';
+            echo '<small>' . esc_html((string) $data['desc']) . '</small>';
             echo '</div>';
         }
     }
@@ -400,6 +398,8 @@ class Custom_Admin_Option_Page
         $comment = isset($captcha_settings['comment']) ? $captcha_settings['comment'] : '';
         $register = isset($captcha_settings['register']) ? $captcha_settings['register'] : '';
         $difficulty = isset($captcha_settings['difficulty']) ? $captcha_settings['difficulty'] : 'medium';
+        $preview_style = $aktif === '1' ? 'margin-top: 15px;' : 'margin-top: 15px; display:none;';
+        $helper_style = $aktif === '1' ? 'display:none; margin-top: 8px;' : 'margin-top: 8px;';
     ?>
         <?php if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) : ?>
             <div class="sad-notice sad-notice-success">
@@ -432,24 +432,45 @@ class Custom_Admin_Option_Page
                                         <option value="hard" <?php selected($difficulty, 'hard'); ?>>Sulit (6 Karakter + Noise)</option>
                                     </select>
                                     <p class="description">Atur kompleksitas kode dan visual CAPTCHA.</p>
-                                    <div id="captcha-preview-container" style="margin-top: 15px;">
+                                    <p id="captcha-preview-helper" class="description" style="<?php echo esc_attr($helper_style); ?>">Aktifkan CAPTCHA untuk melihat preview.</p>
+                                    <div id="captcha-preview-container" style="<?php echo esc_attr($preview_style); ?>">
                                         <strong>Preview:</strong><br>
                                         <img id="captcha-preview-img" src="<?php echo add_query_arg(array('sweetaddons_captcha' => 'preview', 'difficulty' => $difficulty), home_url('/index.php')); ?>" alt="Captcha Preview" style="border:1px solid #d0d4d9; height:50px; width:160px; background:#f5f6fa; border-radius:4px; margin-top: 5px;">
                                         <p><a href="#" id="refresh-captcha-preview" class="button button-small">Refresh Preview</a></p>
                                     </div>
                                     <script>
                                         jQuery(document).ready(function($) {
+                                            var $captchaToggle = $('input[name="captcha_aktif"]');
+                                            var $previewContainer = $('#captcha-preview-container');
+                                            var $previewHelper = $('#captcha-preview-helper');
+
                                             function updateCaptchaPreview() {
                                                 var difficulty = $('#captcha_difficulty').val();
                                                 var src = '<?php echo home_url('/index.php'); ?>?sweetaddons_captcha=preview&difficulty=' + difficulty + '&t=' + new Date().getTime();
                                                 $('#captcha-preview-img').attr('src', src);
                                             }
+
+                                            function toggleCaptchaPreview(refreshPreview) {
+                                                var isActive = $captchaToggle.is(':checked');
+                                                $previewContainer.toggle(isActive);
+                                                $previewHelper.toggle(!isActive);
+
+                                                if (isActive && refreshPreview) {
+                                                    updateCaptchaPreview();
+                                                }
+                                            }
+
                                             $('#captcha_difficulty').on('change', function() {
-                                                updateCaptchaPreview();
+                                                if ($captchaToggle.is(':checked')) {
+                                                    updateCaptchaPreview();
+                                                }
                                             });
                                             $('#refresh-captcha-preview').on('click', function(e) {
                                                 e.preventDefault();
                                                 updateCaptchaPreview();
+                                            });
+                                            $captchaToggle.on('change', function() {
+                                                toggleCaptchaPreview(true);
                                             });
                                         });
                                     </script>
