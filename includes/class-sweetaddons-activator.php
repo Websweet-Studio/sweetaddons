@@ -179,6 +179,7 @@ class Sweetaddons_Activator
 
 		// WhatsApp
 		add_option('sweetaddons_whatsapp_enable', '');
+		add_option('sweetaddons_whatsapp_phone', '');
 		add_option('sweetaddons_whatsapp_message', 'Halo! Saya butuh bantuan.');
 		add_option('sweetaddons_whatsapp_button_text', 'Chat dengan kami');
 		add_option('sweetaddons_whatsapp_position', 'bottom-right');
@@ -210,22 +211,14 @@ class Sweetaddons_Activator
 
 		// Optimasi — Head Cleanup
 		add_option('sweetaddons_head_cleanup', array(
-			'remove_emoji'       => 1,
-			'remove_rsd'         => 1,
-			'remove_wlw'         => 1,
-			'remove_shortlink'   => 1,
-			'remove_rest_link'   => 1,
-			'remove_oembed'      => 0,
-			'remove_generator'   => 1,
-			'disable_pingback'   => 1,
+			'remove_emoji'     => 1,
+			'remove_rsd'       => 1,
+			'remove_wlw'       => 1,
+			'remove_shortlink' => 1,
+			'remove_rest_link' => 1,
+			'remove_oembed'    => 1,
+			'remove_generator' => 1,
+			'disable_pingback' => 1,
 		));
-
-		// Mengarahkan pengguna ke halaman custom_admin_options saat plugin diaktifkan
-		// wp_redirect(admin_url('options-general.php?page=custom_admin_options'));
-		// exit;
-
-		if (function_exists('sweetaddons_build_classmap')) {
-			sweetaddons_build_classmap(true);
-		}
 	}
 }

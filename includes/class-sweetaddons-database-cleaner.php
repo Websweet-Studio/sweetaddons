@@ -54,34 +54,39 @@ class Sweetaddons_Database_Cleaner
         global $wpdb;
         $cleaned = array();
 
-        if (in_array('revisions', $items)) {
-            $wpdb->query("DELETE FROM $wpdb->posts WHERE post_type = 'revision'");
-            $cleaned[] = 'Post Revisions';
+        if (in_array('revisions', $items, true)) {
+            $deleted = $wpdb->query("DELETE FROM $wpdb->posts WHERE post_type = 'revision'");
+            $cleaned['revisions'] = max(0, (int) $deleted);
         }
 
-        if (in_array('auto_drafts', $items)) {
-            $wpdb->query("DELETE FROM $wpdb->posts WHERE post_status = 'auto-draft'");
-            $cleaned[] = 'Auto Drafts';
+        if (in_array('auto_drafts', $items, true)) {
+            $deleted = $wpdb->query("DELETE FROM $wpdb->posts WHERE post_status = 'auto-draft'");
+            $cleaned['auto_drafts'] = max(0, (int) $deleted);
         }
 
-        if (in_array('spam_comments', $items)) {
-            $wpdb->query("DELETE FROM $wpdb->comments WHERE comment_approved = 'spam'");
-            $cleaned[] = 'Spam Comments';
+        if (in_array('spam_comments', $items, true)) {
+            $deleted = $wpdb->query("DELETE FROM $wpdb->comments WHERE comment_approved = 'spam'");
+            $cleaned['spam_comments'] = max(0, (int) $deleted);
         }
 
-        if (in_array('trashed_comments', $items)) {
-            $wpdb->query("DELETE FROM $wpdb->comments WHERE comment_approved = 'trash'");
-            $cleaned[] = 'Trashed Comments';
+        if (in_array('trashed_comments', $items, true)) {
+            $deleted = $wpdb->query("DELETE FROM $wpdb->comments WHERE comment_approved = 'trash'");
+            $cleaned['trashed_comments'] = max(0, (int) $deleted);
         }
 
-        if (in_array('expired_transients', $items)) {
+        if (in_array('expired_transients', $items, true)) {
             $time = time();
-            $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout%' AND option_value < '$time'");
-            $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout%' AND CONCAT('_transient_timeout_', SUBSTRING(option_name, 12)) NOT IN (SELECT option_name FROM $wpdb->options)");
-            $cleaned[] = 'Expired Transients';
+            $deleted_timeouts = $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout%' AND option_value < '$time'");
+            $deleted_values = $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout%' AND CONCAT('_transient_timeout_', SUBSTRING(option_name, 12)) NOT IN (SELECT option_name FROM $wpdb->options)");
+            $cleaned['expired_transients'] = max(0, (int) $deleted_timeouts) + max(0, (int) $deleted_values);
         }
 
         return $cleaned;
+    }
+
+    public function clean($items)
+    {
+        return $this->clean_items($items);
     }
 
     public function format_bytes($bytes)
