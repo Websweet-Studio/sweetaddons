@@ -221,4 +221,81 @@ class Sweetaddons_Activator
 			'disable_pingback' => 1,
 		));
 	}
+
+	/**
+	 * Hapus semua option plugin lalu set ulang ke default (seperti aktivasi baru).
+	 * Data statistik (tabel DB) TIDAK dihapus.
+	 *
+	 * @since 3.0.26
+	 */
+	public static function reset_settings()
+	{
+		$options = array(
+			// Umum
+			'fully_disable_comment',
+			'hide_admin_notice',
+			'disable_gutenberg',
+			'classic_widget_Sweetaddons',
+			'remove_slug_category_Sweetaddons',
+			'auto_resize_image_Sweetaddons',
+			// Proteksi / Security
+			'limit_login_attempts',
+			'disable_xmlrpc',
+			'disable_rest_api',
+			'captcha_Sweetaddons',
+			// Maintenance
+			'maintenance_mode',
+			'maintenance_mode_data',
+			// Block wp-login
+			'block_wp_login',
+			'whitelist_block_wp_login',
+			'redirect_to',
+			// Auto resize image
+			'auto_resize_mode',
+			'auto_resize_mode_data',
+			// License / News
+			'license_key',
+			'news_generate',
+			// SEO
+			'sweetaddons_seo_home_title',
+			'sweetaddons_seo_home_description',
+			'sweetaddons_seo_default_og_image',
+			'sweetaddons_seo_twitter_site',
+			// White Label
+			'sweetaddons_whitelabel_plugin_name',
+			'sweetaddons_whitelabel_plugin_uri',
+			'sweetaddons_whitelabel_description',
+			'sweetaddons_whitelabel_author',
+			'sweetaddons_whitelabel_author_uri',
+			'sweetaddons_whitelabel_menu_title',
+			'sweetaddons_whitelabel_hide_original',
+			// WhatsApp
+			'sweetaddons_whatsapp_enable',
+			'sweetaddons_whatsapp_phone',
+			'sweetaddons_whatsapp_message',
+			'sweetaddons_whatsapp_button_text',
+			'sweetaddons_whatsapp_position',
+			'sweetaddons_whatsapp_color',
+			'sweetaddons_whatsapp_show_mobile',
+			'sweetaddons_whatsapp_show_desktop',
+			'sweetaddons_whatsapp_animation',
+			'sweetaddons_whatsapp_bubble_style',
+			'sweetaddons_whatsapp_show_tooltip',
+			'sweetaddons_whatsapp_show_text_mobile',
+			'sweetaddons_whatsapp_agents',
+			// Login Customizer
+			'sweetaddons_login_customizer',
+			// Optimasi — Redis
+			'sweetaddons_redis_config',
+			// Optimasi — Head Cleanup
+			'sweetaddons_head_cleanup',
+		);
+
+		foreach ($options as $option_name) {
+			delete_option($option_name);
+		}
+
+		// Set ulang semua default seperti saat aktivasi.
+		self::activate();
+	}
 }

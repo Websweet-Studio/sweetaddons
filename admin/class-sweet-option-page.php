@@ -569,8 +569,23 @@ class Custom_Admin_Option_Page
 
     public function options_page_callback()
     {
+        // Handle reset plugin ke pengaturan default
+        if (isset($_POST['sweetaddons_reset_settings'])) {
+            check_admin_referer('sweetaddons_reset_settings');
+            if (!current_user_can('manage_options')) {
+                wp_die('Access denied');
+            }
+            Sweetaddons_Activator::reset_settings();
+            wp_safe_redirect(add_query_arg(array('page' => 'custom_admin_options', 'reset' => '1'), admin_url('admin.php')));
+            exit;
+        }
     ?>
         <?php Sweetaddons_Admin_Layout::open('Dashboard', 'custom_admin_options'); ?>
+        <?php if (isset($_GET['reset']) && $_GET['reset'] === '1') : ?>
+            <div class="sad-notice sad-notice-success">
+                <p>Semua pengaturan Sweet Addons berhasil direset ke default.</p>
+            </div>
+        <?php endif; ?>
         <div class="sad-top sad-top--dashboard">
             <?php
             global $wpdb;
@@ -672,6 +687,14 @@ class Custom_Admin_Option_Page
                     <p class="sad-qc-empty">Tidak ada catatan QC saat ini.</p>
                 <?php endif; ?>
             </div>
+        </div>
+        <div class="sad-card" style="margin-top: 20px;">
+            <div class="sad-card-title">Reset Pengaturan</div>
+            <p class="description">Kembalikan semua pengaturan Sweet Addons ke default (seperti instalasi baru). Data statistik pengunjung tidak dihapus.</p>
+            <form method="post" action="" onsubmit="return confirm('Yakin ingin mereset semua pengaturan Sweet Addons ke default? Tindakan ini tidak dapat dibatalkan.');">
+                <?php wp_nonce_field('sweetaddons_reset_settings'); ?>
+                <button type="submit" name="sweetaddons_reset_settings" value="1" class="button" style="color:#b32d2e; border-color:#b32d2e;">Reset Semua Pengaturan</button>
+            </form>
         </div>
         <script>
             (function() {
