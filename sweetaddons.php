@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://websweetstudio.com
- * @since             3.0.29
+ * @since             3.0.30
  * @package           sweetaddons
  *
  * @wordpress-plugin
  * Plugin Name:       Sweet Addons
  * Plugin URI:        https://websweetstudio.com
  * Description:       Addon plugin for WebsweetStudio Client
- * Version:           3.0.29
+ * Version:           3.0.30
  * Author:            WebsweetStudio
  * Author URI:        https://websweetstudio.com
  * License:           GPL-2.0+

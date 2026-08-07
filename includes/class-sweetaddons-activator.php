@@ -163,6 +163,7 @@ class Sweetaddons_Activator
 		add_option('news_generate', 0);
 
 		// SEO
+		add_option('sweetaddons_seo_enable', 1);
 		add_option('sweetaddons_seo_home_title', '');
 		add_option('sweetaddons_seo_home_description', '');
 		add_option('sweetaddons_seo_default_og_image', '');

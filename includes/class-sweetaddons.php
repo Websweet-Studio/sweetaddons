@@ -166,7 +166,9 @@ class sweetaddons
      */
     private function define_public_hooks()
     {
-        new Sweetaddons_SEO();
+        if (get_option('sweetaddons_seo_enable', 1)) {
+            new Sweetaddons_SEO();
+        }
 
         if (is_admin()) {
             new Sweetaddons_WhiteLabel();

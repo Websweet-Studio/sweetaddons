@@ -127,6 +127,7 @@ class Custom_Admin_Option_Page
         register_setting('custom_admin_options_group', 'news_generate');
 
         // SEO settings
+        register_setting('sweetaddons_seo_group', 'sweetaddons_seo_enable');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_title');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_home_description');
         register_setting('sweetaddons_seo_group', 'sweetaddons_seo_default_og_image');
@@ -1548,8 +1549,15 @@ class Custom_Admin_Option_Page
                     update_option($field, sanitize_text_field($_POST[$field]));
                 }
             }
+
+            if (isset($_POST['sweetaddons_seo_enable'])) {
+                update_option('sweetaddons_seo_enable', 1);
+            } else {
+                delete_option('sweetaddons_seo_enable');
+            }
         }
 
+        $seo_enabled = get_option('sweetaddons_seo_enable', 1);
         $home_title = get_option('sweetaddons_seo_home_title', '');
         $home_description = get_option('sweetaddons_seo_home_description', '');
         $default_og_image = get_option('sweetaddons_seo_default_og_image', '');
@@ -1595,6 +1603,21 @@ class Custom_Admin_Option_Page
                     <div id="seo-tab-general" class="seo-tab-content" style="display:<?php echo $seo_active_tab === 'general' ? 'block' : 'none'; ?>;">
 
                         <!-- General SEO Settings -->
+                        <div class="sad-card sad-mb-16" id="seo-enable-settings">
+                            <div class="sad-card-title">Status Fitur SEO</div>
+                            <table class="form-table">
+                                <tr>
+                                    <th scope="row"><label for="sweetaddons_seo_enable">Aktifkan Fitur SEO</label></th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" id="sweetaddons_seo_enable" name="sweetaddons_seo_enable" value="1" <?php checked(1, (int) $seo_enabled); ?> />
+                                            Aktifkan output meta SEO dari plugin ini
+                                        </label>
+                                        <p class="description">Nonaktifkan jika situs menggunakan plugin SEO lain (contoh: All in One SEO, Rank Math, Yoast) agar tidak terjadi konflik meta title/description.</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                         <div class="sad-card sad-mb-16" id="seo-general-settings">
                             <div class="sad-card-title">SEO Halaman Utama</div>
                             <table class="form-table">
