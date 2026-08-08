@@ -9,7 +9,7 @@
  * that starts the plugin.
  *
  * @link              https://websweetstudio.com
- * @since             3.0.30
+ * @since             3.0.31
  * @package           sweetaddons
  *
  * @wordpress-plugin

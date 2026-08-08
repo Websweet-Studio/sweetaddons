@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * The admin-specific functionality of the plugin.
@@ -2009,8 +2009,63 @@ class Custom_Admin_Option_Page
 
         // Handle settings save
         if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
+            $checkbox_fields = array(
+                'sweetaddons_whatsapp_enable',
+                'sweetaddons_whatsapp_show_mobile',
+                'sweetaddons_whatsapp_show_desktop',
+                'sweetaddons_whatsapp_show_tooltip',
+                'sweetaddons_whatsapp_show_text_mobile',
+            );
+
+            $text_fields = array(
+                'sweetaddons_whatsapp_message',
+                'sweetaddons_whatsapp_button_text',
+            );
+
+            $select_fields = array(
+                'sweetaddons_whatsapp_position' => array('bottom-right', 'bottom-left', 'top-right', 'top-left', 'center-right', 'center-left'),
+                'sweetaddons_whatsapp_animation' => array('none', 'pulse', 'bounce', 'shake'),
+                'sweetaddons_whatsapp_bubble_style' => array('circle', 'extended', 'split'),
+            );
+
+            $color_fields = array(
+                'sweetaddons_whatsapp_color' => '#25D366',
+                'sweetaddons_whatsapp_split_text_bg' => '#ffffff',
+                'sweetaddons_whatsapp_split_text_color' => '#111111',
+            );
+
+            foreach ($checkbox_fields as $field) {
+                update_option($field, isset($_POST[$field]) && $_POST[$field] === '1' ? '1' : '0');
+            }
+
+            foreach ($text_fields as $field) {
+                if (isset($_POST[$field])) {
+                    update_option($field, sanitize_text_field($_POST[$field]));
+                }
+            }
+
+            foreach ($select_fields as $field => $allowed_values) {
+                if (!isset($_POST[$field])) {
+                    continue;
+                }
+
+                $value = sanitize_text_field($_POST[$field]);
+                if (in_array($value, $allowed_values, true)) {
+                    update_option($field, $value);
+                }
+            }
+
+            foreach ($color_fields as $field => $default_color) {
+                if (!isset($_POST[$field])) {
+                    continue;
+                }
+
+                $color = sanitize_hex_color($_POST[$field]);
+                update_option($field, $color ? $color : $default_color);
+            }
+
+            $agents = array();
             if (isset($_POST['sweetaddons_whatsapp_agents']) && is_array($_POST['sweetaddons_whatsapp_agents'])) {
-                $agents = array();
                 foreach ($_POST['sweetaddons_whatsapp_agents'] as $agent) {
                     if (!is_array($agent)) {
                         continue;
@@ -2041,43 +2096,26 @@ class Custom_Admin_Option_Page
                         'avatar' => $avatar,
                     );
                 }
-
-                if (!empty($agents)) {
-                    update_option('sweetaddons_whatsapp_agents', $agents);
-                    delete_option('sweetaddons_whatsapp_phone');
-                } else {
-                    delete_option('sweetaddons_whatsapp_agents');
-                }
-            } else {
-                delete_option('sweetaddons_whatsapp_agents');
             }
 
-            $fields = array(
-                'sweetaddons_whatsapp_enable',
-                'sweetaddons_whatsapp_message',
-                'sweetaddons_whatsapp_button_text',
-                'sweetaddons_whatsapp_position',
-                'sweetaddons_whatsapp_color',
-                'sweetaddons_whatsapp_split_text_bg',
-                'sweetaddons_whatsapp_split_text_color',
-                'sweetaddons_whatsapp_show_mobile',
-                'sweetaddons_whatsapp_show_desktop',
-                'sweetaddons_whatsapp_animation',
-                'sweetaddons_whatsapp_bubble_style',
-                'sweetaddons_whatsapp_show_tooltip',
-                'sweetaddons_whatsapp_show_text_mobile'
-            );
+            if (empty($agents)) {
+                $legacy_phone = isset($_POST['sweetaddons_whatsapp_phone']) ? sanitize_text_field($_POST['sweetaddons_whatsapp_phone']) : get_option('sweetaddons_whatsapp_phone', '');
+                $legacy_phone = preg_replace('/[^0-9]/', '', $legacy_phone);
 
-            foreach ($fields as $field) {
-                if (isset($_POST[$field])) {
-                    update_option($field, sanitize_text_field($_POST[$field]));
-                } else {
-                    // Handle checkbox fields
-                    if (in_array($field, ['sweetaddons_whatsapp_enable', 'sweetaddons_whatsapp_show_mobile', 'sweetaddons_whatsapp_show_desktop', 'sweetaddons_whatsapp_show_tooltip', 'sweetaddons_whatsapp_show_text_mobile'])) {
-                        delete_option($field);
-                    }
+                if (!empty($legacy_phone)) {
+                    $agents[] = array(
+                        'name'   => '',
+                        'phone'  => $legacy_phone,
+                        'role'   => 'Customer Service',
+                        'note'   => '',
+                        'status' => 'online',
+                        'avatar' => '',
+                    );
                 }
             }
+
+            update_option('sweetaddons_whatsapp_agents', $agents);
+            delete_option('sweetaddons_whatsapp_phone');
         }
 
         // Get current settings
@@ -2152,6 +2190,7 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Aktifkan Chat WhatsApp</th>
                                     <td>
+                                        <input type="hidden" name="sweetaddons_whatsapp_enable" value="0" />
                                         <label>
                                             <input type="checkbox" id="sweetaddons_whatsapp_enable" name="sweetaddons_whatsapp_enable" value="1" <?php checked($enable, '1'); ?> />
                                             Enable floating WhatsApp chat button
@@ -2402,15 +2441,18 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Device Visibility</th>
                                     <td>
+                                        <input type="hidden" name="sweetaddons_whatsapp_show_mobile" value="0" />
                                         <label class="sad-form-checkbox">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_mobile" value="1" <?php checked($show_mobile, '1'); ?> />
                                             Tampilkan di perangkat Mobile
                                         </label><br>
+                                        <input type="hidden" name="sweetaddons_whatsapp_show_desktop" value="0" />
                                         <label class="sad-form-checkbox">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_desktop" value="1" <?php checked($show_desktop, '1'); ?> />
                                             Tampilkan di perangkat Desktop
                                         </label>
                                         <p class="description">Choose on which devices to display the chat button.</p>
+                                        <input type="hidden" name="sweetaddons_whatsapp_show_text_mobile" value="0" />
                                         <label class="sad-form-checkbox" style="margin-top:8px;display:block;">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_text_mobile" value="1" <?php checked($show_text_mobile, '1'); ?> />
                                             Tampilkan teks di perangkat Mobile
@@ -2421,6 +2463,7 @@ class Custom_Admin_Option_Page
                                 <tr>
                                     <th scope="row">Tooltip</th>
                                     <td>
+                                        <input type="hidden" name="sweetaddons_whatsapp_show_tooltip" value="0" />
                                         <label class="sad-form-checkbox">
                                             <input type="checkbox" name="sweetaddons_whatsapp_show_tooltip" value="1" <?php checked($show_tooltip, '1'); ?> />
                                             Show tooltip on hover
