@@ -167,8 +167,8 @@ class Sweetaddons_Captcha
 
     private function verify_pair()
     {
-        $token = isset($_POST['sweetaddons_captcha_token']) ? sanitize_text_field($_POST['sweetaddons_captcha_token']) : '';
-        $input = isset($_POST['sweetaddons_captcha_input']) ? sanitize_text_field($_POST['sweetaddons_captcha_input']) : '';
+        $token = isset($_POST['sweetaddons_captcha_token']) ? sanitize_text_field(wp_unslash($_POST['sweetaddons_captcha_token'])) : '';
+        $input = isset($_POST['sweetaddons_captcha_input']) ? sanitize_text_field(wp_unslash($_POST['sweetaddons_captcha_input'])) : '';
         if (!$token || !$input) {
             return array('success' => false, 'message' => 'Harap masukkan teks pada gambar');
         }

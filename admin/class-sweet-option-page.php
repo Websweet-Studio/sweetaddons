@@ -227,7 +227,7 @@ class Custom_Admin_Option_Page
 
     public function spam_page_callback()
     {
-        $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'protect';
+        $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'protect';
 ?>
         <?php
         $subnav = Sweetaddons_Admin_Layout::get_proteksi_subnav();
@@ -402,7 +402,7 @@ class Custom_Admin_Option_Page
         $preview_style = $aktif === '1' ? 'margin-top: 15px;' : 'margin-top: 15px; display:none;';
         $helper_style = $aktif === '1' ? 'display:none; margin-top: 8px;' : 'margin-top: 8px;';
     ?>
-        <?php if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_recaptcha_settings')) : ?>
+        <?php if (isset($_POST['submit'], $_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_recaptcha_settings')) : ?>
             <div class="sad-notice sad-notice-success">
                 <p>Pengaturan CAPTCHA berhasil disimpan.</p>
             </div>
@@ -1044,13 +1044,13 @@ class Custom_Admin_Option_Page
 
         // Handle rebuild request
         $rebuild_message = '';
-        if (isset($_POST['rebuild_stats']) && wp_verify_nonce($_POST['_wpnonce'], 'rebuild_stats')) {
+        if (isset($_POST['rebuild_stats'], $_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'rebuild_stats')) {
             $daily_count = $stats_handler->rebuild_daily_stats();
             $page_count = $stats_handler->rebuild_page_stats();
             $rebuild_message = "<div class='sad-notice sad-notice-success'><p>Statistik berhasil dibangun ulang. Memproses {$daily_count} data harian dan {$page_count} data halaman.</p></div>";
         }
 
-        $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : 'statistic';
+        $current_tab = isset($_GET['subtab']) ? sanitize_key(wp_unslash($_GET['subtab'])) : 'statistic';
         $summary_stats = $stats_handler->get_summary_stats();
         $daily_stats = $stats_handler->get_daily_stats(30);
         $page_stats = $stats_handler->get_page_stats(30);
@@ -1551,7 +1551,10 @@ class Custom_Admin_Option_Page
         wp_enqueue_media();
 
         // Handle settings save
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_seo_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_seo_settings')
+        ) {
             $fields = array(
                 'sweetaddons_seo_home_title',
                 'sweetaddons_seo_home_description',
@@ -1569,7 +1572,7 @@ class Custom_Admin_Option_Page
 
             foreach ($fields as $field) {
                 if (isset($_POST[$field])) {
-                    update_option($field, sanitize_text_field($_POST[$field]));
+                    update_option($field, sanitize_text_field(wp_unslash($_POST[$field])));
                 }
             }
 
@@ -1604,13 +1607,16 @@ class Custom_Admin_Option_Page
         <?php
         $seo_subnav = Sweetaddons_Admin_Layout::get_seo_subnav();
         Sweetaddons_Admin_Layout::open('Pengaturan SEO', 'Sweetaddons_seo', $seo_subnav);
-        $seo_active_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : 'general';
+        $seo_active_tab = isset($_GET['subtab']) ? sanitize_key(wp_unslash($_GET['subtab'])) : 'general';
         if (!in_array($seo_active_tab, array('general', 'social'), true)) {
             $seo_active_tab = 'general';
         }
         ?>
         <?php
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_seo_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_seo_settings')
+        ) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan SEO berhasil disimpan.</p></div>';
         }
         ?>
@@ -1890,7 +1896,10 @@ class Custom_Admin_Option_Page
     private function render_whitelabel_tab()
     {
         // Handle settings save
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whitelabel_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_whitelabel_settings')
+        ) {
             $fields = array(
                 'sweetaddons_whitelabel_plugin_name',
                 'sweetaddons_whitelabel_plugin_uri',
@@ -1903,7 +1912,11 @@ class Custom_Admin_Option_Page
 
             foreach ($fields as $field) {
                 if (isset($_POST[$field])) {
-                    update_option($field, sanitize_text_field($_POST[$field]));
+                    $value = sanitize_text_field(wp_unslash($_POST[$field]));
+                    if (in_array($field, array('sweetaddons_whitelabel_plugin_uri', 'sweetaddons_whitelabel_author_uri'), true)) {
+                        $value = esc_url_raw($value);
+                    }
+                    update_option($field, $value);
                 } else {
                     if ($field === 'sweetaddons_whitelabel_hide_original') {
                         delete_option($field);
@@ -1929,7 +1942,10 @@ class Custom_Admin_Option_Page
         $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/sweetaddons/sweetaddons.php');
     ?>
         <?php
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whitelabel_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_whitelabel_settings')
+        ) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan White Label berhasil disimpan.</p></div>';
         }
         ?>
@@ -2008,7 +2024,10 @@ class Custom_Admin_Option_Page
         wp_enqueue_media();
 
         // Handle settings save
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_whatsapp_settings')
+        ) {
             $checkbox_fields = array(
                 'sweetaddons_whatsapp_enable',
                 'sweetaddons_whatsapp_show_mobile',
@@ -2040,7 +2059,7 @@ class Custom_Admin_Option_Page
 
             foreach ($text_fields as $field) {
                 if (isset($_POST[$field])) {
-                    update_option($field, sanitize_text_field($_POST[$field]));
+                    update_option($field, sanitize_text_field(wp_unslash($_POST[$field])));
                 }
             }
 
@@ -2049,7 +2068,7 @@ class Custom_Admin_Option_Page
                     continue;
                 }
 
-                $value = sanitize_text_field($_POST[$field]);
+                $value = sanitize_text_field(wp_unslash($_POST[$field]));
                 if (in_array($value, $allowed_values, true)) {
                     update_option($field, $value);
                 }
@@ -2060,7 +2079,7 @@ class Custom_Admin_Option_Page
                     continue;
                 }
 
-                $color = sanitize_hex_color($_POST[$field]);
+                $color = sanitize_hex_color(wp_unslash($_POST[$field]));
                 update_option($field, $color ? $color : $default_color);
             }
 
@@ -2071,13 +2090,13 @@ class Custom_Admin_Option_Page
                         continue;
                     }
 
-                    $name = isset($agent['name']) ? sanitize_text_field($agent['name']) : '';
-                    $phone_raw = isset($agent['phone']) ? sanitize_text_field($agent['phone']) : '';
+                    $name = isset($agent['name']) ? sanitize_text_field(wp_unslash($agent['name'])) : '';
+                    $phone_raw = isset($agent['phone']) ? sanitize_text_field(wp_unslash($agent['phone'])) : '';
                     $phone = preg_replace('/[^0-9]/', '', $phone_raw);
-                    $role = isset($agent['role']) ? sanitize_text_field($agent['role']) : '';
-                    $note = isset($agent['note']) ? sanitize_text_field($agent['note']) : '';
-                    $status = isset($agent['status']) ? sanitize_text_field($agent['status']) : 'online';
-                    $avatar = isset($agent['avatar']) ? esc_url_raw($agent['avatar']) : '';
+                    $role = isset($agent['role']) ? sanitize_text_field(wp_unslash($agent['role'])) : '';
+                    $note = isset($agent['note']) ? sanitize_text_field(wp_unslash($agent['note'])) : '';
+                    $status = isset($agent['status']) ? sanitize_text_field(wp_unslash($agent['status'])) : 'online';
+                    $avatar = isset($agent['avatar']) ? esc_url_raw(wp_unslash($agent['avatar'])) : '';
 
                     if (empty($phone)) {
                         continue;
@@ -2099,7 +2118,7 @@ class Custom_Admin_Option_Page
             }
 
             if (empty($agents)) {
-                $legacy_phone = isset($_POST['sweetaddons_whatsapp_phone']) ? sanitize_text_field($_POST['sweetaddons_whatsapp_phone']) : get_option('sweetaddons_whatsapp_phone', '');
+                $legacy_phone = isset($_POST['sweetaddons_whatsapp_phone']) ? sanitize_text_field(wp_unslash($_POST['sweetaddons_whatsapp_phone'])) : get_option('sweetaddons_whatsapp_phone', '');
                 $legacy_phone = preg_replace('/[^0-9]/', '', $legacy_phone);
 
                 if (!empty($legacy_phone)) {
@@ -2167,14 +2186,17 @@ class Custom_Admin_Option_Page
         Sweetaddons_Admin_Layout::open('WhatsApp', 'Sweetaddons_whatsapp', $wa_subnav);
         ?>
         <?php
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_whatsapp_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_whatsapp_settings')
+        ) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan WhatsApp berhasil disimpan.</p></div>';
         }
         ?>
         <form method="post" action="" class="sad-form">
             <?php wp_nonce_field('sweetaddons_whatsapp_settings'); ?>
             <?php
-            $wa_active_tab = isset($_GET['subtab']) ? sanitize_text_field($_GET['subtab']) : 'pengaturan';
+            $wa_active_tab = isset($_GET['subtab']) ? sanitize_text_field(wp_unslash($_GET['subtab'])) : 'pengaturan';
             if (!in_array($wa_active_tab, array('pengaturan', 'style'), true)) {
                 $wa_active_tab = 'pengaturan';
             }

@@ -126,7 +126,7 @@ class Sweetaddons_SEO
         try {
             global $post;
 
-            if (is_singular()) {
+            if (is_singular() && $post instanceof WP_Post) {
                 $custom_title = get_post_meta($post->ID, '_sweetaddons_seo_title', true);
                 if ($custom_title) {
                     return $custom_title;
@@ -204,7 +204,7 @@ class Sweetaddons_SEO
     {
         global $post;
 
-        if (is_singular()) {
+        if (is_singular() && $post instanceof WP_Post) {
             $custom_desc = get_post_meta($post->ID, '_sweetaddons_seo_description', true);
             if ($custom_desc) {
                 return $custom_desc;
@@ -289,7 +289,7 @@ class Sweetaddons_SEO
     {
         global $post;
 
-        if (is_singular()) {
+        if (is_singular() && $post instanceof WP_Post) {
             $custom_keywords = get_post_meta($post->ID, '_sweetaddons_seo_keywords', true);
             if ($custom_keywords) {
                 return $custom_keywords;
@@ -315,7 +315,7 @@ class Sweetaddons_SEO
 
         $robots = array();
 
-        if (is_singular()) {
+        if (is_singular() && $post instanceof WP_Post) {
             $noindex = get_post_meta($post->ID, '_sweetaddons_seo_noindex', true);
             $nofollow = get_post_meta($post->ID, '_sweetaddons_seo_nofollow', true);
 
@@ -342,7 +342,7 @@ class Sweetaddons_SEO
     {
         global $post;
 
-        if (is_singular()) {
+        if (is_singular() && $post instanceof WP_Post) {
             $custom_canonical = get_post_meta($post->ID, '_sweetaddons_seo_canonical', true);
             if ($custom_canonical) {
                 return $custom_canonical;
@@ -424,7 +424,7 @@ class Sweetaddons_SEO
     {
         global $post;
 
-        if (is_singular()) {
+        if (is_singular() && $post instanceof WP_Post) {
             // Custom OG image
             $custom_image = get_post_meta($post->ID, '_sweetaddons_seo_og_image', true);
             if ($custom_image) {
@@ -458,6 +458,10 @@ class Sweetaddons_SEO
     private function output_article_schema()
     {
         global $post;
+
+        if (!$post instanceof WP_Post) {
+            return;
+        }
 
         $schema = array(
             '@context' => 'https://schema.org',
@@ -533,6 +537,10 @@ class Sweetaddons_SEO
 
     public function seo_meta_box_callback($post)
     {
+        if (!$post instanceof WP_Post) {
+            return;
+        }
+
         wp_nonce_field('sweetaddons_seo_meta_nonce', 'sweetaddons_seo_meta_nonce');
 
         $title = get_post_meta($post->ID, '_sweetaddons_seo_title', true);
@@ -838,7 +846,10 @@ class Sweetaddons_SEO
 
     public function save_seo_meta_data($post_id)
     {
-        if (!isset($_POST['sweetaddons_seo_meta_nonce']) || !wp_verify_nonce($_POST['sweetaddons_seo_meta_nonce'], 'sweetaddons_seo_meta_nonce')) {
+        if (
+            !isset($_POST['sweetaddons_seo_meta_nonce'])
+            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['sweetaddons_seo_meta_nonce'])), 'sweetaddons_seo_meta_nonce')
+        ) {
             return;
         }
 
@@ -862,7 +873,11 @@ class Sweetaddons_SEO
 
         foreach ($fields as $field => $meta_key) {
             if (isset($_POST[$field])) {
-                update_post_meta($post_id, $meta_key, sanitize_text_field($_POST[$field]));
+                $value = sanitize_text_field(wp_unslash($_POST[$field]));
+                if (in_array($field, array('sweetaddons_seo_canonical', 'sweetaddons_seo_og_image'), true)) {
+                    $value = esc_url_raw($value);
+                }
+                update_post_meta($post_id, $meta_key, $value);
             } else {
                 delete_post_meta($post_id, $meta_key);
             }

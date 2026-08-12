@@ -171,25 +171,25 @@ class Sweetaddons_Admin_Layout
                 $tab_url = admin_url('admin.php?page=' . $tab['page']);
               } elseif ($active_page === 'Sweetaddons_protect') {
                 $tab_url = self::get_proteksi_tab_url($tab['tab']);
-                $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+                $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
               } elseif ($active_page === 'Sweetaddons_whatsapp') {
                 $tab_url = self::get_whatsapp_tab_url($tab['tab']);
-                $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
+                $current_tab = isset($_GET['subtab']) ? sanitize_key(wp_unslash($_GET['subtab'])) : '';
               } elseif ($active_page === 'Sweetaddons_seo') {
                 $tab_url = self::get_seo_tab_url($tab['tab']);
-                $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
+                $current_tab = isset($_GET['subtab']) ? sanitize_key(wp_unslash($_GET['subtab'])) : '';
               } elseif ($active_page === 'Sweetaddons_visitor_stats') {
                 $tab_url = self::get_visitor_tab_url($tab['tab']);
-                $current_tab = isset($_GET['subtab']) ? sanitize_key($_GET['subtab']) : '';
+                $current_tab = isset($_GET['subtab']) ? sanitize_key(wp_unslash($_GET['subtab'])) : '';
               } elseif ($active_page === 'Sweetaddons_optimasi') {
                 $tab_url = self::get_optimasi_tab_url($tab['tab']);
-                $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+                $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
               } else {
                 $tab_url = self::get_umum_tab_url($tab['tab']);
-                $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+                $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
               }
               if (!isset($current_tab)) {
-                $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+                $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
               }
               $default_tab = $subnav[0]['tab'];
               $tab_active = ($current_tab === $tab['tab']) || (empty($current_tab) && $tab['tab'] === $default_tab);

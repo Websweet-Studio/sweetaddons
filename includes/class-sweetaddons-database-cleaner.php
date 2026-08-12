@@ -35,16 +35,26 @@ class Sweetaddons_Database_Cleaner
         $stats['size_trashed_comments'] = (int) $wpdb->get_var("SELECT COALESCE(SUM(OCTET_LENGTH(comment_content)+OCTET_LENGTH(comment_author)+OCTET_LENGTH(comment_author_email)),0) FROM $wpdb->comments WHERE comment_approved = 'trash'");
 
         $time = time();
-        $stats['expired_transients'] = $wpdb->get_var("SELECT COUNT(*) FROM $wpdb->options WHERE option_name LIKE '_transient_timeout%' AND option_value < '$time'");
-        $stats['size_expired_transients'] = (int) $wpdb->get_var("
-            SELECT COALESCE(SUM(OCTET_LENGTH(o.option_value)),0)
-            FROM $wpdb->options o
-            WHERE o.option_name LIKE '_transient_%'
-              AND o.option_name NOT LIKE '_transient_timeout_%'
-              AND CONCAT('_transient_timeout_', SUBSTRING(o.option_name, 12)) IN (
-                SELECT option_name FROM $wpdb->options WHERE option_name LIKE '_transient_timeout_%' AND option_value < '$time'
-              )
-        ");
+        $expired_timeout_names = $wpdb->get_col($wpdb->prepare(
+            "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s AND option_value < %d",
+            '_transient_timeout_%',
+            $time
+        ));
+        $stats['expired_transients'] = is_array($expired_timeout_names) ? count($expired_timeout_names) : 0;
+        $stats['size_expired_transients'] = 0;
+
+        if (!empty($expired_timeout_names)) {
+            $value_option_names = array();
+            foreach ($expired_timeout_names as $timeout_name) {
+                $value_option_names[] = str_replace('_transient_timeout_', '_transient_', $timeout_name);
+            }
+
+            $placeholders = implode(', ', array_fill(0, count($value_option_names), '%s'));
+            $stats['size_expired_transients'] = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COALESCE(SUM(OCTET_LENGTH(option_value)),0) FROM $wpdb->options WHERE option_name IN ($placeholders)",
+                $value_option_names
+            ));
+        }
 
         return $stats;
     }
@@ -76,8 +86,34 @@ class Sweetaddons_Database_Cleaner
 
         if (in_array('expired_transients', $items, true)) {
             $time = time();
-            $deleted_timeouts = $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_timeout%' AND option_value < '$time'");
-            $deleted_values = $wpdb->query("DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_%' AND option_name NOT LIKE '_transient_timeout%' AND CONCAT('_transient_timeout_', SUBSTRING(option_name, 12)) NOT IN (SELECT option_name FROM $wpdb->options)");
+            $expired_timeout_names = $wpdb->get_col($wpdb->prepare(
+                "SELECT option_name FROM $wpdb->options WHERE option_name LIKE %s AND option_value < %d",
+                '_transient_timeout_%',
+                $time
+            ));
+
+            $deleted_timeouts = 0;
+            $deleted_values = 0;
+
+            if (!empty($expired_timeout_names)) {
+                $value_option_names = array();
+                foreach ($expired_timeout_names as $timeout_name) {
+                    $value_option_names[] = str_replace('_transient_timeout_', '_transient_', $timeout_name);
+                }
+
+                $timeout_placeholders = implode(', ', array_fill(0, count($expired_timeout_names), '%s'));
+                $value_placeholders = implode(', ', array_fill(0, count($value_option_names), '%s'));
+
+                $deleted_values = $wpdb->query($wpdb->prepare(
+                    "DELETE FROM $wpdb->options WHERE option_name IN ($value_placeholders)",
+                    $value_option_names
+                ));
+                $deleted_timeouts = $wpdb->query($wpdb->prepare(
+                    "DELETE FROM $wpdb->options WHERE option_name IN ($timeout_placeholders)",
+                    $expired_timeout_names
+                ));
+            }
+
             $cleaned['expired_transients'] = max(0, (int) $deleted_timeouts) + max(0, (int) $deleted_values);
         }
 

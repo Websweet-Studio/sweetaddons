@@ -73,7 +73,7 @@ class Sweetaddons_Maintenance_Mode
             return;
         }
 
-        $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
         if ($request_uri && strpos($request_uri, 'sweetaddons_captcha=image') !== false) {
             return;
         }
@@ -248,18 +248,17 @@ class Sweetaddons_Maintenance_Mode
                         window.location.reload();
                     }, 300000);
 
-                    // Add click sound effect (optional)
-                    const clickSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBi6Gy/LaizsJHWi98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-
-                    document.querySelector('.back-to-home').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        // Smooth fade out
-                        document.body.style.opacity = '0';
-                        document.body.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => {
-                            window.location.href = this.href;
-                        }, 500);
-                    });
+                    const backToHome = document.querySelector('.back-to-home');
+                    if (backToHome) {
+                        backToHome.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            document.body.style.opacity = '0';
+                            document.body.style.transition = 'opacity 0.5s ease';
+                            setTimeout(() => {
+                                window.location.href = this.href;
+                            }, 500);
+                        });
+                    }
                 });
             </script>
         </body>

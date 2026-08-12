@@ -99,7 +99,7 @@ class Sweet_Option_Umum
 
     public function umum_page_callback()
     {
-        $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'general';
+        $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'general';
 ?>
         <?php
         $subnav = Sweetaddons_Admin_Layout::get_umum_subnav();
@@ -224,23 +224,26 @@ class Sweet_Option_Umum
         $upload_nonce = wp_create_nonce('media-form');
 
         // Handle settings save
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_login_customizer_settings')
+        ) {
             $login_data = array();
 
             if (isset($_POST['login_logo_url'])) {
-                $login_data['logo_url'] = sanitize_text_field($_POST['login_logo_url']);
+                $login_data['logo_url'] = esc_url_raw(wp_unslash($_POST['login_logo_url']));
             }
             if (isset($_POST['login_bg_color'])) {
-                $login_data['bg_color'] = sanitize_text_field($_POST['login_bg_color']);
+                $login_data['bg_color'] = sanitize_hex_color(wp_unslash($_POST['login_bg_color']));
             }
             if (isset($_POST['login_bg_image'])) {
-                $login_data['bg_image'] = sanitize_text_field($_POST['login_bg_image']);
+                $login_data['bg_image'] = esc_url_raw(wp_unslash($_POST['login_bg_image']));
             }
             if (isset($_POST['login_btn_color'])) {
-                $login_data['btn_color'] = sanitize_text_field($_POST['login_btn_color']);
+                $login_data['btn_color'] = sanitize_hex_color(wp_unslash($_POST['login_btn_color']));
             }
             if (isset($_POST['login_btn_text_color'])) {
-                $login_data['btn_text_color'] = sanitize_text_field($_POST['login_btn_text_color']);
+                $login_data['btn_text_color'] = sanitize_hex_color(wp_unslash($_POST['login_btn_text_color']));
             }
 
             update_option('sweetaddons_login_customizer', $login_data);
@@ -259,9 +262,12 @@ class Sweet_Option_Umum
         $bg_image = isset($login_settings['bg_image']) ? $login_settings['bg_image'] : '';
         $btn_color = isset($login_settings['btn_color']) ? $login_settings['btn_color'] : '#2271b1';
         $btn_text_color = isset($login_settings['btn_text_color']) ? $login_settings['btn_text_color'] : '#ffffff';
-?>
+    ?>
         <?php
-        if (isset($_POST['submit']) && wp_verify_nonce($_POST['_wpnonce'], 'sweetaddons_login_customizer_settings')) {
+        if (
+            isset($_POST['submit'], $_POST['_wpnonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'sweetaddons_login_customizer_settings')
+        ) {
             echo '<div class="sad-notice sad-notice-success"><p>Pengaturan Login Page berhasil disimpan.</p></div>';
         }
         ?>
@@ -463,5 +469,4 @@ class Sweet_Option_Umum
         </script>
 <?php
     }
-
 }

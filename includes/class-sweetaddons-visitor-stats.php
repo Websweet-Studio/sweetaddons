@@ -351,12 +351,12 @@ class Sweetaddons_Visitor_Stats
 
         $all_time = $wpdb->get_row(
             "SELECT 
-                (SELECT COALESCE(SUM(unique_visitors), 0) FROM {$this->monthly_stats_table}) +
+                (SELECT COALESCE(SUM(unique_visitors), 0) FROM {$this->monthly_stats_table} WHERE CONCAT(stat_year, '-', LPAD(stat_month, 2, '0')) < DATE_FORMAT(CURDATE(), '%Y-%m')) +
                 (SELECT COALESCE(SUM(unique_visitors), 0) FROM {$this->daily_stats_table} 
-                 WHERE MONTH(stat_date) = MONTH(CURDATE()) AND YEAR(stat_date) = YEAR(CURDATE())) as unique_visitors,
-                (SELECT COALESCE(SUM(total_pageviews), 0) FROM {$this->monthly_stats_table}) +
+                 WHERE YEAR(stat_date) = YEAR(CURDATE()) AND MONTH(stat_date) = MONTH(CURDATE())) as unique_visitors,
+                (SELECT COALESCE(SUM(total_pageviews), 0) FROM {$this->monthly_stats_table} WHERE CONCAT(stat_year, '-', LPAD(stat_month, 2, '0')) < DATE_FORMAT(CURDATE(), '%Y-%m')) +
                 (SELECT COALESCE(SUM(total_pageviews), 0) FROM {$this->daily_stats_table} 
-                 WHERE MONTH(stat_date) = MONTH(CURDATE()) AND YEAR(stat_date) = YEAR(CURDATE())) as total_visits"
+                 WHERE YEAR(stat_date) = YEAR(CURDATE()) AND MONTH(stat_date) = MONTH(CURDATE())) as total_visits"
         );
 
         return array(

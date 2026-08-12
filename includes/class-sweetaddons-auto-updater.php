@@ -201,7 +201,7 @@ class Sweetaddons_Auto_Updater
       'download_link' => $download_url,
       'requires' => '',
       'tested' => '',
-      'requires_php' => PHP_VERSION,
+      'requires_php' => '',
       'last_updated' => isset($release['published_at']) ? $release['published_at'] : '',
       'sections' => array(
         'description' => '<p>Sweet Addons update metadata is served from GitHub Releases.</p>',
@@ -308,7 +308,7 @@ class Sweetaddons_Auto_Updater
       'banners' => array(),
       'banners_rtl' => array(),
       'tested' => '',
-      'requires_php' => PHP_VERSION,
+      'requires_php' => '',
       'compatibility' => new stdClass(),
     );
   }
@@ -333,7 +333,7 @@ class Sweetaddons_Auto_Updater
       'banners' => array(),
       'banners_rtl' => array(),
       'tested' => '',
-      'requires_php' => PHP_VERSION,
+      'requires_php' => '',
       'compatibility' => new stdClass(),
     );
   }

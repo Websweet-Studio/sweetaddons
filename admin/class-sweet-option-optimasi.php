@@ -124,7 +124,7 @@ class Sweet_Option_Optimasi
 
     public function page_callback()
     {
-        $current_tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'redis';
+        $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'redis';
 
         $subnav = Sweetaddons_Admin_Layout::get_optimasi_subnav();
         Sweetaddons_Admin_Layout::open('Optimasi', 'Sweetaddons_optimasi', $subnav);
@@ -460,8 +460,11 @@ class Sweet_Option_Optimasi
         })();
         </script>
 <?php
-        if (isset($_POST['sweetaddons_db_cleaner_clean']) && wp_verify_nonce($_POST['sweetaddons_db_cleaner_nonce'], 'sweetaddons_db_cleaner_action')) {
-            $items_to_clean = isset($_POST['clean_items']) ? array_map('sanitize_text_field', $_POST['clean_items']) : array();
+        if (
+            isset($_POST['sweetaddons_db_cleaner_clean'], $_POST['sweetaddons_db_cleaner_nonce'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['sweetaddons_db_cleaner_nonce'])), 'sweetaddons_db_cleaner_action')
+        ) {
+            $items_to_clean = isset($_POST['clean_items']) ? array_map('sanitize_text_field', wp_unslash($_POST['clean_items'])) : array();
             if (!empty($items_to_clean)) {
                 $cleaner = new Sweetaddons_Database_Cleaner();
                 $cleaned = $cleaner->clean($items_to_clean);

@@ -30,7 +30,7 @@ class Sweetaddons_WhatsApp
             wp_enqueue_style('sweetaddons-whatsapp-css');
             wp_add_inline_style('sweetaddons-whatsapp-css', $this->get_whatsapp_css());
 
-            if (count($agents) > 1) {
+            if ($has_agents && count($agents) > 1) {
                 wp_enqueue_script(
                     'sweetaddons-whatsapp-js',
                     plugin_dir_url(dirname(__FILE__)) . 'assets/public/js/sweetaddons-whatsapp.js',
