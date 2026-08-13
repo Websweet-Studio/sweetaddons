@@ -185,13 +185,17 @@ class Sweet_Option_Snipet
             'css' => array(
                 'title' => 'Script CSS',
                 'description' => 'CSS tambahan. Plugin akan membungkus otomatis dengan tag <style>.',
-                'placeholder' => 'body {\n    scroll-behavior: smooth;\n}',
+                'placeholder' => 'body {
+    scroll-behavior: smooth;
+}',
                 'example' => '<code>.site-header { position: sticky; top: 0; }</code>',
             ),
             'js' => array(
                 'title' => 'Script JS',
                 'description' => 'JavaScript tambahan. Plugin akan membungkus otomatis dengan tag <script>.',
-                'placeholder' => 'document.addEventListener(\'DOMContentLoaded\', function () {\n    console.log(\'hello\');\n});',
+                'placeholder' => 'document.addEventListener(\'DOMContentLoaded\', function () {
+    console.log(\'hello\');
+});',
                 'example' => '<code>document.querySelectorAll(\'.btn\').forEach(function (el) { /* ... */ });</code>',
             ),
         );
