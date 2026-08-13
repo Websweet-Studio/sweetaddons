@@ -45,6 +45,10 @@ class Sweetaddons_Admin_Layout
         'page'  => 'Sweetaddons_optimasi',
         'label' => 'Optimasi',
       ),
+      array(
+        'page'  => 'Sweetaddons_snipet',
+        'label' => 'Script',
+      ),
     );
   }
 
@@ -73,6 +77,18 @@ class Sweetaddons_Admin_Layout
       array('tab' => 'redis', 'label' => 'Redis'),
       array('tab' => 'dbcleaner', 'label' => 'DB Cleaner'),
       array('tab' => 'headcleanup', 'label' => 'Head Cleanup'),
+    );
+  }
+
+  public static function get_snipet_subnav()
+  {
+    return array(
+      array('tab' => 'header', 'label' => 'Header'),
+      array('tab' => 'footer', 'label' => 'Footer'),
+      array('tab' => 'body', 'label' => 'Body'),
+      array('tab' => 'php', 'label' => 'PHP'),
+      array('tab' => 'css', 'label' => 'CSS'),
+      array('tab' => 'js', 'label' => 'JS'),
     );
   }
 
@@ -130,6 +146,11 @@ class Sweetaddons_Admin_Layout
     return admin_url('admin.php?page=Sweetaddons_optimasi&tab=' . $tab);
   }
 
+  public static function get_snipet_tab_url($tab)
+  {
+    return admin_url('admin.php?page=Sweetaddons_snipet&tab=' . $tab);
+  }
+
   public static function open($page_title, $active_page, $subnav = array())
   {
     $plugin_name = self::get_plugin_name();
@@ -183,6 +204,9 @@ class Sweetaddons_Admin_Layout
                 $current_tab = isset($_GET['subtab']) ? sanitize_key(wp_unslash($_GET['subtab'])) : '';
               } elseif ($active_page === 'Sweetaddons_optimasi') {
                 $tab_url = self::get_optimasi_tab_url($tab['tab']);
+                $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
+              } elseif ($active_page === 'Sweetaddons_snipet') {
+                $tab_url = self::get_snipet_tab_url($tab['tab']);
                 $current_tab = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : '';
               } else {
                 $tab_url = self::get_umum_tab_url($tab['tab']);
@@ -277,6 +301,12 @@ class Sweetaddons_Admin_Layout
       if ($plugin_page === 'Sweetaddons_optimasi') {
         $parent_file = 'custom_admin_options';
       }
+      if ($plugin_page === 'Sweetaddons_optimasi') {
+        $parent_file = 'custom_admin_options';
+      }
+      if ($plugin_page === 'Sweetaddons_snipet') {
+        $parent_file = 'custom_admin_options';
+      }
 
       return $parent_file;
     }
@@ -296,6 +326,9 @@ class Sweetaddons_Admin_Layout
       }
       if ($plugin_page === 'Sweetaddons_optimasi') {
         $submenu_file = 'Sweetaddons_optimasi';
+      }
+      if ($plugin_page === 'Sweetaddons_snipet') {
+        $submenu_file = 'Sweetaddons_snipet';
       }
 
       return $submenu_file;

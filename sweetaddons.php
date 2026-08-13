@@ -137,6 +137,8 @@ spl_autoload_register(function ($class) {
         'Sweetaddons_Redis_Cache' => 'includes/class-sweetaddons-redis-cache.php',
         'Sweetaddons_Head_Cleanup' => 'includes/class-sweetaddons-head-cleanup.php',
         'Sweet_Option_Optimasi' => 'admin/class-sweet-option-optimasi.php',
+        'Sweet_Option_Snipet' => 'admin/class-sweet-option-snipet.php',
+        'Sweetaddons_Snipet' => 'includes/class-sweetaddons-snipet.php',
     );
 
     $rel = isset($classmap[$class]) ? $classmap[$class] : '';

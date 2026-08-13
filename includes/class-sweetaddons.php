@@ -154,6 +154,7 @@ class sweetaddons
         new Sweet_Option_Maintenance();
         new Sweet_Option_Block();
         new Sweet_Option_Optimasi();
+        new Sweet_Option_Snipet();
         new Sweetaddons_Redis_Cache();
     }
 
@@ -186,6 +187,7 @@ class sweetaddons
         new Sweetaddons_Remove_Slug_Category();
 
         new Sweetaddons_Visitor_Stats();
+        new Sweetaddons_Snipet();
 
         $enable_whatsapp = get_option('sweetaddons_whatsapp_enable');
         $whatsapp_phone = get_option('sweetaddons_whatsapp_phone');
