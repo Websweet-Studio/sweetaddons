@@ -106,6 +106,10 @@ class sweetaddons
      */
     private function load_dependencies()
     {
+        if (!class_exists('Sweetaddons_Auto_Updater', false)) {
+            require_once plugin_dir_path(__FILE__) . 'class-sweetaddons-auto-updater.php';
+        }
+
         $this->loader = new Sweetaddons_Loader();
     }
 
