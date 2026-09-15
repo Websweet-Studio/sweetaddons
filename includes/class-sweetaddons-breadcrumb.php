@@ -17,6 +17,26 @@ class Sweetaddons_Breadcrumb
         add_shortcode('breadcrumb', array($this, 'breadcrumb_shortcode'));
     }
 
+    /**
+     * Return a safe URL string, or an empty string when the value is not usable.
+     *
+     * WordPress helpers such as get_category_link(), get_tag_link() and
+     * get_term_link() return a WP_Error when the term cannot be resolved.
+     * Echoing that object directly is a fatal error, so every caller must
+     * funnel the result through here.
+     *
+     * @param mixed $url Value to validate.
+     * @return string
+     */
+    private function safe_url($url)
+    {
+        if (is_wp_error($url) || !is_string($url) || $url === '') {
+            return '';
+        }
+
+        return $url;
+    }
+
     public function breadcrumb_shortcode($atts)
     {
         $atts = shortcode_atts(array(
@@ -95,7 +115,7 @@ class Sweetaddons_Breadcrumb
             foreach ($parent_categories as $parent_cat) {
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-category">';
-                echo '<a href="' . get_category_link($parent_cat->term_id) . '">' . esc_html($parent_cat->name) . '</a>';
+                echo '<a href="' . esc_url($this->safe_url(get_category_link($parent_cat->term_id))) . '">' . esc_html($parent_cat->name) . '</a>';
                 echo '</li>';
             }
         }
@@ -200,14 +220,14 @@ class Sweetaddons_Breadcrumb
                     foreach ($parent_categories as $parent_cat) {
                         echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                         echo '<li class="breadcrumb-item breadcrumb-category">';
-                        echo '<a href="' . get_category_link($parent_cat->term_id) . '">' . esc_html($parent_cat->name) . '</a>';
+                        echo '<a href="' . esc_url($this->safe_url(get_category_link($parent_cat->term_id))) . '">' . esc_html($parent_cat->name) . '</a>';
                         echo '</li>';
                     }
                 }
 
                 echo '<li class="breadcrumb-item breadcrumb-separator">' . esc_html($atts['separator']) . '</li>';
                 echo '<li class="breadcrumb-item breadcrumb-category">';
-                echo '<a href="' . get_category_link($category->term_id) . '">' . esc_html($category->name) . '</a>';
+                echo '<a href="' . esc_url($this->safe_url(get_category_link($category->term_id))) . '">' . esc_html($category->name) . '</a>';
                 echo '</li>';
             }
         }

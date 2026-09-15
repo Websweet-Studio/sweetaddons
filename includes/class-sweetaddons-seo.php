@@ -60,7 +60,7 @@ class Sweetaddons_SEO
 
         // Canonical URL
         $canonical = $this->get_canonical_url();
-        if ($canonical) {
+        if (is_string($canonical) && $canonical !== '') {
             echo '<link rel="canonical" href="' . esc_url($canonical) . '">' . "\n";
         }
 
@@ -79,7 +79,10 @@ class Sweetaddons_SEO
         // Open Graph tags
         echo '<meta property="og:type" content="' . $this->get_og_type() . '">' . "\n";
         echo '<meta property="og:title" content="' . esc_attr($this->get_page_title()) . '">' . "\n";
-        echo '<meta property="og:url" content="' . esc_url($this->get_canonical_url()) . '">' . "\n";
+        $og_url = $this->get_canonical_url();
+        if (is_string($og_url) && $og_url !== '') {
+            echo '<meta property="og:url" content="' . esc_url($og_url) . '">' . "\n";
+        }
         echo '<meta property="og:site_name" content="' . esc_attr(get_bloginfo('name')) . '">' . "\n";
 
         $og_description = $this->get_meta_description();
@@ -1005,18 +1008,32 @@ class Sweetaddons_SEO
             }
         } elseif ($type === 'categories') {
             $terms = get_terms(array('taxonomy' => 'category', 'hide_empty' => true, 'number' => $per_page, 'offset' => ($page - 1) * $per_page));
+            if (is_wp_error($terms)) {
+                $terms = array();
+            }
             foreach ($terms as $term) {
+                $term_link = get_term_link($term);
+                if (is_wp_error($term_link) || !is_string($term_link) || $term_link === '') {
+                    continue;
+                }
                 $xml .= '<url>' . "\n";
-                $xml .= '<loc>' . esc_url(get_term_link($term)) . '</loc>' . "\n";
+                $xml .= '<loc>' . esc_url($term_link) . '</loc>' . "\n";
                 $xml .= '<changefreq>weekly</changefreq>' . "\n";
                 $xml .= '<priority>0.5</priority>' . "\n";
                 $xml .= '</url>' . "\n";
             }
         } elseif ($type === 'tags') {
             $terms = get_terms(array('taxonomy' => 'post_tag', 'hide_empty' => true, 'number' => $per_page, 'offset' => ($page - 1) * $per_page));
+            if (is_wp_error($terms)) {
+                $terms = array();
+            }
             foreach ($terms as $term) {
+                $term_link = get_term_link($term);
+                if (is_wp_error($term_link) || !is_string($term_link) || $term_link === '') {
+                    continue;
+                }
                 $xml .= '<url>' . "\n";
-                $xml .= '<loc>' . esc_url(get_term_link($term)) . '</loc>' . "\n";
+                $xml .= '<loc>' . esc_url($term_link) . '</loc>' . "\n";
                 $xml .= '<changefreq>weekly</changefreq>' . "\n";
                 $xml .= '<priority>0.4</priority>' . "\n";
                 $xml .= '</url>' . "\n";

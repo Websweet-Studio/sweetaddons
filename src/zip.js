@@ -45,9 +45,13 @@ const files = glob.sync("**/*", {
   ignore: [
     "dist/**", // Abaikan folder dist
     "src/**", // Abaikan folder src
+    "tests/**", // Abaikan folder tests
+    ".github/**", // Abaikan folder .github
     "node_modules/**", // Abaikan folder node_modules
     "package.json", // Abaikan file package.json
     "package-lock.json", // Abaikan file package-lock.json
+    ".gitignore", // Abaikan file .gitignore
+    "README.md", // Abaikan file README.md
   ],
 });
 
