@@ -358,11 +358,17 @@ class Sweetaddons_SEO
         }
 
         if (is_category()) {
-            return get_category_link(get_queried_object_id());
+            $link = get_category_link(get_queried_object_id());
+            if (!is_wp_error($link)) {
+                return $link;
+            }
         }
 
         if (is_tag()) {
-            return get_tag_link(get_queried_object_id());
+            $link = get_tag_link(get_queried_object_id());
+            if (!is_wp_error($link)) {
+                return $link;
+            }
         }
 
         if (is_post_type_archive()) {
