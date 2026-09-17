@@ -957,10 +957,7 @@ class Sweetaddons_SEO
             'xml' => $xml,
             'last_modified' => $last_modified ?: time()
         ), 12 * HOUR_IN_SECONDS);
-        header('Content-Type: application/xml; charset=utf-8');
-        header('Cache-Control: public, max-age=43200');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', ($last_modified ?: time())) . ' GMT');
-        $this->maybe_output_304($last_modified ?: time());
+        $this->send_xml_headers($last_modified);
         echo $xml;
     }
 
@@ -973,10 +970,7 @@ class Sweetaddons_SEO
         $suffix = $type . '-' . $page;
         $cache = get_transient($this->get_sitemap_cache_key($suffix));
         if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {
-            header('Content-Type: application/xml; charset=utf-8');
-            header('Cache-Control: public, max-age=43200');
-            header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $cache['last_modified']) . ' GMT');
-            $this->maybe_output_304($cache['last_modified']);
+            $this->send_xml_headers($cache['last_modified']);
             echo $cache['xml'];
             return;
         }
@@ -1053,11 +1047,32 @@ class Sweetaddons_SEO
             'last_modified' => $last_modified ?: time()
         ), 12 * HOUR_IN_SECONDS);
 
+        $this->send_xml_headers($last_modified ?: time());
+        echo $xml;
+    }
+
+    /**
+     * Kirim header respons XML sitemap.
+     *
+     * Dijaga dengan headers_sent(): pada konteks CLI/test, atau bila plugin/tema lain
+     * sudah mengirim output lebih dulu, pemanggilan header() akan memicu warning
+     * "Cannot modify header information - headers already sent".
+     *
+     * @param int $last_modified Timestamp terakhir konten berubah.
+     * @return void
+     */
+    private function send_xml_headers($last_modified)
+    {
+        if (headers_sent()) {
+            return;
+        }
+
+        $last_modified = (int) ($last_modified ?: time());
+
         header('Content-Type: application/xml; charset=utf-8');
         header('Cache-Control: public, max-age=43200');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', ($last_modified ?: time())) . ' GMT');
-        $this->maybe_output_304($last_modified ?: time());
-        echo $xml;
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
+        $this->maybe_output_304($last_modified);
     }
 
     private function get_latest_modified_timestamp()
@@ -1124,10 +1139,7 @@ class Sweetaddons_SEO
         if ($qv === 'index') {
             $cache = get_transient($this->get_sitemap_cache_key('index'));
             if (is_array($cache) && isset($cache['xml'], $cache['last_modified'])) {
-                header('Content-Type: application/xml; charset=utf-8');
-                header('Cache-Control: public, max-age=43200');
-                header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $cache['last_modified']) . ' GMT');
-                $this->maybe_output_304($cache['last_modified']);
+                $this->send_xml_headers($cache['last_modified']);
                 echo $cache['xml'];
                 exit;
             }

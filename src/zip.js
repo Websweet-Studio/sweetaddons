@@ -46,6 +46,7 @@ const files = glob.sync("**/*", {
     "dist/**", // Abaikan folder dist
     "src/**", // Abaikan folder src
     "tests/**", // Abaikan folder tests
+    "scripts/**", // Abaikan folder scripts (lint/test runner)
     ".github/**", // Abaikan folder .github
     "node_modules/**", // Abaikan folder node_modules
     "package.json", // Abaikan file package.json

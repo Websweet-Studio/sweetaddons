@@ -5,14 +5,50 @@ on:
     branches:
       - main
       - master
+  pull_request:
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  release:
+  # ---------------------------------------------------------------------------
+  # Gate: lint + unit harness. Rilis TIDAK akan dibuat bila job ini gagal.
+  # ---------------------------------------------------------------------------
+  verify:
+    name: Lint & Test
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: PHP version
+        run: php -v
+
+      - name: Lint semua berkas PHP
+        run: bash scripts/lint.sh
+
+      - name: Jalankan harness uji (tests/*.test.php)
+        run: bash scripts/test.sh
+
+  # ---------------------------------------------------------------------------
+  # Rilis: hanya jalan setelah `verify` hijau.
+  # ---------------------------------------------------------------------------
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    needs: verify
+    if: github.event_name != 'pull_request'
 
     steps:
       - name: Checkout
@@ -70,6 +106,33 @@ jobs:
       - name: Build + Zip (dist/sweetaddons-X.Y.Z.zip)
         if: steps.cmp.outputs.should_release == 'true'
         run: npm run zip
+
+      - name: Verify paket ZIP
+        if: steps.cmp.outputs.should_release == 'true'
+        env:
+          VER: ${{ steps.ver.outputs.version }}
+        run: |
+          set -e
+          ZIP="dist/sweetaddons-${VER}.zip"
+          test -f "$ZIP" || { echo "ZIP tidak dibuat: $ZIP"; exit 1; }
+          echo "Ukuran: $(stat -c%s "$ZIP") byte"
+
+          # Berkas pengembangan tidak boleh ikut terkirim ke situs klien.
+          LEAK="$(unzip -Z1 "$ZIP" | grep -E '^sweetaddons/(\.github|node_modules|tests|scripts|src|dist)/' || true)"
+          if [ -n "$LEAK" ]; then
+            echo "FATAL: berkas pengembangan bocor ke paket rilis:"
+            echo "$LEAK"
+            exit 1
+          fi
+
+          # Versi di dalam paket harus sama dengan versi yang dirilis.
+          unzip -p "$ZIP" sweetaddons/sweetaddons.php | grep -q "Version:[[:space:]]*${VER}" \
+            || { echo "FATAL: versi di dalam ZIP tidak sama dengan ${VER}"; exit 1; }
+
+          unzip -p "$ZIP" sweetaddons/sweetaddons.php | grep -q "SWEETADDONS_VERSION', '${VER}'" \
+            || { echo "FATAL: konstanta SWEETADDONS_VERSION tidak sinkron dengan header Version (${VER})"; exit 1; }
+
+          echo "Paket ZIP terverifikasi."
 
       - name: Create GitHub Release
         if: steps.cmp.outputs.should_release == 'true'
